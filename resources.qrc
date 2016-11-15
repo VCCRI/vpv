@@ -1,0 +1,20 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>icons/edit.png</file>
+    <file>icons/green_view.png</file>
+    <file>icons/red_view.png</file>
+    <file>icons/red_view_inactive.png</file>
+    <file>icons/scroll_arrow.svg</file>
+    <file>icons/scroll_arrow_active.svg</file>
+    <file>icons/scroll_arrow_left.png</file>
+    <file>icons/scroll_arrow_right.png</file>
+    <file>icons/scroll_arrow_right_active.png</file>
+    <file>icons/settings.png</file>
+    <file>icons/sliceviews_indictor.svg</file>
+    <file>icons/sliceviews_indictor_blue.png</file>
+    <file>icons/sliceviews_indictor_blue.svg</file>
+    <file>icons/sliceviews_indictor_green.svg</file>
+    <file>icons/sliceviews_indictor_red.svg</file>
+    <file>icons/Camera_font_awesome.png</file>
+</qresource>
+</RCC>

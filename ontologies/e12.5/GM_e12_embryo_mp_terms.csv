@@ -1,0 +1,47 @@
+parameter_key,mp_id,mp_term
+IMPC_GEM_003_001,MP:0005385,cardiovascular system phenotype
+IMPC_GEM_004_001,MP:0002925,abnormal cardiovascular development
+IMPC_GEM_005_001,MP:0000259,abnormal vascular development
+IMPC_GEM_006_001,MP:0006126,abnormal outflow tract development
+IMPC_GEM_007_001,MP:0000288,abnormal pericardium morphology
+IMPC_GEM_009_001,MP:0005382,craniofacial phenotype
+IMPC_GEM_010_001,MP:0003935,abnormal craniofacial development
+IMPC_GEM_011_001,MP:0005380,embryogenesis phenotype
+IMPC_GEM_012_001,MP:0002086,abnormal extraembryonic tissue morphology
+IMPC_GEM_013_001,MP:0001726,abnormal allantois morphology
+IMPC_GEM_014_001,MP:0003229,abnormal vitelline vasculature morphology
+IMPC_GEM_015_001,MP:0010666,abnormal vitelline vein morphology
+IMPC_GEM_017_001,MP:0001718,abnormal visceral yolk sac morphology
+IMPC_GEM_018_001,MP:0002824,abnormal chorioallantoic fusion
+IMPC_GEM_019_001,MP:0001697,abnormal embryo size
+IMPC_GEM_020_001,MP:0005377,hearing/vestibular/ear phenotype
+IMPC_GEM_021_001,MP:0002102,abnormal ear morphology
+IMPC_GEM_022_001,MP:0003938,abnormal ear development
+IMPC_GEM_023_001,MP:0010771,integument phenotype
+IMPC_GEM_024_001,MP:0009931,abnormal skin appearance
+IMPC_GEM_027_001,MP:0005650,abnormal limb bud morphology
+IMPC_GEM_028_001,MP:0004576,abnormal foot plate morphology
+IMPC_GEM_029_001,MP:0002111,abnormal tail morphology
+IMPC_GEM_030_001,MP:0005370,liver/biliary system phenotype
+IMPC_GEM_031_001,MP:0000598,abnormal liver morphology
+IMPC_GEM_032_001,MP:0004848,abnormal liver size
+IMPC_GEM_035_001,MP:0003631,nervous system phenotype
+IMPC_GEM_036_001,MP:0003720,abnormal neural tube closure
+IMPC_GEM_037_001,MP:0003232,abnormal forebrain development
+IMPC_GEM_038_001,MP:0003864,abnormal midbrain development 
+IMPC_GEM_039_001,MP:0006108,abnormal hindbrain development
+IMPC_GEM_040_001,MP:0005391,vision/eye phenotype
+IMPC_GEM_041_001,MP:0002092,abnormal eye morphology
+IMPC_GEM_042_001,MP:0002697,abnormal eye size
+IMPC_GEM_045_001,MP:0004251,failure of heart looping
+IMPC_GEM_046_001,MP:0001695,abnormal gastrulation
+IMPC_GEM_047_001,MP:0000438,abnormal cranium morphology
+IMPC_GEM_016_002,MP:0001722,pale yolk sac
+IMPC_GEM_025_002,MP:0003717,pallor
+IMPC_GEM_026_002,MP:0008854,bleb
+IMPC_GEM_033_002,MP:0000603,pale liver
+IMPC_GEM_043_002,MP:0001297,microphthalmia
+IMPC_GEM_044_002,MP:0001293,anophthalmia
+IMPC_GEM_060_001,MP:0001672,abnormal embryogenesis/development
+IMPC_GEM_008_002,MP:0004086,absent heartbeat
+IMPC_GEM_034_002,MP:0000757,herniated abdominal wall

@@ -1,0 +1,64 @@
+parameter_key,mp_id,mp_term
+IMPC_GEP_003_001,MP:0005386,behavior/neurological phenotype
+IMPC_GEP_006_001,MP:0005385,cardiovascular system phenotype
+IMPC_GEP_007_001,MP:0002925,abnormal cardiovascular development
+IMPC_GEP_008_001,MP:0000267,abnormal heart development
+IMPC_GEP_009_001,MP:0006126,abnormal outflow tract development
+IMPC_GEP_010_001,MP:0000266,abnormal heart morphology
+IMPC_GEP_013_001,MP:0001614,abnormal blood vessel morphology
+IMPC_GEP_014_001,MP:0005382,craniofacial phenotype
+IMPC_GEP_015_001,MP:0011495,abnormal head shape
+IMPC_GEP_016_001,MP:0011496,abnormal head size
+IMPC_GEP_017_001,MP:0003743,abnormal facial morphology
+IMPC_GEP_020_001,MP:0005381,digestive/alimentary phenotype
+IMPC_GEP_021_001,MP:0000462,abnormal digestive system morphology
+IMPC_GEP_022_001,MP:0001697,abnormal embryo size
+IMPC_GEP_023_001,MP:0009429,decreased embryo weight
+IMPC_GEP_023_001,MP:0009430,increased embryo weight
+IMPC_GEP_023_001,MP:0002088,abnormal embryonic growth/weight/body size
+IMPC_GEP_024_001,MP:0003385,abnormal body wall morphology
+IMPC_GEP_025_001,MP:0005377,hearing/vestibular/ear phenotype
+IMPC_GEP_026_001,MP:0002177,abnormal outer ear morphology
+IMPC_GEP_027_001,MP:0003938,abnormal ear development
+IMPC_GEP_028_001,MP:0005376,homeostasis/metabolism phenotype
+IMPC_GEP_032_001,MP:0010771,integument phenotype
+IMPC_GEP_033_001,MP:0002098,abnormal vibrissa morphology
+IMPC_GEP_034_001,MP:0009931,abnormal skin appearance
+IMPC_GEP_036_001,MP:0011239,abnormal skin coloration
+IMPC_GEP_037_001,MP:0002109,abnormal limb morphology
+IMPC_GEP_038_001,MP:0002111,abnormal tail morphology
+IMPC_GEP_040_001,MP:0005370,liver/biliary system phenotype
+IMPC_GEP_041_001,MP:0000598,abnormal liver morphology
+IMPC_GEP_042_001,MP:0004848,abnormal liver size
+IMPC_GEP_043_001,MP:0005369,muscle phenotype
+IMPC_GEP_044_001,MP:0002279,abnormal diaphragm morphology
+IMPC_GEP_045_001,MP:0003631,nervous system phenotype
+IMPC_GEP_046_001,MP:0000913,abnormal brain development
+IMPC_GEP_050_001,MP:0005367,renal/urinary system phenotype
+IMPC_GEP_051_001,MP:0000527,abnormal kidney development
+IMPC_GEP_052_001,MP:0005388,respiratory system phenotype
+IMPC_GEP_053_001,MP:0001175,abnormal lung morphology
+IMPC_GEP_054_001,MP:0001176,abnormal lung development
+IMPC_GEP_056_001,MP:0005391,vision/eye phenotype
+IMPC_GEP_057_001,MP:0002092,abnormal eye morphology
+IMPC_GEP_058_001,MP:0002697,abnormal eye size
+IMPC_GEP_062_001,MP:0003048,abnormal cervical vertebrae morphology
+IMPC_GEP_004_002,MP:0001404,no spontaneous movement
+IMPC_GEP_005_002,MP:0001491,unresponsive to tactile stimuli
+IMPC_GEP_011_002,MP:0001914,hemorrhage
+IMPC_GEP_012_002,MP:0011514,skin hemorrhage
+IMPC_GEP_018_002,MP:0008797,facial cleft
+IMPC_GEP_019_002,MP:0000111,cleft palate
+IMPC_GEP_029_002,MP:0001575,cyanosis
+IMPC_GEP_030_002,MP:0001785,edema
+IMPC_GEP_031_002,MP:0002192,hydrops fetalis
+IMPC_GEP_035_002,MP:0003717,pallor
+IMPC_GEP_039_002,MP:0000562,polydactyly
+IMPC_GEP_047_002,MP:0000914,exencephaly
+IMPC_GEP_048_002,MP:0005157,holoprosencephaly
+IMPC_GEP_049_002,MP:0003054,spina bifida
+IMPC_GEP_055_002,MP:0001953,respiratory failure
+IMPC_GEP_059_002,MP:0001297,microphthalmia
+IMPC_GEP_060_002,MP:0001293,anophthalmia
+IMPC_GEP_061_002,MP:0009263,abnormal eyelid fusion
+IMPC_GEP_075_001,MP:0001672,abnormal embryogenesis/development
