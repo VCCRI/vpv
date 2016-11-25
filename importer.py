@@ -317,7 +317,7 @@ class Import(QtGui.QDialog):
         self.setFixedWidth(table_width + 43)
 
     def guess_type(self, data_path):
-        volume_types = ['.nrrd', '.tiff', '.tif', '.nii', '.mnc', '.npz', '.bmp', '.json']
+        volume_types = ['.nrrd', '.tiff', '.tif', '.nii', '.mnc', '.npz', '.bmp', '.json', '.gz']
         extension = os.path.splitext(data_path)[1].lower()
 
         data_basname = os.path.basename(data_path)
@@ -329,7 +329,10 @@ class Import(QtGui.QDialog):
             return LAMA_DATA
 
         if extension not in volume_types:
+            print('not found')
             return False
+        else:
+            print('found')
 
         if '_stats_' in data_basname:
             return HEATMAP

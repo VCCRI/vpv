@@ -29,7 +29,7 @@ from scipy.misc import imresize
 import json
 from lib.addict import Dict
 import SimpleITK as sitk
-from common import Orientation, Stage
+from common import Orientation, Stage, read_image
 
 from lib import nrrd
 from lookup_tables import Lut
@@ -45,8 +45,7 @@ class LoadVirtualStackWorker(QtCore.QThread):
         self.memmap_result = None  # Populated at end of run()
 
     def sitk_load(self, p):
-        img = sitk.ReadImage(p)
-        return sitk.GetArrayFromImage(img)
+        return read_image(p)
 
     def pil_load(self, p):
         im = Image.open(p)
@@ -403,8 +402,7 @@ class Volume(Qt.QObject):
         if ext == '.mnc':
             return minc_to_numpy(path)
 
-        img = sitk.ReadImage(path)
-        vol = sitk.GetArrayFromImage(img)
+        vol = read_image(path)
         if memmap:
             temp = tempfile.TemporaryFile()
             m = np.memmap(temp, dtype=vol.dtype, mode='w+', shape=vol.shape)
@@ -527,8 +525,7 @@ class VirtualStackVolume(ImageVolume):
     #     return self.worker.memmap_result
 
         def sitk_load(p):
-            img = sitk.ReadImage(str(p))
-            return sitk.GetArrayFromImage(img)
+            return read_image(str(p))
 
         def pil_load(p):
             im = Image.open(p)
@@ -646,8 +643,7 @@ class DataVolume(Volume):
             arr = mincstats_to_numpy(path)
             return arr
         else:
-            img = sitk.ReadImage(path)
-            arr = sitk.GetArrayFromImage(img).astype(np.float16)
+            arr = read_image(path).astype(np.float16)
             return arr
 
     def timing(f):
@@ -805,8 +801,7 @@ class VectorVolume(object):
         self.subsampling = 5
 
     def _load_data(self, vol, memap=False):
-        img = sitk.ReadImage(vol)
-        return sitk.GetArrayFromImage(img)
+        return read_image(vol)
 
     def get_coronal(self, index):
         #slice_ = np.rot90(self._arr_data[:, index, :], 1)

@@ -1,5 +1,12 @@
 from PyQt4 import QtGui
 from enum import Enum
+import SimpleITK as sitk
+import tempfile
+import gzip
+from os.path import splitext
+
+
+ZIP_EXTENSIONS = ['']
 
 def error_dialog(parent, title, msg):
        dialog = QtGui.QMessageBox.warning(parent, title, msg, QtGui.QMessageBox.Cancel)
@@ -31,3 +38,20 @@ class Layer(Enum):
     vol2 = 1
     heatmap = 2
     vectors = 3
+
+
+def read_image(img_path):
+    print('isfhisdjf', img_path)
+    if img_path.endswith('.gz'):
+        print('dkfjskd')
+        # Get the image file extension
+        ex = splitext(splitext(img_path)[0])[1]
+        tmp = tempfile.NamedTemporaryFile(suffix=ex)
+        with gzip.open(img_path, 'rb') as infile:
+            data = infile.read()
+        with open(tmp.name, 'wb') as outfile:
+            outfile.write(data)
+        img_path = tmp.name
+    img = sitk.ReadImage(img_path)
+    arr = sitk.GetArrayFromImage(img)
+    return arr
