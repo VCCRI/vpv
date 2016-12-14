@@ -8,6 +8,8 @@ from ui.ui_change_vol_name import Ui_VolNameDialog
 import copy
 from common import Orientation, Layer
 
+DEFAULT_SCALE_BAR_SIZE = 14.0
+
 
 class VolNameDialog(QtGui.QDialog):
     name_changed_signal = QtCore.pyqtSignal(str, str)
@@ -159,7 +161,7 @@ class ManageData(QtGui.QWidget):
         self.connected_table.setHorizontalHeaderLabels(['Count', 'Mean', 'location'])
 
         self.ui.doubleSpinBoxVoxelSize.setMaximum(1000.0)
-        self.ui.doubleSpinBoxVoxelSize.setValue(28.0)
+        self.ui.doubleSpinBoxVoxelSize.setValue(DEFAULT_SCALE_BAR_SIZE)
         self.ui.doubleSpinBoxVoxelSize.setKeyboardTracking(False)
         self.ui.doubleSpinBoxVoxelSize.valueChanged.connect(self.set_voxel_size)
 

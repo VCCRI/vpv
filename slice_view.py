@@ -31,6 +31,9 @@ from collections import OrderedDict
 
 from common import Orientation, Layer
 
+DEFAULT_SCALE_BAR_SIZE = 1000.00
+DEFAULT_VOXEL_SIZE = 14.0
+
 
 class ViewBox(pg.ViewBox):
     """
@@ -162,9 +165,9 @@ class ScaleBar(pg.ScaleBar):
         color = QtGui.QColor(255, 255, 255)
         pen = QtGui.QPen(color)
         brush = QtGui.QBrush(color)
-        self.scalebar_size = 1000.0
+        self.scalebar_size = DEFAULT_SCALE_BAR_SIZE
         super(ScaleBar, self).__init__(size=self.scalebar_size, suffix='um', width=7, pen=pen, brush=brush)
-        self.voxel_size = 28.0
+        self.voxel_size = DEFAULT_VOXEL_SIZE
         font = QtGui.QFont('Arial', 16, QtGui.QFont.Bold)
         self.text.setFont(font)
         self.set_scalebar_size(self.scalebar_size)
@@ -188,8 +191,8 @@ class ScaleBar(pg.ScaleBar):
         view = self.parentItem()
         if view is None:
             return
-        p1 = view.mapFromViewToItem(self, QtCore.QPointF(0,0))
-        p2 = view.mapFromViewToItem(self, QtCore.QPointF(self.scalebar_size,0))
+        p1 = view.mapFromViewToItem(self, QtCore.QPointF(0, 0))
+        p2 = view.mapFromViewToItem(self, QtCore.QPointF(self.scalebar_size, 0))
         w = (p2-p1).x() / self.voxel_size
         self.bar.setRect(QtCore.QRectF(-w, 0, w, self._width))
         self.text.setPos(-w/2., 0)
@@ -223,6 +226,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
             pg.functions.USE_WEAVE = False
         else:
             pg.functions.USE_WEAVE = True
+
         self.scalebar = None
         self.ui.setupUi(self)
         self.ui.labelSliceNumber.setFixedWidth(30)
@@ -311,7 +315,8 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         Overide the widget resize event. Updates the scale bar. Does not work unless I stick a sleep in there.
         TODO: Work out how to hook into an event after the size of the widget has been set
         """
-        QtCore.QTimer.singleShot(100, lambda: self.resized_signal.emit())
+        return
+        QtCore.QTimer.singleShot(2000, lambda: self.resized_signal.emit())
 
     def show_scale_bar(self, visible):
         if visible:
@@ -338,12 +343,14 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
 
     def range_changed(self):
         self.scale_changed_signal.emit(self.orientation, self.id,  self.viewbox.viewRange())
+        QtCore.QTimer.singleShot(1000, lambda: self.scalebar.updateBar())
 
     def set_zoom(self, range_x=None, range_y=None):
         if range_x:
-            self.viewbox.setXRange(range_x[0], range_x[1])
+            self.viewbox.setXRange(range_x[0], range_x[1], padding=False)
         if range_y:
-            self.viewbox.setYRange(range_y[0], range_y[1])
+            self.viewbox.setYRange(range_y[0], range_y[1], padding=False)
+        QtCore.QTimer.singleShot(1000, lambda: self.scalebar.updateBar())
 
     def set_data_label_visibility(self, visible):
         self.overlay.setVisible(visible)
@@ -418,7 +425,6 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
             self.scalebar.setParentItem(self.viewbox)
             self.scalebar.anchor((1, 1), (1, 1), offset=(-60, -60))
             self.scalebar.hide()
-            self.resized_signal.connect(self.scalebar.updateBar)
             layer.volume_label_signal.connect(self.overlay.set_volume_label)
 
         elif layer_enum == Layer.vol2:
