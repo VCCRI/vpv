@@ -215,6 +215,13 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
+            <widget class="QPushButton" name="pushButtonScaleBarColor">
+             <property name="text">
+              <string>scale bar color</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="pushButtonScreenShot">
              <property name="styleSheet">
               <string notr="true">border: none</string>

@@ -176,6 +176,11 @@ class ScaleBar(pg.ScaleBar):
         self.voxel_size = voxel_size
         self.updateBar()
 
+    def set_color(self, qcolor):
+        self.bar.setBrush(QtGui.QBrush(qcolor))
+        self.bar.setPen(QtGui.QPen(qcolor))
+        self.updateBar()
+
     def set_scalebar_size(self, size):
         self.scalebar_size = size
         if size >= 1000:
@@ -306,6 +311,9 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         self.ui.seriesSlider.hide()
 
         self.show()
+
+    def set_scalebar_color(self, qcolor):
+        self.scalebar.set_color(qcolor)
 
     def annotation_radius_changed(self, radius):
         self.annotation.set_size(radius)

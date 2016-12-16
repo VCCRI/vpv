@@ -78,7 +78,6 @@ class Vpv(QtCore.QObject):
         self.views = {}
         # layers and views now created in manage_views
         self.data_manager = ManageData(self, self.model, self.mainwindow)
-        self.connect_data_manager_signals()
 
         self.annotations_manager = Annotations(self, self.mainwindow)
         self.annotations_manager.annotation_highlight_signal.connect(self.highlight_annotation)
@@ -122,9 +121,6 @@ class Vpv(QtCore.QObject):
 
         self.any_data_loaded = False
         self.crosshair_permanent = False
-
-    def connect_data_manager_signals(self):
-        pass
 
     def on_console_enter_pressesd(self):
         print('command update')
@@ -200,6 +196,9 @@ class Vpv(QtCore.QObject):
             view.update_view()
 
     def setup_views(self, orientation, color, row, column, hidden=False):
+        """
+        Create all the orthogonal views and setup the signals and slots
+        """
         view = self.add_view(self.view_id_counter, orientation, color, row, column)
         view.mouse_shift.connect(self.mouse_shift)
         view.mouse_pressed_signal.connect(self.dock_widget.mouse_pressed)
@@ -207,6 +206,7 @@ class Vpv(QtCore.QObject):
         view.scale_changed_signal.connect(self.zoom_changed)
         view.slice_index_changed_signal.connect(self.index_changed)
         view.move_to_next_vol_signal.connect(self.move_to_next_vol)
+        self.data_manager.scale_bar_color_signal.connect(view.set_scalebar_color)
         self.crosshair_visible_signal.connect(view.show_crosshair)
         self.crosshair_invisible_signal.connect(view.hide_crosshair)
         self.view_id_counter += 1

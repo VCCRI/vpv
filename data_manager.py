@@ -38,6 +38,7 @@ class ManageData(QtGui.QWidget):
     data_processing_finished_signal = QtCore.pyqtSignal()
     roi_signal = QtCore.pyqtSignal(list, list, list)
     ui_changed_signal = QtCore.pyqtSignal()
+    scale_bar_color_signal = QtCore.pyqtSignal(QtGui.QColor)
 
     def __init__(self, controller, model, mainwindow):
         super(ManageData, self).__init__(mainwindow)
@@ -179,6 +180,12 @@ class ManageData(QtGui.QWidget):
         self.ui.checkBoxShowDataControls.clicked.connect(self.data_controls_visibility)
 
         self.ui.pushButtonEditVolName.clicked.connect(self.on_change_vol_name)
+
+        self.ui.pushButtonScaleBarColor.clicked.connect(self.on_scalebar_color)
+
+    def on_scalebar_color(self):
+        color = QtGui.QColorDialog.getColor()
+        self.scale_bar_color_signal.emit(color)
 
     def on_change_vol_name(self):
         vol = self.controller.current_view.layers[Layer.vol1].vol

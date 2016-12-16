@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'ui_datatab.ui'
 #
-# Created: Fri Oct  7 19:30:07 2016
-#      by: PyQt4 UI code generator 4.11.3
+# Created: Fri Dec 16 09:04:38 2016
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -140,6 +140,9 @@ class Ui_data(object):
         self.verticalLayout_5.addLayout(self.horizontalLayout_4)
         self.horizontalLayout_5 = QtGui.QHBoxLayout()
         self.horizontalLayout_5.setObjectName(_fromUtf8("horizontalLayout_5"))
+        self.pushButtonScaleBarColor = QtGui.QPushButton(data)
+        self.pushButtonScaleBarColor.setObjectName(_fromUtf8("pushButtonScaleBarColor"))
+        self.horizontalLayout_5.addWidget(self.pushButtonScaleBarColor)
         self.pushButtonScreenShot = QtGui.QPushButton(data)
         self.pushButtonScreenShot.setStyleSheet(_fromUtf8("border: none"))
         self.pushButtonScreenShot.setText(_fromUtf8(""))
@@ -414,6 +417,7 @@ class Ui_data(object):
         self.comboBoxOrientation.setItemText(1, _translate("data", "coronal", None))
         self.comboBoxOrientation.setItemText(2, _translate("data", "axial", None))
         self.comboBoxOrientation.setItemText(3, _translate("data", "Isosurface - Not implemented", None))
+        self.pushButtonScaleBarColor.setText(_translate("data", "scale bar color", None))
         self.labelVolume.setText(_translate("data", "Volume 1", None))
         self.label_14.setText(_translate("data", "Volume 2", None))
         self.labelData.setText(_translate("data", "Heatmap Data", None))
