@@ -97,9 +97,9 @@ class Lut(object):
 
     def _inverted_grey(self):
         lut = copy.deepcopy(self.base)
-        lut[:, 0] = np.arange(256, 0, -1)
-        lut[:, 1] = np.arange(256, 0, -1)
-        lut[:, 2] = np.arange(256, 0, -1)
+        lut[:, 0] = np.arange(255, -1, -1)
+        lut[:, 1] = np.arange(255, -1, -1)
+        lut[:, 2] = np.arange(255, -1, -1)
         return lut, 'inverted_grey'
 
     def _grey(self):
