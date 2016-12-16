@@ -56,6 +56,7 @@ from slice_view import SliceWidget
 from data_manager import ManageData
 from annotations import Annotations
 from console import Console
+from gradient_editor import GradientEditor
 
 
 class Vpv(QtCore.QObject):
@@ -78,6 +79,7 @@ class Vpv(QtCore.QObject):
         self.views = {}
         # layers and views now created in manage_views
         self.data_manager = ManageData(self, self.model, self.mainwindow)
+        self.data_manager.gradient_editor_signal.connect(self.gradient_editor)
 
         self.annotations_manager = Annotations(self, self.mainwindow)
         self.annotations_manager.annotation_highlight_signal.connect(self.highlight_annotation)
@@ -121,6 +123,7 @@ class Vpv(QtCore.QObject):
 
         self.any_data_loaded = False
         self.crosshair_permanent = False
+        self.gradient_editor_widget = None
 
     def on_console_enter_pressesd(self):
         print('command update')
@@ -212,6 +215,20 @@ class Vpv(QtCore.QObject):
         self.view_id_counter += 1
         self.mainwindow.add_slice_view(view, row, column)
         view.setHidden(hidden)
+
+    def gradient_editor(self):
+        # Activeated 6 times on one click so bidge for now
+        self.ge = GradientEditor(self)
+        self.ge.sigFinished.connect(self.set_heatmap_luts)
+        self.ge.show()
+        print('gradient in vpv')
+
+    def set_heatmap_luts(self, luts):
+        for view in self.views.values():
+            if view.layers[Layer.heatmap].vol:
+                view.layers[Layer.heatmap].vol.pos_lut = luts[0]
+                #view.layers[Layer.heatmap].vol.neg_lut = luts[1]
+                view.layers[Layer.heatmap].update()
 
     def move_to_next_vol(self, view_id, reverse=False):
         if self.data_manager.link_views:

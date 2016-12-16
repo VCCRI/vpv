@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_datatab.ui'
 #
-# Created: Fri Dec 16 09:04:38 2016
+# Created: Fri Dec 16 16:29:20 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_data(object):
     def setupUi(self, data):
         data.setObjectName(_fromUtf8("data"))
-        data.resize(761, 769)
+        data.resize(761, 835)
         self.verticalLayout = QtGui.QVBoxLayout(data)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.layoutVolume = QtGui.QVBoxLayout()
@@ -296,6 +296,9 @@ class Ui_data(object):
         self.pushButtonRecalcConnectComponents.setSizePolicy(sizePolicy)
         self.pushButtonRecalcConnectComponents.setObjectName(_fromUtf8("pushButtonRecalcConnectComponents"))
         self.horizontalLayout_10.addWidget(self.pushButtonRecalcConnectComponents)
+        self.pushButtonPosLUT = QtGui.QPushButton(self.dataWidget)
+        self.pushButtonPosLUT.setObjectName(_fromUtf8("pushButtonPosLUT"))
+        self.horizontalLayout_10.addWidget(self.pushButtonPosLUT)
         self.verticalLayout_4.addLayout(self.horizontalLayout_10)
         self.verticalLayoutConnectedComponents = QtGui.QHBoxLayout()
         self.verticalLayoutConnectedComponents.setObjectName(_fromUtf8("verticalLayoutConnectedComponents"))
@@ -423,6 +426,7 @@ class Ui_data(object):
         self.labelData.setText(_translate("data", "Heatmap Data", None))
         self.pushButtonFilterQValue.setText(_translate("data", "Filter by qvalue", None))
         self.pushButtonRecalcConnectComponents.setText(_translate("data", "recalculate", None))
+        self.pushButtonPosLUT.setText(_translate("data", "Heatmap LUTs", None))
         self.label_9.setText(_translate("data", "Vectors", None))
         self.label_10.setText(_translate("data", "Subsample", None))
         self.label_11.setText(_translate("data", "Scale", None))

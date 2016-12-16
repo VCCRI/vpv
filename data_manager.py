@@ -39,13 +39,14 @@ class ManageData(QtGui.QWidget):
     roi_signal = QtCore.pyqtSignal(list, list, list)
     ui_changed_signal = QtCore.pyqtSignal()
     scale_bar_color_signal = QtCore.pyqtSignal(QtGui.QColor)
+    gradient_editor_signal = QtCore.pyqtSignal()
 
     def __init__(self, controller, model, mainwindow):
         super(ManageData, self).__init__(mainwindow)
         self.ui = Ui_data()
         self.ui.setupUi(self)
         self.views = controller.views
-
+        self.mainwindow = mainwindow
         lut = Lut()
         self.controller = controller  # vpv.py
         self.ui.pushButtonRecalcConnectComponents.clicked.connect(self.controller.recalc_connected_components)
@@ -182,6 +183,12 @@ class ManageData(QtGui.QWidget):
         self.ui.pushButtonEditVolName.clicked.connect(self.on_change_vol_name)
 
         self.ui.pushButtonScaleBarColor.clicked.connect(self.on_scalebar_color)
+
+        self.ui.pushButtonPosLUT.clicked.connect(self.on_pos_lut)
+
+    def on_pos_lut(self):
+        print('gradient in dm')
+        self.gradient_editor_signal.emit() # called 5/6 times on one click
 
     def on_scalebar_color(self):
         color = QtGui.QColorDialog.getColor()

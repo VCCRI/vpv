@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>761</width>
-    <height>769</height>
+    <height>835</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -464,6 +464,13 @@ color: rgb(223, 223, 223);</string>
           </property>
           <property name="text">
            <string>recalculate</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonPosLUT">
+          <property name="text">
+           <string>Heatmap LUTs</string>
           </property>
          </widget>
         </item>
