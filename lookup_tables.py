@@ -49,29 +49,52 @@ class Lut(object):
     def lut_list(self):
         return ['red', 'green', 'blue', 'inverted_grey', 'grey', 'cyan', 'yellow', 'magenta', 'anatomy_labels']
 
+    # def hotred(self):
+    #     colours = (
+    #         (0.2, 0.5, 0.0, 0.0),
+    #         (0.4, 0.5, 0.0, 0.0),
+    #         (0.6, 1.0, 0.0, 0.5),
+    #         (0.8, 1.0, 0.5, 1.0),
+    #         (1.00, 1.0, 1.0, 1.0)
+    #     )
+    #     lut = self.interpolate_colors(colours, 256)
+    #     lut[0][3] = 0.0
+    #     return lut
+    #
+    # def hotblue(self):
+    #     colours = (
+    #         (0.2, 0.0, 0.0, 0.5),
+    #         (0.4, 0.0, 0.0, 0.5),
+    #         (0.6, 0.0, 0.5, 1.0),
+    #         (0.8, 0.5, 1.0, 1.0),
+    #         (1.00, 1.0, 1.0, 1.0)
+    #     )
+    #     lut = self.interpolate_colors(colours, 256)[::-1]
+    #     lut[-1][3] = 0.0
+    #     return lut
+
     def hotred(self):
         colours = (
-            (0.6, 0.5, 0.0, 0.0),
-            (1.0, 0.5, 0.0, 0.0),
-            (1.0, 1.0, 0.0, 0.5),
-            (1.0, 1.0, 0.5, 1.0),
-            (1.00, 1, 1*(190/255), 1*(69/255))
+            (0.00, 0.0, 0.0, 0.0),
+            (0.25, 0.5, 0.0, 0.0),
+            (0.50, 1.0, 0.0, 0.5),
+            (0.75, 1.0, 0.5, 1.0),
+            (1.00, 1.0, 1.0, 1.0)
         )
         lut = self.interpolate_colors(colours, 256)
-        lut[0][3] = 0.0
         return lut
 
     def hotblue(self):
         colours = (
-            (0.6, 0.0, 0.0, 0.5),
-            (1., 0.0, 0.0, 0.5),
-            (1., 0.0, 0.5, 1.0),
-            (1., 0.5, 1.0, 1.0),
+            (0.00, 0.0, 0.0, 0.0),
+            (0.25, 0.0, 0.0, 0.5),
+            (0.50, 0.0, 0.5, 1.0),
+            (0.75, 0.5, 1.0, 1.0),
             (1.00, 1.0, 1.0, 1.0)
         )
         lut = self.interpolate_colors(colours, 256)[::-1]
-        lut[-1][3] = 0.0
         return lut
+
 
     def transparent(self):
         lut = np.zeros((256, 4), dtype=np.ubyte)

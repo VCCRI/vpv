@@ -697,6 +697,8 @@ class ColorScaleBar(object):
         self.font = QtGui.QFont('Arial', 13, QtGui.QFont.Bold)
         self.neg_lut = neg_lut
         self.pos_lut = pos_lut
+        self.pushButtonInvertColor = QtGui.QPushButton('Invert color')
+        self.pushButtonInvertColor.clicked.connect(self.on_invert)
 
     def update(self, max_pos, min_pos, min_neg, max_neg):
         if self.color_scale_view:
@@ -761,15 +763,32 @@ class ColorScaleBar(object):
         min_neg_y_mapped = self.color_scale_view.mapFromItemToView(ii, QtCore.QPointF(40, min_neg_y))
         min_neg_text.setPos(7, min_neg_y_mapped.y())
 
-        label = pg.TextItem('t-statistics', angle=-90)
-        label.setFont(self.font)
-        self.color_scale_view.addItem(label)
-        label.setPos(-20, 70)
+        self.label = pg.TextItem('t-statistics', angle=-90)
+        self.label.setFont(self.font)
+        self.color = 'white'
+        self.label.setText('t-statistics', self.color)
+        self.color_scale_view.addItem(self.label)
+        self.label.setPos(-20, 70)
+        self.inverted = False
+
+
+    def redraw(self):
+        pass
+
+    def on_invert(self):
+        if self.inverted:
+            self.inverted = False
+            self.label.color= 'black'
+        else:
+            self.inverted = True
+            self.label.color = 'white'
 
     def hide(self):
+        self.pushButtonInvertColor.hide()
         self.color_scale_widget.hide()
 
     def show(self):
+        self.pushButtonInvertColor.show()
         self.color_scale_widget.show()
 
     def set_minimum_value(self, value):

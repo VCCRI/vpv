@@ -217,7 +217,7 @@ class Vpv(QtCore.QObject):
         view.setHidden(hidden)
 
     def gradient_editor(self):
-        # Activeated 6 times on one click so bidge for now
+        # Activeated 6 times on one click so bogdge for now
         self.ge = GradientEditor(self)
         self.ge.sigFinished.connect(self.set_heatmap_luts)
         self.ge.show()
@@ -229,6 +229,7 @@ class Vpv(QtCore.QObject):
                 view.layers[Layer.heatmap].vol.pos_lut = luts[0]
                 #view.layers[Layer.heatmap].vol.neg_lut = luts[1]
                 view.layers[Layer.heatmap].update()
+
 
     def move_to_next_vol(self, view_id, reverse=False):
         if self.data_manager.link_views:
