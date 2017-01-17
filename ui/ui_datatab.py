@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_datatab.ui'
 #
-# Created: Fri Dec 16 16:29:20 2016
+# Created: Tue Jan 17 17:27:37 2017
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -277,6 +277,17 @@ class Ui_data(object):
         self.comboBoxData = QtGui.QComboBox(self.dataWidget)
         self.comboBoxData.setObjectName(_fromUtf8("comboBoxData"))
         self.verticalLayout_4.addWidget(self.comboBoxData)
+        self.horizontalLayout_6 = QtGui.QHBoxLayout()
+        self.horizontalLayout_6.setObjectName(_fromUtf8("horizontalLayout_6"))
+        self.doubleSpinBoxNegThresh = QtGui.QDoubleSpinBox(self.dataWidget)
+        self.doubleSpinBoxNegThresh.setObjectName(_fromUtf8("doubleSpinBoxNegThresh"))
+        self.horizontalLayout_6.addWidget(self.doubleSpinBoxNegThresh)
+        spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_6.addItem(spacerItem)
+        self.doubleSpinBoxPosThresh = QtGui.QDoubleSpinBox(self.dataWidget)
+        self.doubleSpinBoxPosThresh.setObjectName(_fromUtf8("doubleSpinBoxPosThresh"))
+        self.horizontalLayout_6.addWidget(self.doubleSpinBoxPosThresh)
+        self.verticalLayout_4.addLayout(self.horizontalLayout_6)
         self.horizontalLayoutDataSliders = QtGui.QHBoxLayout()
         self.horizontalLayoutDataSliders.setObjectName(_fromUtf8("horizontalLayoutDataSliders"))
         self.verticalLayout_4.addLayout(self.horizontalLayoutDataSliders)
@@ -346,16 +357,16 @@ class Ui_data(object):
         self.spinBoxVectorSubsampling = QtGui.QSpinBox(self.vectorWidget)
         self.spinBoxVectorSubsampling.setObjectName(_fromUtf8("spinBoxVectorSubsampling"))
         self.horizontalLayout_7.addWidget(self.spinBoxVectorSubsampling)
-        spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_7.addItem(spacerItem)
+        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem1)
         self.label_11 = QtGui.QLabel(self.vectorWidget)
         self.label_11.setObjectName(_fromUtf8("label_11"))
         self.horizontalLayout_7.addWidget(self.label_11)
         self.spinBoxVectorScale = QtGui.QSpinBox(self.vectorWidget)
         self.spinBoxVectorScale.setObjectName(_fromUtf8("spinBoxVectorScale"))
         self.horizontalLayout_7.addWidget(self.spinBoxVectorScale)
-        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_7.addItem(spacerItem1)
+        spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem2)
         self.label_12 = QtGui.QLabel(self.vectorWidget)
         self.label_12.setObjectName(_fromUtf8("label_12"))
         self.horizontalLayout_7.addWidget(self.label_12)
@@ -402,8 +413,8 @@ class Ui_data(object):
         self.verticalLayoutColorScale = QtGui.QVBoxLayout()
         self.verticalLayoutColorScale.setObjectName(_fromUtf8("verticalLayoutColorScale"))
         self.verticalLayout.addLayout(self.verticalLayoutColorScale)
-        spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.verticalLayout.addItem(spacerItem2)
+        spacerItem3 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem3)
 
         self.retranslateUi(data)
         QtCore.QMetaObject.connectSlotsByName(data)
@@ -425,7 +436,7 @@ class Ui_data(object):
         self.label_14.setText(_translate("data", "Volume 2", None))
         self.labelData.setText(_translate("data", "Heatmap Data", None))
         self.pushButtonFilterQValue.setText(_translate("data", "Filter by qvalue", None))
-        self.pushButtonRecalcConnectComponents.setText(_translate("data", "recalculate", None))
+        self.pushButtonRecalcConnectComponents.setText(_translate("data", "recalculate blobs", None))
         self.pushButtonPosLUT.setText(_translate("data", "Heatmap LUTs", None))
         self.label_9.setText(_translate("data", "Vectors", None))
         self.label_10.setText(_translate("data", "Subsample", None))

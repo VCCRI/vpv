@@ -184,7 +184,21 @@ class ManageData(QtGui.QWidget):
 
         self.ui.pushButtonScaleBarColor.clicked.connect(self.on_scalebar_color)
 
+        self.ui.pushButtonPosLUT.hide()  # Don't shiw for now. Needs more development
         self.ui.pushButtonPosLUT.clicked.connect(self.on_pos_lut)
+
+        self.ui.doubleSpinBoxNegThresh.valueChanged.connect(self.on_neg_thresh_spin)
+        self.ui.doubleSpinBoxNegThresh.setMaximum(0)
+        self.ui.doubleSpinBoxNegThresh.setMinimum(-100)
+
+        self.ui.doubleSpinBoxPosThresh.valueChanged.connect(self.on_pos_thresh_spin)
+        #self.ui.doubleSpinBoxPosThresh.setMinimum(0)
+
+    def on_neg_thresh_spin(self, value):
+        self.data_levels_negative_slider.setEnd(value)
+
+    def on_pos_thresh_spin(self, value):
+        self.data_levels_positive_slider.setStart(value)
 
     def on_pos_lut(self):
         print('gradient in dm')
@@ -494,7 +508,7 @@ class ManageData(QtGui.QWidget):
             neg_min_nonzero, pos_min_nonzero = vol.non_zero_mins
             neg_lower, neg_upper = [round(x, 2) for x in vol.neg_levels]
             pos_lower, pos_upper = [round(x, 2) for x in vol.pos_levels]
-            #print min_, max_, neg_lower, pos_lower, pos_upper
+            # print min_, max_, neg_lower, pos_lower, pos_upper
 
             # if there are no values for negative or positive stats, we need to inactivate the respective sliders
             # as we can't have sliders with min=0 and max = 0
@@ -537,6 +551,8 @@ class ManageData(QtGui.QWidget):
                 neg_bg = 'background: qlineargradient(x1: 0.2, x2: 1,stop: 0 #ADADAD, stop: 1  #ADADAD);'
                 self.data_levels_negative_slider.handle.setStyleSheet(neg_bg)
             self.update_color_scale_bar()
+            self.ui.doubleSpinBoxNegThresh.setValue(neg_upper)
+            self.ui.doubleSpinBoxPosThresh.setValue(pos_lower)
         else:
             self.ui.comboBoxData.setCurrentIndex(self.ui.comboBoxData.findText('None'))
 
@@ -587,9 +603,11 @@ class ManageData(QtGui.QWidget):
 
     def data_negative_higher_changed(self, value):
         self.update_data_lut('neg_upper', value)
+        self.ui.doubleSpinBoxNegThresh.setValue(value)
 
     def data_positive_lower_changed(self, value):
         self.update_data_lut('pos_lower', value)
+        self.ui.doubleSpinBoxPosThresh.setValue(value)
 
     def data_positive_higher_changed(self, value):
         self.update_data_lut('pos_upper', value)
@@ -699,17 +717,19 @@ class ColorScaleBar(object):
         self.pos_lut = pos_lut
         self.pushButtonInvertColor = QtGui.QPushButton('Invert color')
         self.pushButtonInvertColor.clicked.connect(self.on_invert)
+        self.layout.addWidget(self.pushButtonInvertColor)
+        self.pushButtonInvertColor.hide()
 
     def update(self, max_pos, min_pos, min_neg, max_neg):
         if self.color_scale_view:
             self.color_scale_widget.removeItem(self.color_scale_view)
         self.color_scale_view = self.color_scale_widget.addViewBox(row=0, col=0, enableMouse=False, lockAspect=True)
 
-        min_pos_text = pg.TextItem(str(round(min_pos, 2)))
-        min_neg_text = pg.TextItem(str(round(min_neg, 2)))
+        self.min_pos_text = pg.TextItem(str(round(min_pos, 2)))
+        self.min_neg_text = pg.TextItem(str(round(min_neg, 2)))
 
-        max_pos_text = pg.TextItem(str(round(max_pos, 2)))
-        max_neg_text = pg.TextItem(str(round(max_neg, 2)))
+        self.max_pos_text = pg.TextItem(str(round(max_pos, 2)))
+        self.max_neg_text = pg.TextItem(str(round(max_neg, 2)))
 
         rgba_pos = []
         for x in range(0, self.pos_lut.shape[1]):
@@ -728,7 +748,7 @@ class ColorScaleBar(object):
 
         full_img = np.rot90(np.vstack((neg_img, pos_img)))
 
-        remove_padding = 120
+        remove_padding = 0
         # remove the black section of the colormap from the negative scale
         remove_start = int(full_img.shape[1] / 2 - remove_padding)
         remove_end = int(full_img.shape[1] / 2 + remove_padding)
@@ -739,34 +759,34 @@ class ColorScaleBar(object):
         ii = pg.ImageItem(full_img)
         ii.setRect(QtCore.QRect(0, 0, 10, 200))
 
-        self.color_scale_view.addItem(max_pos_text)
-        self.color_scale_view.addItem(min_neg_text)
-        self.color_scale_view.addItem(min_pos_text)
-        self.color_scale_view.addItem(max_neg_text)
-        max_pos_text.setFont(self.font)
-        min_neg_text.setFont(self.font)
-        min_pos_text.setFont(self.font)
-        max_neg_text.setFont(self.font)
+        self.color_scale_view.addItem(self.max_pos_text)
+        self.color_scale_view.addItem(self.min_neg_text)
+        self.color_scale_view.addItem(self.min_pos_text)
+        self.color_scale_view.addItem(self.max_neg_text)
+        self.max_pos_text.setFont(self.font)
+        self.min_neg_text.setFont(self.font)
+        self.min_pos_text.setFont(self.font)
+        self.max_neg_text.setFont(self.font)
 
-        max_neg_text.setPos(10, 13)
-        max_pos_text.setPos(10, 210)
+        self.max_neg_text.setPos(10, 13)
+        self.max_pos_text.setPos(10, 210)
         #min_neg_text.setPos(10, 60)
 
         self.color_scale_view.addItem(ii)
 
         # Find how far up the color map the minimum positive  is
-        min_pos_y = full_img.shape[1] / 2 + 50
+        min_pos_y = full_img.shape[1] / 2 + 80
         min_pos_y_mapped = self.color_scale_view.mapFromItemToView(ii, QtCore.QPointF(40, min_pos_y))
-        min_pos_text.setPos(10, min_pos_y_mapped.y())
+        self.min_pos_text.setPos(10, min_pos_y_mapped.y())
 
-        min_neg_y = full_img.shape[1] / 2
+        min_neg_y = full_img.shape[1] / 2 + 30
         min_neg_y_mapped = self.color_scale_view.mapFromItemToView(ii, QtCore.QPointF(40, min_neg_y))
-        min_neg_text.setPos(7, min_neg_y_mapped.y())
+        self.min_neg_text.setPos(7, min_neg_y_mapped.y())
 
         self.label = pg.TextItem('t-statistics', angle=-90)
         self.label.setFont(self.font)
         self.color = 'white'
-        self.label.setText('t-statistics', self.color)
+        #self.label.setText('t-statistics', self.color)
         self.color_scale_view.addItem(self.label)
         self.label.setPos(-20, 70)
         self.inverted = False
@@ -778,18 +798,31 @@ class ColorScaleBar(object):
     def on_invert(self):
         if self.inverted:
             self.inverted = False
-            self.label.color= 'black'
+            self.label.textItem.setDefaultTextColor(QtGui.QColor(0, 0, 0))
+            self.max_pos_text.textItem.setDefaultTextColor(QtGui.QColor(0, 0, 0))
+            self.min_pos_text.textItem.setDefaultTextColor(QtGui.QColor(0, 0, 0))
+            self.max_neg_text.textItem.setDefaultTextColor(QtGui.QColor(0, 0, 0))
+            self.min_neg_text.textItem.setDefaultTextColor(QtGui.QColor(0, 0, 0))
+            self.color_scale_widget.setBackground(QtGui.QColor(255, 255, 255))
+
         else:
             self.inverted = True
-            self.label.color = 'white'
+            self.label.textItem.setDefaultTextColor(QtGui.QColor(255, 255, 255))
+            self.max_pos_text.textItem.setDefaultTextColor(QtGui.QColor(255, 255, 255))
+            self.min_pos_text.textItem.setDefaultTextColor(QtGui.QColor(255, 255, 255))
+            self.max_neg_text.textItem.setDefaultTextColor(QtGui.QColor(255, 255, 255))
+            self.min_neg_text.textItem.setDefaultTextColor(QtGui.QColor(255, 255, 255))
+            self.color_scale_widget.setBackground(QtGui.QColor(0, 0, 0))
 
     def hide(self):
         self.pushButtonInvertColor.hide()
         self.color_scale_widget.hide()
+        self.pushButtonInvertColor.hide()
 
     def show(self):
         self.pushButtonInvertColor.show()
         self.color_scale_widget.show()
+        self.pushButtonInvertColor.show()
 
     def set_minimum_value(self, value):
         pass
