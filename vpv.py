@@ -381,7 +381,10 @@ class Vpv(QtCore.QObject):
             # TODO: make this better
             if orientation == Orientation.sagittal:
                 if view.orientation == Orientation.axial:
-                    x1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - x
+                    try:
+                        x1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - x
+                    except:
+                        pass
                     view.set_slice(y, crosshair_xy=(own_index, x1))
                 elif view.orientation == Orientation.coronal:
                     view.set_slice(x, crosshair_xy=(own_index, y))
@@ -471,7 +474,7 @@ class Vpv(QtCore.QObject):
                 view.layers[Layer.vol1].update()  # This should make sure 16bit images are scaled correctly at loading?
 
         except IndexError:  # No Volume objects have been loaded
-            pass
+            print('No volumes oaded')
         try:  # See if we have any Data objects loaded
             init_vol = self.model.data_id_list()[0]
             for view in self.views.values():

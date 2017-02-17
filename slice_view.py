@@ -796,7 +796,7 @@ class LayerBase(Qt.QObject):
             slice_indx = dim_len / 2
         else:
             slice_indx = self.parent.current_slice_idx
-        slice_ = self.vol.get_data(orientation, slice_indx)
+        slice_ = self.vol.get_data(orientation, int(slice_indx))
         self.parent.set_slice_slider(dim_len, slice_indx)
 
         self.image_item.setImage(slice_, autoLevels=False, opacity=1.0)
