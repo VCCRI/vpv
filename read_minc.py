@@ -108,8 +108,8 @@ def minc_info(recon):
 
     try:
         info = sp.check_output(['mincinfo', recon], universal_newlines=True)
-    except OSError:
-        raise OSError("Minc tools not installed")
+    except OSError as e:
+        raise OSError("Minc tools not installed\n{}".format(e))
     #info = str(info)
 
     info_dict = {}

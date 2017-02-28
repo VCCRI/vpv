@@ -26,6 +26,7 @@ WINPYTHON_DIR = 'WinPython-64bit-3.4.4.2Zero'
 PYTHON_DIR = 'python-3.4.4.amd64'
 
 import os
+from os.path import join
 import sys
 
 if os.name == 'nt':
@@ -57,6 +58,9 @@ from data_manager import ManageData
 from annotations import Annotations
 from console import Console
 from gradient_editor import GradientEditor
+import zipfile
+from lib import addict
+import tempfile
 
 
 class Vpv(QtCore.QObject):
@@ -482,8 +486,8 @@ class Vpv(QtCore.QObject):
         except IndexError:  # No Volume objects have been loaded
             pass
 
-    def importer_callback(self, volumes, datafiles, annotations, dual_datafiles, vector_files, image_series, last_dir,
-                          memory_map=False):
+    def importer_callback(self, volumes, datafiles, annotations, dual_datafiles, vector_files, image_series,
+                          impc_analysis, last_dir, memory_map=False):
         """
         Recieves a list of files to open from the Importer widget
 
@@ -493,6 +497,8 @@ class Vpv(QtCore.QObject):
             path to config file for loading paired tval/pval files
         :return:
         """
+        if len(impc_analysis) > 0:
+            self.load_impc_analysis(impc_analysis)
         if len(volumes) > 0:
             self.load_volumes(volumes, 'vol', memory_map)
         if len(datafiles) > 0:
@@ -537,6 +543,52 @@ class Vpv(QtCore.QObject):
         if len(non_loaded) > 0:
             dialog = QtGui.QMessageBox.warning(self.mainwindow, 'Volumes not loaded', '\n'.join(non_loaded),
                                                QtGui.QMessageBox.Cancel)
+
+    def load_impc_analysis(self, impc_zip_file):
+        """
+        Load a zip file containing the results of the IMPC automated analysis (TCP pipeline)
+        Parameters
+        ----------
+        impc_zip_file: str
+            path tho analysis results zip
+        """
+        file_ = join(impc_zip_file[0], impc_zip_file[1])
+        zf = zipfile.ZipFile(file_)
+        names = zf.namelist()
+
+        file_names = addict.Dict(
+            {'intensity_tstats_file': None,
+            'jacobians_tstats_file': None,
+            'qvals_intensity_file': None,
+            'qvals_jacobians_file': None,
+            'popavg_file': None}
+        )
+
+        for name in names:
+            name_lc = name.lower()
+            if 'intensities-tstats' in name_lc:
+                file_names.intensity_tstats_file = name
+            elif 'jacobians-tstats' in name_lc:
+                file_names.jacobians_tstats_file = name
+            elif 'qvals-intensities' in name_lc:
+                file_names.qvals_intensity_file = name
+            elif 'qvals-jacobians' in name_lc:
+                file_names.qvals_jacobians_file = name
+            elif 'popavg' in name_lc:
+                file_names.popavg_file = name
+        if all(value for value in file_names.values()):
+            td = tempfile.TemporaryDirectory()
+            zf.extractall(td.name)
+            popavg = join(td.name, file_names.popavg_file)
+            self.load_volumes([popavg], 'vol')
+        else:
+            # Make this a dialog?
+            failed = []
+            for f in file_names:
+                if not f:
+                    failed.append(f)
+            print('IMPC analysis data failed to load. The following files could not be found in the zip')
+            print(failed)
 
     def activate_view_manager(self, view_widget_id):
         """

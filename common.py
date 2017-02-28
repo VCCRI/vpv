@@ -16,6 +16,14 @@ def info_dialog(parent, title, msg):
     dialog = QtGui.QMessageBox.information(parent, title, msg, QtGui.QMessageBox.Ok)
 
 
+class ImType(Enum):
+    VOLUME = 'Volume'
+    HEATMAP = 'Heatmap data'
+    LAMA_DATA = 'LAMA data'
+    VECTORS = "Vectors"
+    ANNOTATIONS = "Annotations"
+    IMAGE_SERIES = "Image series"
+    IMPC_ANALYSIS = "IMPC analysis"
 
 class Orientation(Enum):
     sagittal = 1

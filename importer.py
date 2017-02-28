@@ -18,6 +18,7 @@
 from PyQt4 import QtGui, QtCore
 import os
 from ui.ui_importer import Ui_Dialog
+from common import ImType
 
 
 VOLUME = 'Volume'
@@ -26,8 +27,9 @@ LAMA_DATA = 'LAMA data'
 VECTORS = "Vectors"
 ANNOTATIONS = "Annotations"
 IMAGE_SERIES = "Image series"
+IMPC_ANALYSIS = "IMPC analysis"
 
-TYPE_CHOICES = (VOLUME, HEATMAP, ANNOTATIONS, LAMA_DATA, VECTORS, IMAGE_SERIES)
+TYPE_CHOICES = (VOLUME, HEATMAP, ANNOTATIONS, LAMA_DATA, VECTORS, IMAGE_SERIES, IMPC_ANALYSIS)
 
 class Import(QtGui.QDialog):
     def __init__(self, parent, callback, virtual_stack_callback, last_dir, appdata, dragged_files=None):
@@ -198,6 +200,7 @@ class Import(QtGui.QDialog):
         vector_files = []
         image_series = []
         annotations = []
+        impc_analysis = []
 
         for row in range(self.ui.table.rowCount()):
             if self.ui.table.cellWidget(row, 2).isChecked():
@@ -215,6 +218,8 @@ class Import(QtGui.QDialog):
                     image_series.append(self.ui.table.item(row, 0).data(QtCore.Qt.UserRole))
                 elif type_ == ANNOTATIONS:
                     annotations.append(self.ui.table.item(row, 0).data(QtCore.Qt.UserRole))
+                elif type_ == IMPC_ANALYSIS:
+                    impc_analysis.append(self.ui.table.item(row, 0).data(QtCore.Qt.UserRole))
 
         self.callback(volumes, datafiles, annotations, dual_files, vector_files, image_series, self.last_dir, self.ui.checkBoxMemoryMap.isChecked())
 
@@ -317,10 +322,13 @@ class Import(QtGui.QDialog):
         self.setFixedWidth(table_width + 43)
 
     def guess_type(self, data_path):
-        volume_types = ['.nrrd', '.tiff', '.tif', '.nii', '.mnc', '.npz', '.bmp', '.json', '.gz']
+        volume_types = ['.nrrd', '.tiff', '.tif', '.nii', '.mnc', '.npz', '.bmp', '.json', '.gz', '.zip']
         extension = os.path.splitext(data_path)[1].lower()
 
         data_basname = os.path.basename(data_path)
+
+        if extension == '.zip':
+            return IMPC_ANALYSIS
 
         if extension == '.json':
             return ANNOTATIONS
