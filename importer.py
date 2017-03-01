@@ -221,7 +221,8 @@ class Import(QtGui.QDialog):
                 elif type_ == IMPC_ANALYSIS:
                     impc_analysis.append(self.ui.table.item(row, 0).data(QtCore.Qt.UserRole))
 
-        self.callback(volumes, datafiles, annotations, dual_files, vector_files, image_series, self.last_dir, self.ui.checkBoxMemoryMap.isChecked())
+        self.callback(volumes, datafiles, annotations, dual_files, vector_files, image_series, impc_analysis,
+        self.last_dir, self.ui.checkBoxMemoryMap.isChecked())
 
         self.close()
 

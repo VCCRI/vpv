@@ -61,6 +61,7 @@ from gradient_editor import GradientEditor
 import zipfile
 from lib import addict
 import tempfile
+import csv
 
 
 class Vpv(QtCore.QObject):
@@ -581,6 +582,14 @@ class Vpv(QtCore.QObject):
             zf.extractall(td.name)
             popavg = join(td.name, file_names.popavg_file)
             self.load_volumes([popavg], 'vol')
+            inten_tstat = join(td.name, file_names.intensity_tstats_file)
+            jac_tstat = join(td.name, file_names.jacobians_tstats_file)
+            self.load_volumes([inten_tstat, jac_tstat], 'data')
+            #now set the threshold
+
+            qval_int_csv = join(td.name, file_names.qvals_intensity_file)
+            intensity_t_thesh = self.extract_threshold_value_from_csv(qval_int_csv, 0.05)
+            print(intensity_t_thesh)
         else:
             # Make this a dialog?
             failed = []
@@ -589,6 +598,30 @@ class Vpv(QtCore.QObject):
                     failed.append(f)
             print('IMPC analysis data failed to load. The following files could not be found in the zip')
             print(failed)
+
+    @staticmethod
+    def extract_threshold_value_from_csv(stats_info_csv, p_value):
+        """
+        Given a csv path containing the stats summary from the TCP pipeline and a p-value cutoff,
+        return the corresponding t-stat threshold
+
+        Parameters
+        ----------
+        stats_info_csv: str
+            path to csv
+        p_value: float
+            the p-value threshold at which the corresponding t-score should be set to invisible
+        Returns
+        -------
+        t_score_threshold: float
+        """
+        with open(stats_info_csv, 'rb') as csvfile:
+            reader = csv.reader(csvfile, delimiter=',')
+            for line in reader:
+                p = line[0]
+                if p == p_value:
+                    return line[3]
+
 
     def activate_view_manager(self, view_widget_id):
         """
