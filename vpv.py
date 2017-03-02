@@ -499,7 +499,7 @@ class Vpv(QtCore.QObject):
         :return:
         """
         if len(impc_analysis) > 0:
-            self.load_impc_analysis(impc_analysis)
+            self.load_impc_analysis(impc_analysis[0])
         if len(volumes) > 0:
             self.load_volumes(volumes, 'vol', memory_map)
         if len(datafiles) > 0:
@@ -528,11 +528,28 @@ class Vpv(QtCore.QObject):
             self.data_manager.update()
             self.annotations_manager.update()
 
-    def load_volumes(self, file_list, data_type, memory_map=False):
+    def load_volumes(self, file_list, data_type, memory_map=False, lower_thresholds=False):
+        """
+        Load some volumes from a list of paths.
+        Parameters
+        ----------
+        file_list: list
+            list of paths to volumes
+        data_type: str
+            vol data etc
+        memory_map: bool
+            wheter to memory map after reading
+        lower_thresholds: list
+            optional lower thresholds to apply to the list of volumes. Ussually for data volumes
+
+        """
         non_loaded = []
-        for vol_path in file_list:
+        for i, vol_path in enumerate(file_list):
             try:
-                self.model.add_volume(vol_path, data_type, memory_map)
+                if lower_thresholds:
+                    self.model.add_volume(vol_path, data_type, memory_map, lower_thresholds[i])
+                else:
+                    self.model.add_volume(vol_path, data_type, memory_map)
                 self.appdata.add_used_volume(vol_path)
                 if not self.any_data_loaded:
                     #  Load up one of the volumes just loaded into the bottom layer
@@ -553,8 +570,7 @@ class Vpv(QtCore.QObject):
         impc_zip_file: str
             path tho analysis results zip
         """
-        file_ = join(impc_zip_file[0], impc_zip_file[1])
-        zf = zipfile.ZipFile(file_)
+        zf = zipfile.ZipFile(impc_zip_file)
         names = zf.namelist()
 
         file_names = addict.Dict(
@@ -584,12 +600,18 @@ class Vpv(QtCore.QObject):
             self.load_volumes([popavg], 'vol')
             inten_tstat = join(td.name, file_names.intensity_tstats_file)
             jac_tstat = join(td.name, file_names.jacobians_tstats_file)
-            self.load_volumes([inten_tstat, jac_tstat], 'data')
-            #now set the threshold
 
+            # get the trhesholds from the csv files
             qval_int_csv = join(td.name, file_names.qvals_intensity_file)
-            intensity_t_thesh = self.extract_threshold_value_from_csv(qval_int_csv, 0.05)
-            print(intensity_t_thesh)
+            intensity_t_thresh = self.extract_threshold_value_from_csv(qval_int_csv, 0.05)
+            qval_jac_csv = join(td.name, file_names.qvals_jacobians_file)
+            jacobian_t_thresh = self.extract_threshold_value_from_csv(qval_jac_csv, 0.05)
+            print('jacobian threshold at p=0.005 is {}'.format(jacobian_t_thresh))
+            print('intensity threshold at p=0.005 is {}'.format(intensity_t_thresh))
+
+            self.load_volumes([inten_tstat, jac_tstat], 'data', memory_map=False,
+                              lower_thresholds= [intensity_t_thresh, jacobian_t_thresh])
+
         else:
             # Make this a dialog?
             failed = []
@@ -613,14 +635,22 @@ class Vpv(QtCore.QObject):
             the p-value threshold at which the corresponding t-score should be set to invisible
         Returns
         -------
-        t_score_threshold: float
+            t_score_threshold: float
+            0 if t-threshold cannot be extracted from csv file
         """
-        with open(stats_info_csv, 'rb') as csvfile:
+        with open(stats_info_csv, 'r') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
+            t = 0
             for line in reader:
-                p = line[0]
+                try:
+                    p = float(line[0])
+                except ValueError:
+                    continue
                 if p == p_value:
-                    return line[3]
+                    t = float(line[3])
+        if t == 0:
+            print('Could not find the p-value {} line in the stats info csv {}'.format(p_value), csvfile)
+        return t
 
 
     def activate_view_manager(self, view_widget_id):

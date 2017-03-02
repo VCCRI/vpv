@@ -290,11 +290,20 @@ class DataModel(QtCore.QObject):
             return "Could not load annotation: {}. Not able to find loaded volume with same id".format(file_id)
         return None
 
-    def add_volume(self, volpath, data_type, memory_map):
+    def add_volume(self, volpath, data_type, memory_map, lower_threshold=None):
         """
-        Add a volume to all the slice views
-        :param volpath:
-        :raises RunntimeError if ITK can't read the volume
+        Load a volume into a subclass of a Volume object
+        Parameters
+        ----------
+        volpath
+        data_type
+        memory_map
+        lower_threshold: float
+            A value used to threshold low values. Currently only used for heatmap objects
+
+        Returns
+        -------
+
         """
 
         if data_type != 'virtual_stack':
@@ -307,6 +316,9 @@ class DataModel(QtCore.QObject):
 
         if data_type == 'data':
             vol = DataVolume(volpath, self, 'data')
+            if lower_threshold:
+                vol.set_upper_negative_lut(-lower_threshold)
+                vol.set_lower_positive_lut(lower_threshold)
             vol.name = unique_name
             self._data[vol.name] = vol
         elif data_type == 'vol':
