@@ -380,8 +380,8 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         """
  
         self.setFocus()
-        x = self.layers[Layer.vol1].image_item.mapFromScene(pos).x()
-        y = self.layers[Layer.vol1].image_item.mapFromScene(pos).y()
+        x = int(self.layers[Layer.vol1].image_item.mapFromScene(pos).x())
+        y = int(self.layers[Layer.vol1].image_item.mapFromScene(pos).y())
         if x < 0 or y < 0:
             return
         if self.layers[Layer.vol1].vol:
