@@ -581,6 +581,7 @@ class Vpv(QtCore.QObject):
              'popavg_file': None}
         )
 
+        files_remaining = []
         for name in names:
             name_lc = name.lower()
             if 'intensities-tstats' in name_lc:
@@ -593,6 +594,9 @@ class Vpv(QtCore.QObject):
                 file_names.qvals_jacobians_file = name
             elif 'popavg' in name_lc:
                 file_names.popavg_file = name
+            else:
+               files_remaining.append(name)
+
         if all(value for value in file_names.values()):
             td = tempfile.TemporaryDirectory()
             zf.extractall(td.name)
@@ -609,8 +613,13 @@ class Vpv(QtCore.QObject):
             print('jacobian threshold at p=0.005 is {}'.format(jacobian_t_thresh))
             print('intensity threshold at p=0.005 is {}'.format(intensity_t_thresh))
 
+            # Load the population average and stats
             self.load_volumes([inten_tstat, jac_tstat], 'data', memory_map=False,
                               lower_thresholds= [intensity_t_thresh, jacobian_t_thresh])
+
+            # Load any other volumes in the zip. Probably will be mutants
+            mutants = [join(td.name, x) for x in files_remaining if x.endswith('nrrd')]
+            self.load_volumes(mutants, 'vol', memory_map=False)
 
         else:
             # Make this a dialog?
