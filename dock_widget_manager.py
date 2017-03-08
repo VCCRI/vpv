@@ -29,8 +29,8 @@ class ManagerDockWidget(QtGui.QDockWidget):
         self.data_manager = data_manager
         self.annotations = annotations_manager
         self.console = console
-        self.hotred = lut.hotred()
-        self.hotblue = lut.hotblue()
+        self.hotred = lut._hot_red_blue()[0]
+        self.hotblue = lut._hot_red_blue()[1]
         self.ui = Ui_ManageViews()
         self.ui.setupUi(self)
         self.setStyleSheet("font-size: 12px")

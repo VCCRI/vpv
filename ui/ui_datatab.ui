@@ -432,12 +432,30 @@ color: rgb(223, 223, 223);</string>
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>100</height>
+       <height>170</height>
       </size>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <widget class="QComboBox" name="comboBoxData"/>
+       <layout class="QVBoxLayout" name="verticalLayout_8">
+        <item>
+         <widget class="QComboBox" name="comboBoxData"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_11">
+          <item>
+           <widget class="QComboBox" name="comboBoxLutHeatmap">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -503,10 +521,9 @@ color: rgb(223, 223, 223);</string>
        <layout class="QHBoxLayout" name="verticalLayoutConnectedComponents"/>
       </item>
      </layout>
-     <zorder>comboBoxData</zorder>
      <zorder></zorder>
      <zorder></zorder>
-     <zorder>horizontalLayoutWidget</zorder>
+     <zorder>verticalLayoutWidget</zorder>
     </widget>
    </item>
    <item>

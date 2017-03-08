@@ -51,8 +51,8 @@ class ManageData(QtGui.QWidget):
         self.controller = controller  # vpv.py
         self.ui.pushButtonRecalcConnectComponents.clicked.connect(self.controller.recalc_connected_components)
 
-        self.hotred = lut.hotred()
-        self.hotblue = lut.hotblue()
+        self.hotred = lut._hot_red_blue()[0]
+        self.hotblue = lut._hot_red_blue()[1]
 
         self.model = model
         self.volume_ids = None
@@ -110,6 +110,8 @@ class ManageData(QtGui.QWidget):
         neg_bg = 'background: qlineargradient(x1: 0.2, x2: 1,stop: 0 #0000FF, stop: 1  #FFFFFF);'
         self.data_levels_negative_slider.handle.setStyleSheet(neg_bg)
         self.ui.horizontalLayoutDataSliders.insertWidget(0, self.data_levels_negative_slider)
+
+        self.ui.comboBoxLutHeatmap.activated['QString'].connect(self.on_heatmap_lut_changed)
 
         # Qval filter spin box
         self.ui.doubleSpinBoxQValue.setMinimum(0.0)
@@ -172,7 +174,6 @@ class ManageData(QtGui.QWidget):
         self.ui.doubleSpinBoxScaleBarLength.setKeyboardTracking(False)
         self.ui.doubleSpinBoxScaleBarLength.valueChanged.connect(self.set_scalebar_length)
         self.colour_bar = ColorScaleBar(self.ui.verticalLayoutColorScale, self.hotblue, self.hotred)
-
         self.ui.vol2ControlsWidget.hide()
         self.ui.vectorWidget.hide()
         self.ui.dataWidget.hide()
@@ -404,22 +405,24 @@ class ManageData(QtGui.QWidget):
         Called when viewing a new orthogonal view
         """
         self.populate_volume_controls()
-        self.populate_data_controls()
+        self.populate_heatmap_controls()
         self.populate_vector_controls()
 
     def refresh_data_comboboxes(self):
         """
         """
         self.populate_volume_controls()
-        self.populate_data_controls()
+        self.populate_heatmap_controls()
         self.annotations.update()
 
-    def populate_data_controls(self):
+    def populate_heatmap_controls(self):
         self.ui.comboBoxData.clear()
         self.ui.comboBoxData.addItems(self.model.data_id_list())
         self.ui.comboBoxData.addItem("None")
         self.ui.comboBoxOrientation.setCurrentIndex(self.ui.comboBoxOrientation.findText(
             self.controller.current_orientation().name))
+        self.ui.comboBoxLutHeatmap.clear()
+        self.ui.comboBoxLutHeatmap.addItems(self.luts.heatmap_lut_list())
         self.update_data_controls()
 
     def populate_volume_controls(self):
@@ -620,6 +623,18 @@ class ManageData(QtGui.QWidget):
 
     def on_vol2_lut_changed(self, lut_name):
         self.modify_layer(Layer.vol2, 'set_lut', lut_name)
+
+    def on_heatmap_lut_changed(self, lut_name):
+        """
+        The heatmap LUT is stored on the volume not on the layer
+        Parameters
+        ----------
+        lut_name str:
+            the name of the LUT
+        """
+        vol = self.controller.current_view.layers[Layer.heatmap].vol
+        vol.set_lut(lut_name)
+        self.update_slice_views()
 
     def update_slice_views(self):
         self.update_color_scale_bar()

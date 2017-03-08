@@ -343,7 +343,7 @@ class Import(QtGui.QDialog):
         else:
             print('found')
 
-        heatmap_suggestions = ('stats', 'inten', 'jac', 'def')
+        heatmap_suggestions = ('stats', 'inten', 'jac')
         if any(x in data_basname for x in heatmap_suggestions):
             return HEATMAP
         if 'vector' in data_basname:

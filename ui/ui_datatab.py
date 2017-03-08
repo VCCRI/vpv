@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_datatab.ui'
 #
-# Created: Tue Jan 17 17:27:37 2017
-#      by: PyQt4 UI code generator 4.10.4
+# Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -223,7 +222,6 @@ class Ui_data(object):
         self.vol2ControlsWidget.setMinimumSize(QtCore.QSize(300, 80))
         self.vol2ControlsWidget.setObjectName(_fromUtf8("vol2ControlsWidget"))
         self.verticalLayout_3 = QtGui.QVBoxLayout(self.vol2ControlsWidget)
-        self.verticalLayout_3.setMargin(0)
         self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
         self.layoutVolume2 = QtGui.QVBoxLayout()
         self.layoutVolume2.setObjectName(_fromUtf8("layoutVolume2"))
@@ -269,14 +267,27 @@ class Ui_data(object):
         self.horizontalLayout_3.addWidget(self.labelData)
         self.verticalLayout.addLayout(self.horizontalLayout_3)
         self.dataWidget = QtGui.QWidget(data)
-        self.dataWidget.setMinimumSize(QtCore.QSize(0, 100))
+        self.dataWidget.setMinimumSize(QtCore.QSize(0, 170))
         self.dataWidget.setObjectName(_fromUtf8("dataWidget"))
         self.verticalLayout_4 = QtGui.QVBoxLayout(self.dataWidget)
-        self.verticalLayout_4.setMargin(0)
         self.verticalLayout_4.setObjectName(_fromUtf8("verticalLayout_4"))
+        self.verticalLayout_8 = QtGui.QVBoxLayout()
+        self.verticalLayout_8.setObjectName(_fromUtf8("verticalLayout_8"))
         self.comboBoxData = QtGui.QComboBox(self.dataWidget)
         self.comboBoxData.setObjectName(_fromUtf8("comboBoxData"))
-        self.verticalLayout_4.addWidget(self.comboBoxData)
+        self.verticalLayout_8.addWidget(self.comboBoxData)
+        self.horizontalLayout_11 = QtGui.QHBoxLayout()
+        self.horizontalLayout_11.setObjectName(_fromUtf8("horizontalLayout_11"))
+        self.comboBoxLutHeatmap = QtGui.QComboBox(self.dataWidget)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.comboBoxLutHeatmap.sizePolicy().hasHeightForWidth())
+        self.comboBoxLutHeatmap.setSizePolicy(sizePolicy)
+        self.comboBoxLutHeatmap.setObjectName(_fromUtf8("comboBoxLutHeatmap"))
+        self.horizontalLayout_11.addWidget(self.comboBoxLutHeatmap)
+        self.verticalLayout_8.addLayout(self.horizontalLayout_11)
+        self.verticalLayout_4.addLayout(self.verticalLayout_8)
         self.horizontalLayout_6 = QtGui.QHBoxLayout()
         self.horizontalLayout_6.setObjectName(_fromUtf8("horizontalLayout_6"))
         self.doubleSpinBoxNegThresh = QtGui.QDoubleSpinBox(self.dataWidget)
@@ -344,7 +355,6 @@ class Ui_data(object):
         self.vectorWidget.setMinimumSize(QtCore.QSize(0, 100))
         self.vectorWidget.setObjectName(_fromUtf8("vectorWidget"))
         self.verticalLayout_2 = QtGui.QVBoxLayout(self.vectorWidget)
-        self.verticalLayout_2.setMargin(0)
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.comboBoxVectors = QtGui.QComboBox(self.vectorWidget)
         self.comboBoxVectors.setObjectName(_fromUtf8("comboBoxVectors"))

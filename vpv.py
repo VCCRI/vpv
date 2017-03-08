@@ -26,8 +26,8 @@ WINPYTHON_DIR = 'WinPython-64bit-3.4.4.2Zero'
 PYTHON_DIR = 'python-3.4.4.amd64'
 
 import os
-from os.path import join
 import sys
+from os.path import join
 
 if os.name == 'nt':
     # check where vpv has been installed
@@ -48,12 +48,12 @@ import numpy as np
 from dock_widget_manager import ManagerDockWidget
 import importer
 from PyQt4 import QtGui, QtCore
-import model
+from model.model import DataModel
 from appdata import AppData
 from stats import StatsWidget
 import common
 from common import Orientation, Layer
-from slice_view import SliceWidget
+from layers.slice_view import SliceWidget
 from data_manager import ManageData
 from annotations import Annotations
 from console import Console
@@ -77,7 +77,7 @@ class Vpv(QtCore.QObject):
         self.appdata = AppData()
         self.mainwindow = main_window.Main(self, self.appdata)
         # self.mainwindow.showFullScreen()
-        self.model = model.DataModel()
+        self.model = DataModel()
         self.model.updating_started_signal.connect(self.updating_started)
         self.model.updating_finished_signal.connect(self.updating_finished)
         self.model.updating_msg_signal.connect(self.display_update_msg)
@@ -575,10 +575,10 @@ class Vpv(QtCore.QObject):
 
         file_names = addict.Dict(
             {'intensity_tstats_file': None,
-            'jacobians_tstats_file': None,
-            'qvals_intensity_file': None,
-            'qvals_jacobians_file': None,
-            'popavg_file': None}
+             'jacobians_tstats_file': None,
+             'qvals_intensity_file': None,
+             'qvals_jacobians_file': None,
+             'popavg_file': None}
         )
 
         for name in names:
@@ -640,16 +640,24 @@ class Vpv(QtCore.QObject):
         """
         with open(stats_info_csv, 'r') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
+            reader.__next__()  # remove header
             t = 0
             for line in reader:
                 try:
                     p = float(line[0])
                 except ValueError:
-                    continue
+                    print("There is a problem with the stats info file. Cannot read the pvalue '{}'from file {}".format(
+                        line[0], stats_info_csv
+                    ))
+                    return 'max'
                 if p == p_value:
-                    t = float(line[3])
-        if t == 0:
-            print('Could not find the p-value {} line in the stats info csv {}'.format(p_value), csvfile)
+                    try:
+                        t = float(line[3])
+                    except ValueError: # NAs have been noticed here
+                        print("There is a problem with the stats info file. Cannot read the pvalue '{}'from file {}".format(
+                            line[3], stats_info_csv
+                            ))
+                        return 'max'
         return t
 
 

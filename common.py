@@ -30,7 +30,6 @@ class Orientation(Enum):
     coronal = 2
     axial = 3
 
-
 class Stage(Enum):
     e9_5 = 'E9.5'
     e12_5 = 'E12.5'
@@ -49,7 +48,6 @@ class Layer(Enum):
 
 
 def read_image(img_path):
-    print('isfhisdjf', img_path)
     if img_path.endswith('.gz'):
         print('dkfjskd')
         # Get the image file extension
@@ -63,3 +61,14 @@ def read_image(img_path):
     img = sitk.ReadImage(img_path)
     arr = sitk.GetArrayFromImage(img)
     return arr
+
+
+def timing(f):
+    import time
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print('%s function took %0.3f ms' % (f.__name__, (time2 - time1) * 1000.0))
+        return ret
+    return wrap
