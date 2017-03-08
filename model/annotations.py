@@ -51,7 +51,7 @@ class VolumeAnnotations(object):
         self.col_count = 4
         self.dims = dims
 
-    def add_mapato(self, x, y, z, ma, pato, stage):
+    def add_emap_annotation(self, x, y, z, ma, pato, stage):
         """
         Add an emap/pato type annotaiotn unless exact is already present
         """
@@ -61,18 +61,6 @@ class VolumeAnnotations(object):
             if new_params == old_parmas:
                 return
         ann = MaPatoAnnotation(x, y, z, ma, pato, self.dims, stage)
-        self.annotations.append(ann)
-
-    def add_mp(self,  x, y, z, mp, stage):
-        """
-        Add a n MP type annotation unless excat already present
-        """
-        for a in self.annotations:
-            new_params = (x, y, z, mp)
-            old_parmas = (a.x, a.y, a.z, mp)
-            if new_params == old_parmas:
-                return
-        ann = MpAnnotation(x, y, z, mp, self.dims, stage)
         self.annotations.append(ann)
 
     def remove(self, row):

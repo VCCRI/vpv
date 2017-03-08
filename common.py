@@ -33,7 +33,8 @@ class Orientation(Enum):
 class Stage(Enum):
     e9_5 = 'E9.5'
     e12_5 = 'E12.5'
-    e14_5 = 'E14.5-E15.5'
+    e14_5 = 'E14.5'
+    e15_5 = 'E15.5'
     e18_5 = 'E18.5'
 
 

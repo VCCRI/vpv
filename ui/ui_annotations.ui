@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>573</width>
-    <height>776</height>
+    <width>582</width>
+    <height>915</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -117,20 +117,56 @@
        <item>
         <widget class="QGroupBox" name="groupBoxAnnotationType">
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="1" column="0">
-           <widget class="QRadioButton" name="radioButtonUseMp">
+          <item row="5" column="0">
+           <widget class="QRadioButton" name="radioButtonE125">
             <property name="text">
-             <string>Use MP</string>
+             <string>E12.5</string>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QRadioButton" name="radioButtonE185">
+            <property name="text">
+             <string>E18.5</string>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QRadioButton" name="radioButtonE155">
+            <property name="text">
+             <string>E15.5</string>
             </property>
             <property name="checked">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QRadioButton" name="radioButtonUseMaPato">
+          <item row="3" column="0">
+           <widget class="QRadioButton" name="radioButtonE145">
             <property name="text">
-             <string>Use EMAP/pato</string>
+             <string>E14.5</string>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QRadioButton" name="radioButtonE95">
+            <property name="text">
+             <string>E9.5</string>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -146,32 +182,7 @@
        </item>
        <item>
         <widget class="QGroupBox" name="groupBoxStage">
-         <layout class="QGridLayout" name="gridLayout_4">
-          <item row="2" column="0">
-           <widget class="QRadioButton" name="radioButtonE185">
-            <property name="text">
-             <string>E18.5 terms</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QRadioButton" name="radioButtonE125">
-            <property name="text">
-             <string>E12.5 terms</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QRadioButton" name="radioButtonE145">
-            <property name="text">
-             <string>E14.5/E15.5 terms</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <layout class="QGridLayout" name="gridLayout_4"/>
         </widget>
        </item>
       </layout>
@@ -191,48 +202,54 @@
          <height>40</height>
         </size>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <widget class="QLabel" name="label_32">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>EMAP terms</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="comboBoxMaTerms"/>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
-           <widget class="QLabel" name="label_33">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Pato terms</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="comboBoxPatoTerms"/>
-          </item>
-         </layout>
-        </item>
-       </layout>
+       <widget class="QLabel" name="label_3">
+        <property name="geometry">
+         <rect>
+          <x>9</x>
+          <y>42</y>
+          <width>68</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>561</width>
+          <height>42</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Emap</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBoxEmap">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </item>
      <item>
@@ -249,60 +266,47 @@
          <height>40</height>
         </size>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QLabel" name="label">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>MP terms</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBoxMpTerms"/>
-        </item>
-       </layout>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>-1</x>
+          <y>9</y>
+          <width>561</width>
+          <height>29</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Option</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBoxOptions">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pushButtonAddAnnotation">
        <property name="text">
         <string>Add annotation</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_31">
-       <property name="text">
-        <string>Free text comments</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QTextEdit" name="textEditFreetext">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>100</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="labelAvailableAnnotations">
-       <property name="text">
-        <string/>
        </property>
       </widget>
      </item>

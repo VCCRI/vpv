@@ -10,15 +10,15 @@ from common import Orientation, Stage, Layer
 from lib.addict import Dict
 
 
-E145_MP_TERMS_FILE = 'ontologies/e14.5/GM_e14-15_embryo_mp_terms.csv'
 E145_PATO_TERMS_FILE = 'ontologies/e14.5/pato_terms.csv'
 E145_EMAP_TERMS_FILE = 'ontologies/e14.5/emap_terms.csv'
 
-E185_MP_TERMS_FILE = 'ontologies/e18.5/GM_e18_embryo_mp_terms.csv'
+E155_OPTIONS_FILE = 'ontologies/e15.5/options.csv'
+E155_EMAP_TERMS_FILE = 'ontologies/e15.5/emap_terms.csv'
+
 E185_PATO_TERMS_FILE = 'ontologies/e18.5/pato_terms.csv'
 E185_EMAP_TERMS_FILE = 'ontologies/e18.5/emap_terms.csv'
 
-E125_MP_TERMS_FILE = 'ontologies/e12.5/GM_e12_embryo_mp_terms.csv'
 E125_PATO_TERMS_FILE = 'ontologies/e12.5/pato_terms.csv'
 E125_EMAP_TERMS_FILE = 'ontologies/e12.5/emap_terms.csv'
 
@@ -68,22 +68,19 @@ class Annotations(QtGui.QWidget):
         self.controller = controller
         self.ui = Ui_Annotations()
         self.ui.setupUi(self)
-        # Hide the free text for now
-        self.ui.textEditFreetext.hide()
-        self.ui.label_31.hide()
         self.appdata = self.controller.appdata
 
         self.terms = Dict()
-        self.terms[Stage.e12_5]['mp'] = self.parse_mp(E125_MP_TERMS_FILE)
-        self.terms[Stage.e12_5]['pato'] = self.parse_pato(E125_PATO_TERMS_FILE)
+        self.terms[Stage.e12_5]['pato'] = self.parse_options(E125_PATO_TERMS_FILE)
         self.terms[Stage.e12_5]['emap'] = self.parse_emap(E125_EMAP_TERMS_FILE)
 
-        self.terms[Stage.e14_5]['mp'] = self.parse_mp(E145_MP_TERMS_FILE)
-        self.terms[Stage.e14_5]['pato'] = self.parse_pato(E145_PATO_TERMS_FILE)
+        self.terms[Stage.e14_5]['option'] = self.parse_options(E145_PATO_TERMS_FILE)
         self.terms[Stage.e14_5]['emap'] = self.parse_emap(E145_EMAP_TERMS_FILE)
 
-        self.terms[Stage.e18_5]['mp'] = self.parse_mp(E185_MP_TERMS_FILE)
-        self.terms[Stage.e18_5]['pato'] = self.parse_pato(E185_PATO_TERMS_FILE)
+        self.terms[Stage.e15_5]['option'] = self.parse_options(E155_OPTIONS_FILE)
+        self.terms[Stage.e15_5]['emap'] = self.parse_emap(E155_EMAP_TERMS_FILE)
+
+        self.terms[Stage.e18_5]['pato'] = self.parse_options(E185_PATO_TERMS_FILE)
         self.terms[Stage.e18_5]['emap'] = self.parse_emap(E185_EMAP_TERMS_FILE)
 
         # Set E145 terms as the default
@@ -104,14 +101,10 @@ class Annotations(QtGui.QWidget):
         self.ui.radioButtonE145.toggled.connect(self.activate_stage)
         self.ui.radioButtonE185.toggled.connect(self.activate_stage)
 
-        self.ui.radioButtonUseMp.toggled.connect(self.mp_radio_clicked)
-        self.ui.radioButtonUseMaPato.toggled.connect(self.ma_radio_clicked)
-
-        self.ui.maPatoWidget.hide()
         self.ui.pushButtonSaveAnnotations.clicked.connect(self.save_annotations)
         self.ui.spinBoxAnnotationCircleSize.valueChanged.connect(self.annotation_radius_changed)
         self.annotation_radius = 10
-        self.annotation_type = 'mp'
+        self.annotation_type = 'emap'
         self.annotating = False
 
     def clear(self):
@@ -121,37 +114,18 @@ class Annotations(QtGui.QWidget):
         self.annotation_radius = radius
         self.annotation_radius_signal.emit(radius)
 
-    def parse_mp(self, mp_file):
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        mp_path = os.path.join(script_dir, mp_file)
-        mp_info = {}
-        try:
-            with open(mp_path, 'r') as fh:
-                csv_reader = csv.reader(fh)
-                header = csv_reader.__next__()
-                for row in csv_reader:
-                    parameter_key, mp_id, mp_term = row
-                    entry = {'parameter_key': parameter_key, 'mp_id': mp_id, 'mp_term': mp_term}
-                    mp_info[mp_term] = entry
-        except OSError:
-            return None
-        return mp_info
-
-    def parse_pato(self, pato_file):
+    def parse_options(self, pato_file):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         pato_path = os.path.join(script_dir, pato_file)
-        pato_info = {}
+        options = []
         try:
             with open(pato_path, 'r') as fh:
                 csv_reader = csv.reader(fh)
-                header = csv_reader.__next__()
                 for row in csv_reader:
-                    pato_term, pato_name= row
-                    entry = {'pato_term': pato_term, 'pato_name': pato_name}
-                    pato_info[pato_name] = entry
+                    options.append(row[0])
         except OSError:
             return None
-        return pato_info
+        return options
 
     def parse_emap(self, emap_file):
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -163,7 +137,7 @@ class Annotations(QtGui.QWidget):
                 header = csv_reader.__next__()
                 for row in csv_reader:
                     emap_id, emap_term= row
-                    entry = {'emap_term': emap_term, 'emap_id': emap_id}
+                    entry = {'emap_term': emap_term, 'emap_id': emap_id}   # [1:-1] stripping quotes
                     emap_info[emap_term] = entry
         except OSError:
             return None
@@ -189,19 +163,10 @@ class Annotations(QtGui.QWidget):
             ann = vol.annotations
             vol_id = vol.name
             for i,  a in enumerate(ann.annotations):
-                if a.type == 'mp':
-                    annotations_dict[i]['annotation_type'] = 'mp'
-                    ann = self.terms[a.stage]['mp'][a.mp_term]
-                    annotations_dict[i]['mp_term'] = ann['mp_term']
-                    annotations_dict[i]['mp_id'] = ann['mp_id']
-                    annotations_dict[i]['parameter_key'] = ann['parameter_key']
-                elif a.type == 'ma':
-                    annotations_dict[i]['annotation_type'] = 'emap'
-                    annotations_dict[i]['emap_term'] = a.emap_term
-                    annotations_dict[i]['emap_id'] = self.terms['ma'][a.emap_term]['emap_id']
-                    annotations_dict[i]['pato_term'] = a.pato_term
-                    annotations_dict[i]['pato_id'] = self.terms['pato'][a.pato_term]['pato_id']
-                annotations_dict[i]['stage'] = a.stage.value  # Convert enum value to string
+                annotations_dict[i]['annotation_type'] = 'emapa'
+                annotations_dict[i]['emapa_term'] = a.emap_term
+                annotations_dict[i]['emapa_id'] = self.terms[a.stage]['emap'][a.emap_term]['emap_id']
+                annotations_dict[i]['option'] = a.pato_term
                 annotations_dict[i]['x'] = a.x
                 annotations_dict[i]['y'] = a.y
                 annotations_dict[i]['z'] = a.z
@@ -232,39 +197,36 @@ class Annotations(QtGui.QWidget):
         self.annotation_recent_dir_signal.emit(out_dir)
 
     def activate_stage(self):
-        if self.ui.radioButtonE125.isChecked():
-            # Set E145 terms as the default
-            mp_terms = [x['mp_term'] for x in self.terms[Stage.e12_5]['mp'].values()]
-            pato_terms = [x['pato_name'] for x in self.terms[Stage.e12_5]['pato'].values()]
-            emap_terms = [x['emap_term'] for x in self.terms[Stage.e12_5]['emap'].values()]
-        elif self.ui.radioButtonE145.isChecked():
-            # Set E145 terms as the default
-            mp_terms = [x['mp_term'] for x in self.terms[Stage.e14_5]['mp'].values()]
-            pato_terms = [x['pato_name'] for x in self.terms[Stage.e14_5]['pato'].values()]
-            emap_terms = [x['emap_term'] for x in self.terms[Stage.e14_5]['emap'].values()]
-        elif self.ui.radioButtonE185.isChecked():
-            # Set E145 terms as the default
-            mp_terms = [x['mp_term'] for x in self.terms[Stage.e18_5]['mp'].values()]
-            pato_terms = [x['pato_name'] for x in self.terms[Stage.e18_5]['pato'].values()]
-            emap_terms = [x['emap_term'] for x in self.terms[Stage.e18_5]['emap'].values()]
+        """
+        All radio buttons except e15.5 are incativated for now within QT designer
+        Returns
+        -------
 
-        self.ui.comboBoxMaTerms.clear()
-        self.ui.comboBoxMaTerms.addItems(sorted(emap_terms))
-        self.ui.comboBoxPatoTerms.clear()
-        self.ui.comboBoxPatoTerms.addItems(sorted(pato_terms))
-        self.ui.comboBoxMpTerms.clear()
-        self.ui.comboBoxMpTerms.addItems(sorted(mp_terms))
-        self.ui.comboBoxMpTerms.update()
+        """
+        # if self.ui.radioButtonE125.isChecked():
+        #     # Set E145 terms as the default
+        #     mp_terms = [x['mp_term'] for x in self.terms[Stage.e12_5]['mp'].values()]
+        #     pato_terms = [x['pato_name'] for x in self.terms[Stage.e12_5]['pato'].values()]
+        #     emap_terms = [x['emap_term'] for x in self.terms[Stage.e12_5]['emap'].values()]
+        # elif self.ui.radioButtonE155.isChecked():
+        #     # Set E145 terms as the default
+        #     mp_terms = [x['mp_term'] for x in self.terms[Stage.e14_5]['mp'].values()]
+        #     pato_terms = [x['pato_name'] for x in self.terms[Stage.e14_5]['pato'].values()]
+        #     emap_terms = [x['emap_term'] for x in self.terms[Stage.e14_5]['emap'].values()]
+        # elif self.ui.radioButtonE185.isChecked():
+        #     # Set E145 terms as the default
+        #     mp_terms = [x['mp_term'] for x in self.terms[Stage.e18_5]['mp'].values()]
+        #     pato_terms = [x['pato_name'] for x in self.terms[Stage.e18_5]['pato'].values()]
+        #     emap_terms = [x['emap_term'] for x in self.terms[Stage.e18_5]['emap'].values()]
 
-    def mp_radio_clicked(self):
-        self.ui.mpWidget.show()
-        self.ui.maPatoWidget.hide()
-        self.annotation_type = 'mp'
+        options = self.terms[Stage.e15_5]['option']
+        emap_terms = [x['emap_term'] for x in self.terms[Stage.e15_5]['emap'].values()]
 
-    def ma_radio_clicked(self):
-        self.ui.mpWidget.hide()
-        self.ui.maPatoWidget.show()
-        self.annotation_type = 'ma'
+        self.ui.comboBoxOptions.clear()
+        self.ui.comboBoxOptions.addItems(sorted(options))
+        self.ui.comboBoxEmap.clear()
+        self.ui.comboBoxEmap.addItems(sorted(emap_terms))
+        self.ui.comboBoxEmap.update()
 
     def volume_changed(self, vol_id):
         self.controller.volume_changed(vol_id)
@@ -310,14 +272,12 @@ class Annotations(QtGui.QWidget):
             stage = Stage.e18_5
         elif self.ui.radioButtonE125.isChecked():
             stage = Stage.e12_5
+        elif self.ui.radioButtonE155.isChecked():
+            stage = Stage.e15_5
 
-        if self.annotation_type == 'mp':
-            mp_term = str(self.ui.comboBoxMpTerms.currentText())
-            self.controller.current_view.layers[Layer.vol1].vol.annotations.add_mp(x, y, z, mp_term, stage)
-        elif self.annotation_type == 'ma':
-            ma_term = str(self.ui.comboBoxMaTerms.currentText())
-            pato_term = str(self.ui.comboBoxPatoTerms.currentText())
-            self.controller.current_view.layers[Layer.vol1].vol.annotations.add_mapato(x, y, z, ma_term, pato_term, stage)
+        emap_term = str(self.ui.comboBoxEmap.currentText())
+        option = str(self.ui.comboBoxOptions.currentText())
+        self.controller.current_view.layers[Layer.vol1].vol.annotations.add_emap_annotation(x, y, z, emap_term, option, stage)
         self.update()
 
     def mouse_pressed_annotate(self, view_index, x, y, orientation, vol_id):

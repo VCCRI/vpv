@@ -204,7 +204,7 @@ class DataModel(QtCore.QObject):
                     if a.annotation_type == 'mp':
                         vol.annotations.add_mp(a.x, a.y, a.z, a.mp_term, Stage(a.stage))
                     elif a.annotation_type == 'emap':
-                        vol.annotations.add_mapato(a.x, a.y, a.z, a.emap_term, a.pato_term, Stage(a.stage))
+                        vol.annotations.add_emap_annotation(a.x, a.y, a.z, a.emap_term, a.pato_term, Stage(a.stage))
         else:
             return "Could not load annotation: {}. Not able to find loaded volume with same id".format(file_id)
         return None
