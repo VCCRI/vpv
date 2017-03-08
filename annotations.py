@@ -27,7 +27,7 @@ class VolumeAnnotationsTableModel(QtCore.QAbstractTableModel):
     def __init__(self, parent=None):
         super(VolumeAnnotationsTableModel, self).__init__(parent)
         self.ann_data = None  # model.volume.VolumeAnnotations
-        self.header_data = ['x:y:z', 'EMAP/MP', 'pato', 'stage']
+        self.header_data = ['x:y:z', 'EMAPA', 'option', 'stage']
 
     def set_data(self, annotations_model):
         self.ann_data = annotations_model

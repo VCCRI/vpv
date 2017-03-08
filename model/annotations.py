@@ -23,14 +23,6 @@ class Annotation(object):
         return xp, yp, zp
 
 
-class MpAnnotation(Annotation):
-    def __init__(self, x, y, z, mp_term, dims, stage):
-        super(MpAnnotation, self).__init__(x, y, z, dims, stage)
-        self.mp_term = str(mp_term)
-        self.indexes = [self.mp_term, '', self.stage.value]
-        self.type = 'mp'
-
-
 class MaPatoAnnotation(Annotation):
     def __init__(self, x, y, z, ma_term, pato_term, dims, stage):
         super(MaPatoAnnotation, self).__init__(x, y, z, dims, stage)
@@ -51,16 +43,16 @@ class VolumeAnnotations(object):
         self.col_count = 4
         self.dims = dims
 
-    def add_emap_annotation(self, x, y, z, ma, pato, stage):
+    def add_emap_annotation(self, x, y, z, emapa, option, stage):
         """
         Add an emap/pato type annotaiotn unless exact is already present
         """
         for a in self.annotations:
-            new_params = (x, y, z, ma, pato)
-            old_parmas = (a.x, a.y, a.z, pato)
+            new_params = (x, y, z, emapa, option)
+            old_parmas = (a.x, a.y, a.z, emapa, option)
             if new_params == old_parmas:
-                return
-        ann = MaPatoAnnotation(x, y, z, ma, pato, self.dims, stage)
+                return  # prevent duplicates
+        ann = MaPatoAnnotation(x, y, z, emapa, option, self.dims, stage)
         self.annotations.append(ann)
 
     def remove(self, row):
