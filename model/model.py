@@ -42,6 +42,7 @@ from .VectorVolume import VectorVolume
 from .ImageSeriesVolume import ImageSeriesVolume
 from .VirtualStackVolume import VirtualStackVolume
 
+
 class LoadVirtualStackWorker(QtCore.QThread):
     progress_signal = QtCore.pyqtSignal([str])
 
