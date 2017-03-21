@@ -165,14 +165,14 @@ class Vpv(QtCore.QObject):
         for view in self.views.values():
             view.annotation_radius_changed(radius)
 
-    def tab_changed(self, indx):
+    def tab_changed(self, indx: int):
         """
         When changing to annotations tab, make sure all views are linked
         """
         self.data_manager.link_views = True
         self.annotations_manager.tab_changed(indx)
 
-    def add_layer(self, z_position): # move
+    def add_layer(self, z_position: int):  # move
         for view in self.views.values():
             view.register_layer(z_position, self)
 
@@ -182,7 +182,7 @@ class Vpv(QtCore.QObject):
     def updating_finished(self):
         self.updating_dlg.close()
 
-    def display_update_msg(self, msg):
+    def display_update_msg(self, msg: str):
         self.updating_dlg.setText(msg)
 
     def set_view_controls_visibility(self, visible):
