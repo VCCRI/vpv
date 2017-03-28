@@ -8,6 +8,7 @@ import csv
 import common
 from common import Orientation, Stage, Layer
 from lib.addict import Dict
+from .annotation_tree_model import AnnotationTreeModel, AnnotationTreeItem
 
 
 E145_PATO_TERMS_FILE = 'ontologies/e14.5/pato_terms.csv'
@@ -89,7 +90,7 @@ class Annotations(QtGui.QWidget):
         self.ui.radioButtonE145.setChecked(True)
         self.activate_stage()
 
-        self.annotations_table = VolumeAnnotationsTableModel(self)
+        self.annotations_table = AnnotationTreeModel(self)
         self.ui.tableViewAvailableAnnotations.setModel(self.annotations_table)
         self.ui.tableViewAvailableAnnotations.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.ui.tableViewAvailableAnnotations.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
@@ -98,7 +99,7 @@ class Annotations(QtGui.QWidget):
         self.ui.pushButtonAddAnnotation.clicked.connect(self.add_annotation)
         self.ui.pushButtonRemoveAnnotation.clicked.connect(self.remove_annotation)
         self.ui.tableViewAvailableAnnotations.clicked.connect(self.annotation_row_selected)
-        self.ui.treeWidgetAvailableTerms.clicked.connect(self.resize_table)
+        self.ui.treeWidgetAvailableTerms.clicked.connect(self.update_avaialble_terms_table)
 
 
         self.ui.radioButtonE125.toggled.connect(self.activate_stage)
@@ -128,10 +129,13 @@ class Annotations(QtGui.QWidget):
                 child = QtGui.QTreeWidgetItem(parent)
                 child.setText(1, term)
                 parent.addChild(child)
-                box_item = QtGui.QTreeWidgetItem(child)
                 box = QtGui.QComboBox()
                 box.addItems(['normal', 'abnormal', 'unobserved'])
                 self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)
+
+    def update_avaialble_terms_table(self, item):
+        self.resize_table()
+        # if the selected item has an annotation diply it in the bottom tableQtrTree
 
     def annotation_radius_changed(self, radius):
         self.annotation_radius = radius
@@ -309,6 +313,10 @@ class Annotations(QtGui.QWidget):
             self.annotations_table.layoutChanged.emit()
 
     def add_annotation(self):
+        vol = self.controller.current_view.layers[Layer.vol1].vol
+        if not vol:
+            common.info_dialog(self, "Error", "No volume selected")
+            return
         x = int(self.ui.labelXPos.text())
         y = int(self.ui.labelYPos.text())
         z = int(self.ui.labelZPos.text())
@@ -322,9 +330,23 @@ class Annotations(QtGui.QWidget):
         elif self.ui.radioButtonE155.isChecked():
             stage = Stage.e15_5
 
-        option = str(self.ui.comboBoxOptions.currentText())
-        self.controller.current_view.layers[Layer.vol1].vol.annotations.add_emap_annotation(x, y, z, emap_term, option, stage)
-        self.update()
+        selected = self.ui.treeWidgetAvailableTerms.selectedItems()
+        if selected:
+            base_node = selected[0]
+            term = base_node.text(1)
+            if not term:
+                common.info_dialog(self, "Error", "No term is selected!")
+                return
+            else:
+                # get the option from the combobox
+                cbox = self.ui.treeWidgetAvailableTerms.itemWidget(base_node, 2)
+                option = cbox.currentText()
+        else:
+            common.info_dialog(self, "Error", "No term is selected!")
+            return
+
+        self.controller.current_view.layers[Layer.vol1].vol.annotations.add_emap_annotation(x, y, z, term, option, stage)
+        # self.update()
 
     def mouse_pressed_annotate(self, view_index, x, y, orientation, vol_id):
         """
