@@ -174,7 +174,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QTreeWidget" name="treeWidgetAvailableTerms">
+        <widget class="QTreeView" name="treeViewAvailableTerms">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
            <horstretch>0</horstretch>
@@ -187,11 +187,6 @@
            <height>300</height>
           </size>
          </property>
-         <column>
-          <property name="text">
-           <string notr="true">1</string>
-          </property>
-         </column>
         </widget>
        </item>
       </layout>

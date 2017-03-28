@@ -90,15 +90,15 @@ class Annotations(QtGui.QWidget):
         self.ui.radioButtonE145.setChecked(True)
         self.activate_stage()
 
-        self.annotations_table = AnnotationTreeModel(self)
-        self.ui.tableViewAvailableAnnotations.setModel(self.annotations_table)
-        self.ui.tableViewAvailableAnnotations.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        self.ui.tableViewAvailableAnnotations.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.annotations_tree_model = AnnotationTreeModel()
+        self.ui.treeViewAvailableAnnotations.setModel(self.annotations_tree_model)
+        self.ui.treeViewAvailableAnnotations.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.ui.treeViewAvailableAnnotations.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
 
         self.ui.comboBoxAnnotationsVolumes.activated['QString'].connect(self.volume_changed)
         self.ui.pushButtonAddAnnotation.clicked.connect(self.add_annotation)
         self.ui.pushButtonRemoveAnnotation.clicked.connect(self.remove_annotation)
-        self.ui.tableViewAvailableAnnotations.clicked.connect(self.annotation_row_selected)
+        self.ui.treeViewAvailableAnnotations.clicked.connect(self.annotation_row_selected)
         self.ui.treeWidgetAvailableTerms.clicked.connect(self.update_avaialble_terms_table)
 
 
@@ -306,7 +306,7 @@ class Annotations(QtGui.QWidget):
             self.annotating = False
 
     def remove_annotation(self):
-        indexes = self.ui.tableViewAvailableAnnotations.selectionModel().selectedRows()
+        indexes = self.ui.treeViewAvailableAnnotations.selectionModel().selectedRows()
         if len(indexes) > 0:
             selected_row = indexes[0].row()
             self.controller.current_view.layers[Layer.vol1].vol.annotations.remove(selected_row)
