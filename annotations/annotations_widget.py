@@ -14,13 +14,14 @@ E145_PATO_TERMS_FILE = 'ontologies/e14.5/pato_terms.csv'
 E145_EMAP_TERMS_FILE = 'ontologies/e14.5/emap_terms.csv'
 
 E155_OPTIONS_FILE = 'ontologies/e15.5/options.csv'
-E155_EMAP_TERMS_FILE = 'ontologies/e15.5/emap_terms.csv'
-
+# E155_EMAP_TERMS_FILE = 'ontologies/e15.5/emap_terms.csv'
+E155_EMAP_TERMS_FILE = 'ontologies/e15.5/VPV_e15_5_terms.yaml'
 E185_PATO_TERMS_FILE = 'ontologies/e18.5/pato_terms.csv'
 E185_EMAP_TERMS_FILE = 'ontologies/e18.5/emap_terms.csv'
 
 E125_PATO_TERMS_FILE = 'ontologies/e12.5/pato_terms.csv'
 E125_EMAP_TERMS_FILE = 'ontologies/e12.5/emap_terms.csv'
+
 
 
 class VolumeAnnotationsTableModel(QtCore.QAbstractTableModel):
@@ -78,7 +79,8 @@ class Annotations(QtGui.QWidget):
         self.terms[Stage.e14_5]['emap'] = self.parse_emap(E145_EMAP_TERMS_FILE)
 
         self.terms[Stage.e15_5]['option'] = self.parse_options(E155_OPTIONS_FILE)
-        self.terms[Stage.e15_5]['emap'] = self.parse_emap(E155_EMAP_TERMS_FILE)
+        # self.terms[Stage.e15_5]['emap'] = self.parse_emap(E155_EMAP_TERMS_FILE)
+        self.terms[Stage.e15_5]['emap'] = self.parse_emap_yaml(E155_EMAP_TERMS_FILE)
 
         self.terms[Stage.e18_5]['pato'] = self.parse_options(E185_PATO_TERMS_FILE)
         self.terms[Stage.e18_5]['emap'] = self.parse_emap(E185_EMAP_TERMS_FILE)
@@ -96,6 +98,8 @@ class Annotations(QtGui.QWidget):
         self.ui.pushButtonAddAnnotation.clicked.connect(self.add_annotation)
         self.ui.pushButtonRemoveAnnotation.clicked.connect(self.remove_annotation)
         self.ui.tableViewAvailableAnnotations.clicked.connect(self.annotation_row_selected)
+        self.ui.treeWidgetAvailableTerms.clicked.connect(self.resize_table)
+
 
         self.ui.radioButtonE125.toggled.connect(self.activate_stage)
         self.ui.radioButtonE145.toggled.connect(self.activate_stage)
@@ -106,9 +110,28 @@ class Annotations(QtGui.QWidget):
         self.annotation_radius = 10
         self.annotation_type = 'emap'
         self.annotating = False
+        self.populate_available_terms()
 
     def clear(self):
         self.ui.comboBoxAnnotationsVolumes.clear()
+
+    def populate_available_terms(self):
+        terms = self.terms[Stage.e15_5]['emap']
+
+        header = QtGui.QTreeWidgetItem(['category', 'term', 'option'])
+        self.ui.treeWidgetAvailableTerms.setHeaderItem(header)
+        for category in terms:
+            parent = QtGui.QTreeWidgetItem(self.ui.treeWidgetAvailableTerms)
+            parent.setText(0, category)
+            parent.setFlags(parent.flags())
+            for i, term in enumerate(terms[category]):
+                child = QtGui.QTreeWidgetItem(parent)
+                child.setText(1, term)
+                parent.addChild(child)
+                box_item = QtGui.QTreeWidgetItem(child)
+                box = QtGui.QComboBox()
+                box.addItems(['normal', 'abnormal', 'unobserved'])
+                self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)
 
     def annotation_radius_changed(self, radius):
         self.annotation_radius = radius
@@ -128,6 +151,16 @@ class Annotations(QtGui.QWidget):
         return options
 
     def parse_emap(self, emap_file):
+        """
+        This may not be used soon. Moving to yaml file loading
+        Parameters
+        ----------
+        emap_file
+
+        Returns
+        -------
+
+        """
         script_dir = os.path.dirname(os.path.abspath(__file__))
         emap_path = os.path.join(script_dir, emap_file)
         emap_info = {}
@@ -142,6 +175,24 @@ class Annotations(QtGui.QWidget):
         except OSError:
             return None
         return emap_info
+
+    def parse_emap_yaml(self, emap_file):
+        import yaml
+        from collections import defaultdict
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        emap_path = os.path.join(script_dir, emap_file)
+        outdict = Dict()
+        try:
+            with open(emap_path, 'r') as fh:
+                emap_terms = yaml.load(fh)
+                for category, terms in emap_terms.items():
+                    for term in terms:
+                        outdict[category][term] = 'emap id here'
+        except OSError:
+            print('could not open the annotations yaml file {}'.format(emap_path))
+            raise
+        return outdict
+
 
     def save_annotations(self):
 
@@ -222,11 +273,6 @@ class Annotations(QtGui.QWidget):
         options = self.terms[Stage.e15_5]['option']
         emap_terms = [x['emap_term'] for x in self.terms[Stage.e15_5]['emap'].values()]
 
-        self.ui.comboBoxOptions.clear()
-        self.ui.comboBoxOptions.addItems(sorted(options))
-        self.ui.comboBoxEmap.clear()
-        self.ui.comboBoxEmap.addItems(sorted(emap_terms))
-        self.ui.comboBoxEmap.update()
 
     def volume_changed(self, vol_id):
         self.controller.volume_changed(vol_id)
@@ -238,6 +284,7 @@ class Annotations(QtGui.QWidget):
         y = ann.y
         z = ann.z
         self.annotation_highlight_signal.emit(x, y, z, [0, 255, 0], self.annotation_radius)
+        self.resize_table()
 
     def tab_changed(self, tab_indx):
         """
@@ -275,7 +322,6 @@ class Annotations(QtGui.QWidget):
         elif self.ui.radioButtonE155.isChecked():
             stage = Stage.e15_5
 
-        emap_term = str(self.ui.comboBoxEmap.currentText())
         option = str(self.ui.comboBoxOptions.currentText())
         self.controller.current_view.layers[Layer.vol1].vol.annotations.add_emap_annotation(x, y, z, emap_term, option, stage)
         self.update()
@@ -312,6 +358,10 @@ class Annotations(QtGui.QWidget):
             self.ui.labelZPos.setText(str(z))
             self.annotation_highlight_signal.emit(int(x), int(y), int(z), [255, 0, 0], self.annotation_radius)
 
+    def resize_table(self):
+        self.ui.treeWidgetAvailableTerms.resizeColumnToContents(0)
+        self.ui.treeWidgetAvailableTerms.resizeColumnToContents(1)
+
     def update(self):
         vol = self.controller.current_view.layers[Layer.vol1].vol
         if vol:
@@ -321,4 +371,4 @@ class Annotations(QtGui.QWidget):
             self.ui.comboBoxAnnotationsVolumes.addItem("None")
             self.ui.comboBoxAnnotationsVolumes.setCurrentIndex(self.ui.comboBoxAnnotationsVolumes.findText(vol.name))
             self.annotations_table.layoutChanged.emit()
-            self.ui.tableViewAvailableAnnotations.resizeColumnsToContents()
+            self.resize_table()
