@@ -124,7 +124,9 @@ class Annotations(QtGui.QWidget):
 
         header = QtGui.QTreeWidgetItem(['category', 'term', 'option'])
         self.ui.treeWidgetAvailableTerms.setHeaderItem(header)
+
         for category in terms:
+            # The offending line
             parent = QtGui.QTreeWidgetItem(self.ui.treeWidgetAvailableTerms)
             parent.setText(0, category)
             parent.setFlags(parent.flags())
