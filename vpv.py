@@ -130,6 +130,16 @@ class Vpv(QtCore.QObject):
         self.crosshair_permanent = False
         self.gradient_editor_widget = None
 
+    def current_annotation_volume(self):
+        """
+        Get the volume currently visible in the annotation view
+        
+        Returns 
+        -------
+        model.ImageVolume instance
+        """
+        return self.current_view.layers[Layer.vol1].vol
+
     def on_console_enter_pressesd(self):
         print('command update')
         self.update_slice_views()

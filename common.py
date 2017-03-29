@@ -25,6 +25,11 @@ class ImType(Enum):
     IMAGE_SERIES = "Image series"
     IMPC_ANALYSIS = "IMPC analysis"
 
+class AnnotationOption(Enum):
+    unobserved = "unobserved"
+    normal = 'normal'
+    abnormal = 'abnormal'
+
 class Orientation(Enum):
     sagittal = 1
     coronal = 2

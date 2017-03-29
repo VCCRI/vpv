@@ -10,18 +10,10 @@ from common import Orientation, Stage, Layer
 from lib.addict import Dict
 from .annotation_tree_model import AnnotationTreeModel, AnnotationTreeItem
 
-
-E145_PATO_TERMS_FILE = 'ontologies/e14.5/pato_terms.csv'
-E145_EMAP_TERMS_FILE = 'ontologies/e14.5/emap_terms.csv'
-
-E155_OPTIONS_FILE = 'ontologies/e15.5/options.csv'
-# E155_EMAP_TERMS_FILE = 'ontologies/e15.5/emap_terms.csv'
-E155_EMAP_TERMS_FILE = 'ontologies/e15.5/VPV_e15_5_terms.yaml'
-E185_PATO_TERMS_FILE = 'ontologies/e18.5/pato_terms.csv'
-E185_EMAP_TERMS_FILE = 'ontologies/e18.5/emap_terms.csv'
-
-E125_PATO_TERMS_FILE = 'ontologies/e12.5/pato_terms.csv'
-E125_EMAP_TERMS_FILE = 'ontologies/e12.5/emap_terms.csv'
+# The background colours for annotation tree widget items
+COLOR_UNOBSERVED = (0, 255, 255, 100)
+COLOR_ABNORMAL = (255, 0, 0, 100)
+COLOR_NORMAL = (0, 255, 0, 100)
 
 
 
@@ -72,20 +64,7 @@ class Annotations(QtGui.QWidget):
         self.ui.setupUi(self)
         self.appdata = self.controller.appdata
 
-        # Create a dict to store all the annotation terms for each stage
-        self.terms = Dict()
-        self.terms[Stage.e12_5]['pato'] = self.parse_options(E125_PATO_TERMS_FILE)
-        self.terms[Stage.e12_5]['emap'] = self.parse_emap(E125_EMAP_TERMS_FILE)
 
-        self.terms[Stage.e14_5]['option'] = self.parse_options(E145_PATO_TERMS_FILE)
-        self.terms[Stage.e14_5]['emap'] = self.parse_emap(E145_EMAP_TERMS_FILE)
-
-        self.terms[Stage.e15_5]['option'] = self.parse_options(E155_OPTIONS_FILE)
-        # self.terms[Stage.e15_5]['emap'] = self.parse_emap(E155_EMAP_TERMS_FILE)
-        self.terms[Stage.e15_5]['emap'] = self.parse_emap_yaml(E155_EMAP_TERMS_FILE)
-
-        self.terms[Stage.e18_5]['pato'] = self.parse_options(E185_PATO_TERMS_FILE)
-        self.terms[Stage.e18_5]['emap'] = self.parse_emap(E185_EMAP_TERMS_FILE)
 
         # Set E15_5 terms as the default
         self.ui.radioButtonE155.setChecked(True)
@@ -115,16 +94,15 @@ class Annotations(QtGui.QWidget):
 
     def populate_available_terms(self):
         """
-        
+        Run this at start up
         Returns
         -------
-
         """
-        terms = self.terms[Stage.e15_5]['emap']
-
         header = QtGui.QTreeWidgetItem(['category', 'term', 'option'])
         self.ui.treeWidgetAvailableTerms.setHeaderItem(header)
 
+        # Load the default 'unobserved' annotation for each term for the current volume
+        vol = self.controller.current_view.layers[Layer.vol1].vol
         for category in terms:
             # The offending line
             parent = QtGui.QTreeWidgetItem(self.ui.treeWidgetAvailableTerms)
@@ -146,61 +124,6 @@ class Annotations(QtGui.QWidget):
         self.annotation_radius = radius
         self.annotation_radius_signal.emit(radius)
 
-    def parse_options(self, pato_file):
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        pato_path = os.path.join(script_dir, pato_file)
-        options = []
-        try:
-            with open(pato_path, 'r') as fh:
-                csv_reader = csv.reader(fh)
-                for row in csv_reader:
-                    options.append(row[0])
-        except OSError:
-            return None
-        return options
-
-    def parse_emap(self, emap_file):
-        """
-        This may not be used soon. Moving to yaml file loading
-        Parameters
-        ----------
-        emap_file
-
-        Returns
-        -------
-
-        """
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        emap_path = os.path.join(script_dir, emap_file)
-        emap_info = {}
-        try:
-            with open(emap_path, 'r') as fh:
-                csv_reader = csv.reader(fh)
-                header = csv_reader.__next__()
-                for row in csv_reader:
-                    emap_id, emap_term= row
-                    entry = {'emap_term': emap_term, 'emap_id': emap_id}   # [1:-1] stripping quotes
-                    emap_info[emap_term] = entry
-        except OSError:
-            return None
-        return emap_info
-
-    def parse_emap_yaml(self, emap_file):
-        import yaml
-        from collections import defaultdict
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        emap_path = os.path.join(script_dir, emap_file)
-        outdict = Dict()
-        try:
-            with open(emap_path, 'r') as fh:
-                emap_terms = yaml.load(fh)
-                for category, terms in emap_terms.items():
-                    for term in terms:
-                        outdict[category][term] = 'emap id here'
-        except OSError:
-            print('could not open the annotations yaml file {}'.format(emap_path))
-            raise
-        return outdict
 
 
     def save_annotations(self):
@@ -223,10 +146,10 @@ class Annotations(QtGui.QWidget):
             ann = vol.annotations
             vol_id = vol.name
             for i,  a in enumerate(ann.annotations):
-                annotations_dict[i]['annotation_type'] = 'emapa'
-                annotations_dict[i]['emapa_term'] = a.emap_term
+                annotations_dict[i]['annotation_type'] = a.type
+                annotations_dict[i]['emapa_term'] = a.term
                 annotations_dict[i]['emapa_id'] = self.terms[a.stage]['emap'][a.emap_term]['emap_id']
-                annotations_dict[i]['option'] = a.pato_term
+                annotations_dict[i]['option'] = a.option
                 annotations_dict[i]['x'] = a.x
                 annotations_dict[i]['y'] = a.y
                 annotations_dict[i]['z'] = a.z
@@ -318,6 +241,8 @@ class Annotations(QtGui.QWidget):
         #     self.annotations_table.layoutChanged.emit()
 
     def add_annotation(self):
+        print('add ann')
+        self.update_annotation_tree_widget()
         vol = self.controller.current_view.layers[Layer.vol1].vol
         if not vol:
             common.info_dialog(self, "Error", "No volume selected")
@@ -351,7 +276,7 @@ class Annotations(QtGui.QWidget):
             return
 
         self.controller.current_view.layers[Layer.vol1].vol.annotations.add_emap_annotation(x, y, z, term, option, stage)
-        # self.update()
+        self.update_annotation_tree_widget()
 
     def mouse_pressed_annotate(self, view_index, x, y, orientation, vol_id):
         """
@@ -390,12 +315,30 @@ class Annotations(QtGui.QWidget):
         self.ui.treeWidgetAvailableTerms.resizeColumnToContents(1)
 
     def update(self):
+
         vol = self.controller.current_view.layers[Layer.vol1].vol
         if vol:
-            # self.annotations_table.set_data(vol.annotations)
-            # self.ui.comboBoxAnnotationsVolumes.clear()
-            # self.ui.comboBoxAnnotationsVolumes.addItems(self.controller.model.volume_id_list())
-            # self.ui.comboBoxAnnotationsVolumes.addItem("None")
-            # self.ui.comboBoxAnnotationsVolumes.setCurrentIndex(self.ui.comboBoxAnnotationsVolumes.findText(vol.name))
-            # self.annotations_table.layoutChanged.emit()
+            self.ui.comboBoxAnnotationsVolumes.clear()
+            self.ui.comboBoxAnnotationsVolumes.addItems(self.controller.model.volume_id_list())
+            self.ui.comboBoxAnnotationsVolumes.addItem("None")
+            self.ui.comboBoxAnnotationsVolumes.setCurrentIndex(self.ui.comboBoxAnnotationsVolumes.findText(vol.name))
             self.resize_table()
+
+    def update_annotation_tree_widget(self):
+        """
+        Update the tree widget for example when annotations are added or removed
+
+        """
+        # Get the terms that have been annotated
+
+        root = self.ui.treeWidgetAvailableTerms.invisibleRootItem()
+        child_count = root.childCount()
+        for i in range(child_count):
+            category_item = root.child(i)
+            term_count = category_item.childCount()
+            for t in range(term_count):
+                term_item = category_item.child(t)
+                term = term_item.text(1)  # text at first (0) column
+                current_vol = self.controller.current_annotation_volume()
+                if current_vol.annotations.is_annotated(term):
+                    term_item.setBackgroundColor(1, QtGui.QColor(0, 255, 0, 100))
