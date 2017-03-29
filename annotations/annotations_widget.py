@@ -72,6 +72,7 @@ class Annotations(QtGui.QWidget):
         self.ui.setupUi(self)
         self.appdata = self.controller.appdata
 
+        # Create a dict to store all the annotation terms for each stage
         self.terms = Dict()
         self.terms[Stage.e12_5]['pato'] = self.parse_options(E125_PATO_TERMS_FILE)
         self.terms[Stage.e12_5]['emap'] = self.parse_emap(E125_EMAP_TERMS_FILE)
@@ -86,20 +87,16 @@ class Annotations(QtGui.QWidget):
         self.terms[Stage.e18_5]['pato'] = self.parse_options(E185_PATO_TERMS_FILE)
         self.terms[Stage.e18_5]['emap'] = self.parse_emap(E185_EMAP_TERMS_FILE)
 
-        # Set E145 terms as the default
-        self.ui.radioButtonE145.setChecked(True)
+        # Set E15_5 terms as the default
+        self.ui.radioButtonE155.setChecked(True)
         self.activate_stage()
 
-        self.annotations_tree_model = AnnotationTreeModel()
-        self.ui.treeViewAvailableAnnotations.setModel(self.annotations_tree_model)
-        self.ui.treeViewAvailableAnnotations.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        self.ui.treeViewAvailableAnnotations.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-
+        # Something after here makes it crash
         self.ui.comboBoxAnnotationsVolumes.activated['QString'].connect(self.volume_changed)
         self.ui.pushButtonAddAnnotation.clicked.connect(self.add_annotation)
         self.ui.pushButtonRemoveAnnotation.clicked.connect(self.remove_annotation)
-        self.ui.treeViewAvailableAnnotations.clicked.connect(self.annotation_row_selected)
-        self.ui.treeWidgetAvailableTerms.clicked.connect(self.update_avaialble_terms_table)
+        #self.ui.tableViewAvailableAnnotations.clicked.connect(self.annotation_row_selected)
+        #self.ui.treeWidgetAvailableTerms.clicked.connect(self.update_avaialble_terms_table)
 
 
         self.ui.radioButtonE125.toggled.connect(self.activate_stage)
@@ -117,6 +114,12 @@ class Annotations(QtGui.QWidget):
         self.ui.comboBoxAnnotationsVolumes.clear()
 
     def populate_available_terms(self):
+        """
+        
+        Returns
+        -------
+
+        """
         terms = self.terms[Stage.e15_5]['emap']
 
         header = QtGui.QTreeWidgetItem(['category', 'term', 'option'])
@@ -307,10 +310,10 @@ class Annotations(QtGui.QWidget):
 
     def remove_annotation(self):
         indexes = self.ui.treeViewAvailableAnnotations.selectionModel().selectedRows()
-        if len(indexes) > 0:
-            selected_row = indexes[0].row()
-            self.controller.current_view.layers[Layer.vol1].vol.annotations.remove(selected_row)
-            self.annotations_table.layoutChanged.emit()
+        # if len(indexes) > 0:
+        #     selected_row = indexes[0].row()
+        #     self.controller.current_view.layers[Layer.vol1].vol.annotations.remove(selected_row)
+        #     self.annotations_table.layoutChanged.emit()
 
     def add_annotation(self):
         vol = self.controller.current_view.layers[Layer.vol1].vol
@@ -387,10 +390,10 @@ class Annotations(QtGui.QWidget):
     def update(self):
         vol = self.controller.current_view.layers[Layer.vol1].vol
         if vol:
-            self.annotations_table.set_data(vol.annotations)
-            self.ui.comboBoxAnnotationsVolumes.clear()
-            self.ui.comboBoxAnnotationsVolumes.addItems(self.controller.model.volume_id_list())
-            self.ui.comboBoxAnnotationsVolumes.addItem("None")
-            self.ui.comboBoxAnnotationsVolumes.setCurrentIndex(self.ui.comboBoxAnnotationsVolumes.findText(vol.name))
-            self.annotations_table.layoutChanged.emit()
+            # self.annotations_table.set_data(vol.annotations)
+            # self.ui.comboBoxAnnotationsVolumes.clear()
+            # self.ui.comboBoxAnnotationsVolumes.addItems(self.controller.model.volume_id_list())
+            # self.ui.comboBoxAnnotationsVolumes.addItem("None")
+            # self.ui.comboBoxAnnotationsVolumes.setCurrentIndex(self.ui.comboBoxAnnotationsVolumes.findText(vol.name))
+            # self.annotations_table.layoutChanged.emit()
             self.resize_table()

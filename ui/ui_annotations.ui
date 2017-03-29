@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>576</width>
-    <height>802</height>
+    <width>1135</width>
+    <height>1532</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -174,7 +174,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QTreeView" name="treeViewAvailableTerms">
+        <widget class="QTreeWidget" name="treeWidgetAvailableTerms">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
            <horstretch>0</horstretch>
@@ -187,6 +187,11 @@
            <height>300</height>
           </size>
          </property>
+         <column>
+          <property name="text">
+           <string notr="true">1</string>
+          </property>
+         </column>
         </widget>
        </item>
       </layout>
