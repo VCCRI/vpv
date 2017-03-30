@@ -55,7 +55,7 @@ class EmapaAnnotation(Annotation):
     def __init__(self, x, y, z, emapa_term, option, dims, stage, category):
         super(EmapaAnnotation, self).__init__(x, y, z, dims, stage)
         self.term = str(emapa_term)
-        self.option = str(option)
+        self.option = option
         self.indexes = [self.term, self.option, self.stage.value]
         self.type = 'emapa'
         self.category = category
@@ -77,15 +77,17 @@ class VolumeAnnotations(object):
         self.load_emap_yaml(E155_EMAP_TERMS_FILE)
         self.index = len(self.annotations)
 
-    def add_emap_annotation(self, x, y, z, emapa, option, stage, category):
+    def add_emap_annotation(self, x, y, z, emapa, option, stage, category=None):
         """
         Add an emap/pato type annotaiotn unless exact is already present
         """
+        t = type(option)
+        assert isinstance(option, AnnotationOption)
+        assert isinstance(stage, Stage)
 
         for a in self.annotations:
-            new_params = (x, y, z, emapa, option, emapa)
-            old_parmas = (a.x, a.y, a.z, emapa, option, a.term)
-            if new_params == old_parmas:  # update annotation
+
+            if emapa == a.term:
                 a.x = x
                 a.y = y
                 a.z = z

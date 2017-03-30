@@ -68,24 +68,20 @@ class Annotations(QtGui.QWidget):
 
         # Set E15_5 terms as the default
         self.ui.radioButtonE155.setChecked(True)
-        self.activate_stage()
 
         # Something after here makes it crash
         self.ui.comboBoxAnnotationsVolumes.activated['QString'].connect(self.volume_changed)
-        self.ui.pushButtonAddAnnotation.clicked.connect(self.update_annotation)
         self.ui.pushButtonRemoveAnnotation.clicked.connect(self.remove_annotation)
-        #self.ui.tableViewAvailableAnnotations.clicked.connect(self.annotation_row_selected)
-        #self.ui.treeWidgetAvailableTerms.clicked.connect(self.update_avaialble_terms_table)
 
-
-        self.ui.radioButtonE125.toggled.connect(self.activate_stage)
-        self.ui.radioButtonE145.toggled.connect(self.activate_stage)
-        self.ui.radioButtonE185.toggled.connect(self.activate_stage)
+        # self.ui.radioButtonE125.toggled.connect(self.activate_stage)
+        # self.ui.radioButtonE145.toggled.connect(self.activate_stage)
+        # self.ui.radioButtonE185.toggled.connect(self.activate_stage)
 
         self.ui.pushButtonSaveAnnotations.clicked.connect(self.save_annotations)
         self.ui.spinBoxAnnotationCircleSize.valueChanged.connect(self.annotation_radius_changed)
         self.annotation_radius = 10
         self.annotating = False
+        # self.ui.treeWidgetAvailableTerms.setSe
 
 
     def tab_is_active(self):
@@ -109,6 +105,13 @@ class Annotations(QtGui.QWidget):
         Returns
         -------
         """
+        self.ui.treeWidgetAvailableTerms.clear()
+        def setup_signal(box_, child_):
+            """
+            Created this inner function otherwise the last cbox made was always giving the signal?
+            """
+            box.activated.connect(lambda: self.update_annotation(child_, box_))
+
         header = QtGui.QTreeWidgetItem(['category', 'term', 'option'])
         self.ui.treeWidgetAvailableTerms.setHeaderItem(header)
         ann_by_cat = defaultdict(list)  # sort the annotations into categories
@@ -118,24 +121,24 @@ class Annotations(QtGui.QWidget):
         for ann in annotations:
             ann_by_cat[ann.category].append(ann)
         for category, annotations in ann_by_cat.items():
-            # The offending line
             parent = QtGui.QTreeWidgetItem(self.ui.treeWidgetAvailableTerms)
             parent.setText(0, category)
             parent.setFlags(parent.flags())
             for i, annotation in enumerate(annotations):
                 child = QtGui.QTreeWidgetItem(parent)
                 child.setText(1, annotation.term)
+                option = annotation.option
                 parent.addChild(child)
                 box = QtGui.QComboBox()
                 box.addItems([AnnotationOption.normal.value,
                               AnnotationOption.abnormal.value,
                               AnnotationOption.unobserved.value,
                               AnnotationOption.image_only.value])
-                box.setCurrentIndex(3)
-                box.activated[str].connect(self.update_annotation)
+                box.setCurrentIndex(box.findText(option.value))
+                # Setup combobox selection signal
+                setup_signal(box, child)
                 self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)
                 child.setBackgroundColor(1, QtGui.QColor(*COLOR_IMAGE_ONLY))
-
 
 
     def update_avaialble_terms_table(self, item):
@@ -168,8 +171,8 @@ class Annotations(QtGui.QWidget):
             for i,  a in enumerate(ann.annotations):
                 annotations_dict[i]['annotation_type'] = a.type
                 annotations_dict[i]['emapa_term'] = a.term
-                annotations_dict[i]['emapa_id'] = self.terms[a.stage]['emap'][a.emap_term]['emap_id']
-                annotations_dict[i]['option'] = a.option
+                annotations_dict[i]['emapa_id'] = 'dummy id'
+                annotations_dict[i]['option'] = a.option.value
                 annotations_dict[i]['x'] = a.x
                 annotations_dict[i]['y'] = a.y
                 annotations_dict[i]['z'] = a.z
@@ -199,36 +202,9 @@ class Annotations(QtGui.QWidget):
 
         self.annotation_recent_dir_signal.emit(out_dir)
 
-    def activate_stage(self):
-        """
-        All radio buttons except e15.5 are incativated for now within QT designer
-        Returns
-        -------
-
-        """
-        return
-        # if self.ui.radioButtonE125.isChecked():
-        #     # Set E145 terms as the default
-        #     mp_terms = [x['mp_term'] for x in self.terms[Stage.e12_5]['mp'].values()]
-        #     pato_terms = [x['pato_name'] for x in self.terms[Stage.e12_5]['pato'].values()]
-        #     emap_terms = [x['emap_term'] for x in self.terms[Stage.e12_5]['emap'].values()]
-        # elif self.ui.radioButtonE155.isChecked():
-        #     # Set E145 terms as the default
-        #     mp_terms = [x['mp_term'] for x in self.terms[Stage.e14_5]['mp'].values()]
-        #     pato_terms = [x['pato_name'] for x in self.terms[Stage.e14_5]['pato'].values()]
-        #     emap_terms = [x['emap_term'] for x in self.terms[Stage.e14_5]['emap'].values()]
-        # elif self.ui.radioButtonE185.isChecked():
-        #     # Set E145 terms as the default
-        #     mp_terms = [x['mp_term'] for x in self.terms[Stage.e18_5]['mp'].values()]
-        #     pato_terms = [x['pato_name'] for x in self.terms[Stage.e18_5]['pato'].values()]
-        #     emap_terms = [x['emap_term'] for x in self.terms[Stage.e18_5]['emap'].values()]
-
-        # options = self.terms[Stage.e15_5]['option']
-        # emap_terms = [x['emap_term'] for x in self.terms[Stage.e15_5]['emap'].values()]
-
-
     def volume_changed(self, vol_id):
         self.controller.volume_changed(vol_id)
+        self.populate_available_terms()
         self.update()
 
     def annotation_row_selected(self, cell):
@@ -246,9 +222,8 @@ class Annotations(QtGui.QWidget):
         #     self.controller.current_view.layers[Layer.vol1].vol.annotations.remove(selected_row)
         #     self.annotations_table.layoutChanged.emit()
 
-    def update_annotation(self):
+    def update_annotation(self, child, cbox):
         """
-        Delete this !!!!!!!!!!!!!!!!!!!!!11
         Returns
         -------
 
@@ -271,36 +246,28 @@ class Annotations(QtGui.QWidget):
         elif self.ui.radioButtonE155.isChecked():
             stage = Stage.e15_5
 
-        selected = self.ui.treeWidgetAvailableTerms.selectedItems()
-        if selected:
-            base_node = selected[0]
-            parent = base_node.parent()
-            category = parent.text(0)
-            term = base_node.text(1)
-            if not term:
-                common.info_dialog(self, "Error", "No term is selected!")
-                return
-            else:
-                # get the option from the combobox
-                cbox = self.ui.treeWidgetAvailableTerms.itemWidget(base_node, 2)
-                option = cbox.currentText()
-
-            if option == AnnotationOption.normal.value:
-                color = COLOR_NORMAL
-            elif option == AnnotationOption.abnormal.value:
-                color = COLOR_ABNORMAL
-            elif option == AnnotationOption.unobserved.value:
-                color = COLOR_UNOBSERVED
-            elif option == AnnotationOption.image_only.value:
-                color = COLOR_IMAGE_ONLY
-            base_node.setBackgroundColor(1, QtGui.QColor(*color))
-
-        else:
+        base_node = child
+        term = base_node.text(1)
+        if not term:
             common.info_dialog(self, "Error", "No term is selected!")
             return
+        else:
+            # get the option from the combobox
 
-        vol.annotations.add_emap_annotation(x, y, z, term, option, stage, category)
-        #self.update_annotation_tree_widget()
+            option = cbox.currentText()
+
+        if option == AnnotationOption.normal.value:
+            color = COLOR_NORMAL
+        elif option == AnnotationOption.abnormal.value:
+            color = COLOR_ABNORMAL
+        elif option == AnnotationOption.unobserved.value:
+            color = COLOR_UNOBSERVED
+        elif option == AnnotationOption.image_only.value:
+            color = COLOR_IMAGE_ONLY
+        base_node.setBackgroundColor(1, QtGui.QColor(*color))
+
+        vol.annotations.add_emap_annotation(x, y, z, term, AnnotationOption[option], stage)
+
 
     def mouse_pressed_annotate(self, view_index, x, y, orientation, vol_id):
         """
