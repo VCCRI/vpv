@@ -25,7 +25,7 @@ except AttributeError:
 class Ui_Annotations(object):
     def setupUi(self, Annotations):
         Annotations.setObjectName(_fromUtf8("Annotations"))
-        Annotations.resize(1135, 1532)
+        Annotations.resize(576, 802)
         Annotations.setMinimumSize(QtCore.QSize(0, 40))
         self.verticalLayout_17 = QtGui.QVBoxLayout(Annotations)
         self.verticalLayout_17.setObjectName(_fromUtf8("verticalLayout_17"))
@@ -132,9 +132,6 @@ class Ui_Annotations(object):
         self.line_2.setFrameShadow(QtGui.QFrame.Sunken)
         self.line_2.setObjectName(_fromUtf8("line_2"))
         self.verticalLayout.addWidget(self.line_2)
-        self.pushButtonAddAnnotation = QtGui.QPushButton(Annotations)
-        self.pushButtonAddAnnotation.setObjectName(_fromUtf8("pushButtonAddAnnotation"))
-        self.verticalLayout.addWidget(self.pushButtonAddAnnotation)
         self.horizontalLayout_6 = QtGui.QHBoxLayout()
         self.horizontalLayout_6.setObjectName(_fromUtf8("horizontalLayout_6"))
         self.label_2 = QtGui.QLabel(Annotations)
@@ -197,7 +194,6 @@ class Ui_Annotations(object):
         self.radioButtonE125.setText(_translate("Annotations", "E12.5", None))
         self.radioButtonE155.setText(_translate("Annotations", "E15.5", None))
         self.radioButtonE95.setText(_translate("Annotations", "E9.5", None))
-        self.pushButtonAddAnnotation.setText(_translate("Annotations", "Add/update annotation", None))
         self.label_2.setText(_translate("Annotations", "Circle radius", None))
         self.pushButtonSaveAnnotations.setText(_translate("Annotations", "Save annotations", None))
         self.pushButtonRemoveAnnotation.setText(_translate("Annotations", "Remove annotation", None))

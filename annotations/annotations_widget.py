@@ -4,18 +4,23 @@ import copy
 from PyQt4 import QtGui, QtCore
 from ui.ui_annotations import Ui_Annotations
 import json
-import csv
 import common
 from common import Orientation, Stage, Layer, AnnotationOption
 from lib.addict import Dict
 from collections import defaultdict
-from .annotation_tree_model import AnnotationTreeModel, AnnotationTreeItem
 
 # The background colours for annotation tree widget items
 COLOR_UNOBSERVED = (0, 255, 255, 100)
 COLOR_ABNORMAL = (255, 0, 0, 100)
 COLOR_NORMAL = (0, 255, 0, 100)
 COLOR_IMAGE_ONLY = (30, 30, 30, 100)
+
+OPTION_COLOR_MAP = {
+    AnnotationOption.unobserved: (0, 255, 255, 100),
+    AnnotationOption.image_only: (30, 30, 30, 100),
+    AnnotationOption.normal: (0, 255, 0, 100),
+    AnnotationOption.abnormal: (255, 0, 0, 100)}
+
 
 
 
@@ -81,8 +86,7 @@ class Annotations(QtGui.QWidget):
         self.ui.spinBoxAnnotationCircleSize.valueChanged.connect(self.annotation_radius_changed)
         self.annotation_radius = 10
         self.annotating = False
-        # self.ui.treeWidgetAvailableTerms.setSe
-
+        self.ui.treeWidgetAvailableTerms.clear()
 
     def tab_is_active(self):
 
@@ -95,7 +99,6 @@ class Annotations(QtGui.QWidget):
         self.populate_available_terms()
         self.update()
 
-
     def clear(self):
         self.ui.comboBoxAnnotationsVolumes.clear()
 
@@ -106,6 +109,7 @@ class Annotations(QtGui.QWidget):
         -------
         """
         self.ui.treeWidgetAvailableTerms.clear()
+
         def setup_signal(box_, child_):
             """
             Created this inner function otherwise the last cbox made was always giving the signal?
@@ -117,7 +121,11 @@ class Annotations(QtGui.QWidget):
         ann_by_cat = defaultdict(list)  # sort the annotations into categories
 
         # Load the default 'unobserved' annotation for each term for the current volume
-        annotations = self.controller.current_annotation_volume().annotations
+        vol = self.controller.current_annotation_volume()
+        if not vol:
+            return
+        annotations = vol.annotations
+
         for ann in annotations:
             ann_by_cat[ann.category].append(ann)
         for category, annotations in ann_by_cat.items():
@@ -128,6 +136,7 @@ class Annotations(QtGui.QWidget):
                 child = QtGui.QTreeWidgetItem(parent)
                 child.setText(1, annotation.term)
                 option = annotation.option
+                color = OPTION_COLOR_MAP[option]
                 parent.addChild(child)
                 box = QtGui.QComboBox()
                 box.addItems([AnnotationOption.normal.value,
@@ -138,7 +147,7 @@ class Annotations(QtGui.QWidget):
                 # Setup combobox selection signal
                 setup_signal(box, child)
                 self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)
-                child.setBackgroundColor(1, QtGui.QColor(*COLOR_IMAGE_ONLY))
+                child.setBackgroundColor(1, QtGui.QColor(*color))  # Unpack the tuple of colors and opacity
 
 
     def update_avaialble_terms_table(self, item):
@@ -201,11 +210,13 @@ class Annotations(QtGui.QWidget):
             common.info_dialog(self, 'Success', 'Annotation files saved')
 
         self.annotation_recent_dir_signal.emit(out_dir)
+        self.resize_table()
 
     def volume_changed(self, vol_id):
         self.controller.volume_changed(vol_id)
-        self.populate_available_terms()
         self.update()
+        self.populate_available_terms()
+
 
     def annotation_row_selected(self, cell):
         ann = self.controller.current_view.layers[Layer.vol1].vol.annotations[cell.row()]

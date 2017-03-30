@@ -81,7 +81,6 @@ class VolumeAnnotations(object):
         """
         Add an emap/pato type annotaiotn unless exact is already present
         """
-        t = type(option)
         assert isinstance(option, AnnotationOption)
         assert isinstance(stage, Stage)
 
@@ -110,6 +109,7 @@ class VolumeAnnotations(object):
 
     def __next__(self):
         if self.index == 0:
+            self.index = len(self.annotations)
             raise StopIteration
         self.index -= 1
         return self.annotations[self.index]
