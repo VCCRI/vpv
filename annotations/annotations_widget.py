@@ -6,14 +6,16 @@ from ui.ui_annotations import Ui_Annotations
 import json
 import csv
 import common
-from common import Orientation, Stage, Layer
+from common import Orientation, Stage, Layer, AnnotationOption
 from lib.addict import Dict
+from collections import defaultdict
 from .annotation_tree_model import AnnotationTreeModel, AnnotationTreeItem
 
 # The background colours for annotation tree widget items
 COLOR_UNOBSERVED = (0, 255, 255, 100)
 COLOR_ABNORMAL = (255, 0, 0, 100)
 COLOR_NORMAL = (0, 255, 0, 100)
+COLOR_IMAGE_ONLY = (30, 30, 30, 100)
 
 
 
@@ -64,15 +66,13 @@ class Annotations(QtGui.QWidget):
         self.ui.setupUi(self)
         self.appdata = self.controller.appdata
 
-
-
         # Set E15_5 terms as the default
         self.ui.radioButtonE155.setChecked(True)
         self.activate_stage()
 
         # Something after here makes it crash
         self.ui.comboBoxAnnotationsVolumes.activated['QString'].connect(self.volume_changed)
-        self.ui.pushButtonAddAnnotation.clicked.connect(self.add_annotation)
+        self.ui.pushButtonAddAnnotation.clicked.connect(self.update_annotation)
         self.ui.pushButtonRemoveAnnotation.clicked.connect(self.remove_annotation)
         #self.ui.tableViewAvailableAnnotations.clicked.connect(self.annotation_row_selected)
         #self.ui.treeWidgetAvailableTerms.clicked.connect(self.update_avaialble_terms_table)
@@ -85,9 +85,20 @@ class Annotations(QtGui.QWidget):
         self.ui.pushButtonSaveAnnotations.clicked.connect(self.save_annotations)
         self.ui.spinBoxAnnotationCircleSize.valueChanged.connect(self.annotation_radius_changed)
         self.annotation_radius = 10
-        self.annotation_type = 'emap'
         self.annotating = False
+
+
+    def tab_is_active(self):
+
+        vol = self.controller.current_annotation_volume()
+
+        if not vol:
+            return
+        for view in self.controller.views.values():
+            view.layers[Layer.vol1].set_volume(vol.name)
         self.populate_available_terms()
+        self.update()
+
 
     def clear(self):
         self.ui.comboBoxAnnotationsVolumes.clear()
@@ -100,21 +111,32 @@ class Annotations(QtGui.QWidget):
         """
         header = QtGui.QTreeWidgetItem(['category', 'term', 'option'])
         self.ui.treeWidgetAvailableTerms.setHeaderItem(header)
+        ann_by_cat = defaultdict(list)  # sort the annotations into categories
 
         # Load the default 'unobserved' annotation for each term for the current volume
-        vol = self.controller.current_view.layers[Layer.vol1].vol
-        for category in terms:
+        annotations = self.controller.current_annotation_volume().annotations
+        for ann in annotations:
+            ann_by_cat[ann.category].append(ann)
+        for category, annotations in ann_by_cat.items():
             # The offending line
             parent = QtGui.QTreeWidgetItem(self.ui.treeWidgetAvailableTerms)
             parent.setText(0, category)
             parent.setFlags(parent.flags())
-            for i, term in enumerate(terms[category]):
+            for i, annotation in enumerate(annotations):
                 child = QtGui.QTreeWidgetItem(parent)
-                child.setText(1, term)
+                child.setText(1, annotation.term)
                 parent.addChild(child)
                 box = QtGui.QComboBox()
-                box.addItems(['normal', 'abnormal', 'unobserved'])
+                box.addItems([AnnotationOption.normal.value,
+                              AnnotationOption.abnormal.value,
+                              AnnotationOption.unobserved.value,
+                              AnnotationOption.image_only.value])
+                box.setCurrentIndex(3)
+                box.activated[str].connect(self.update_annotation)
                 self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)
+                child.setBackgroundColor(1, QtGui.QColor(*COLOR_IMAGE_ONLY))
+
+
 
     def update_avaialble_terms_table(self, item):
         self.resize_table()
@@ -123,8 +145,6 @@ class Annotations(QtGui.QWidget):
     def annotation_radius_changed(self, radius):
         self.annotation_radius = radius
         self.annotation_radius_signal.emit(radius)
-
-
 
     def save_annotations(self):
 
@@ -186,6 +206,7 @@ class Annotations(QtGui.QWidget):
         -------
 
         """
+        return
         # if self.ui.radioButtonE125.isChecked():
         #     # Set E145 terms as the default
         #     mp_terms = [x['mp_term'] for x in self.terms[Stage.e12_5]['mp'].values()]
@@ -202,8 +223,8 @@ class Annotations(QtGui.QWidget):
         #     pato_terms = [x['pato_name'] for x in self.terms[Stage.e18_5]['pato'].values()]
         #     emap_terms = [x['emap_term'] for x in self.terms[Stage.e18_5]['emap'].values()]
 
-        options = self.terms[Stage.e15_5]['option']
-        emap_terms = [x['emap_term'] for x in self.terms[Stage.e15_5]['emap'].values()]
+        # options = self.terms[Stage.e15_5]['option']
+        # emap_terms = [x['emap_term'] for x in self.terms[Stage.e15_5]['emap'].values()]
 
 
     def volume_changed(self, vol_id):
@@ -218,21 +239,6 @@ class Annotations(QtGui.QWidget):
         self.annotation_highlight_signal.emit(x, y, z, [0, 255, 0], self.annotation_radius)
         self.resize_table()
 
-    def tab_changed(self, tab_indx):
-        """
-        When switching to annotation tab, make sure all views have same volume
-        """
-        vol = self.controller.current_view.layers[Layer.vol1].vol
-        if not vol:
-            return
-        if tab_indx == 1:
-            self.annotating = True
-            for view in self.controller.views.values():
-                view.layers[Layer.vol1].set_volume(vol.name)
-            self.update()
-        else:
-            self.annotating = False
-
     def remove_annotation(self):
         indexes = self.ui.treeViewAvailableAnnotations.selectionModel().selectedRows()
         # if len(indexes) > 0:
@@ -240,10 +246,15 @@ class Annotations(QtGui.QWidget):
         #     self.controller.current_view.layers[Layer.vol1].vol.annotations.remove(selected_row)
         #     self.annotations_table.layoutChanged.emit()
 
-    def add_annotation(self):
-        print('add ann')
-        self.update_annotation_tree_widget()
-        vol = self.controller.current_view.layers[Layer.vol1].vol
+    def update_annotation(self):
+        """
+        Delete this !!!!!!!!!!!!!!!!!!!!!11
+        Returns
+        -------
+
+        """
+
+        vol = self.controller.current_annotation_volume()
         if not vol:
             common.info_dialog(self, "Error", "No volume selected")
             return
@@ -263,6 +274,8 @@ class Annotations(QtGui.QWidget):
         selected = self.ui.treeWidgetAvailableTerms.selectedItems()
         if selected:
             base_node = selected[0]
+            parent = base_node.parent()
+            category = parent.text(0)
             term = base_node.text(1)
             if not term:
                 common.info_dialog(self, "Error", "No term is selected!")
@@ -271,12 +284,23 @@ class Annotations(QtGui.QWidget):
                 # get the option from the combobox
                 cbox = self.ui.treeWidgetAvailableTerms.itemWidget(base_node, 2)
                 option = cbox.currentText()
+
+            if option == AnnotationOption.normal.value:
+                color = COLOR_NORMAL
+            elif option == AnnotationOption.abnormal.value:
+                color = COLOR_ABNORMAL
+            elif option == AnnotationOption.unobserved.value:
+                color = COLOR_UNOBSERVED
+            elif option == AnnotationOption.image_only.value:
+                color = COLOR_IMAGE_ONLY
+            base_node.setBackgroundColor(1, QtGui.QColor(*color))
+
         else:
             common.info_dialog(self, "Error", "No term is selected!")
             return
 
-        self.controller.current_view.layers[Layer.vol1].vol.annotations.add_emap_annotation(x, y, z, term, option, stage)
-        self.update_annotation_tree_widget()
+        vol.annotations.add_emap_annotation(x, y, z, term, option, stage, category)
+        #self.update_annotation_tree_widget()
 
     def mouse_pressed_annotate(self, view_index, x, y, orientation, vol_id):
         """

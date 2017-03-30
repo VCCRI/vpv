@@ -195,6 +195,9 @@ class ManageData(QtGui.QWidget):
         self.ui.doubleSpinBoxPosThresh.valueChanged.connect(self.on_pos_thresh_spin)
         #self.ui.doubleSpinBoxPosThresh.setMinimum(0)
 
+    def tab_is_active(self):
+        pass
+
     def on_neg_thresh_spin(self, value):
         self.data_levels_negative_slider.setEnd(value)
 

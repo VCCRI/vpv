@@ -36,6 +36,9 @@ class Console(QtGui.QWidget):
         widget = ExampleWidget(variables, parent=vpv)
         self.ui.mainLayout.addWidget(widget)
 
+    def tab_is_active(self):
+        pass
+
     def current_volume(self):
         return self.vpv.current_view.layers[0].vol._arr_data
 

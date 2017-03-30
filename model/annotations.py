@@ -32,7 +32,7 @@ class Annotation(object):
         self.y = y
         self.z = z
         self.dims = dims  # x,y,z
-        self.x_percent, self.y_percent, self.z_percent = self.set_percentages(dims)
+        self.x_percent, self.y_percent, self.z_percent = self.set_percentages()
         self.stage = stage
 
     def __getitem__(self, index):
@@ -41,7 +41,10 @@ class Annotation(object):
         else: # The terms and stages columns
             return self.indexes[index - 1]
 
-    def set_percentages(self, dims):
+    def set_percentages(self):
+        dims = self.dims
+        if None in (self.x, self.y, self.z):  # Annotations at startup. No position when not annotated
+            return None, None, None
         xp = 100.0 / dims[0] * self.x
         yp = 100.0 / dims[1] * self.y
         zp = 100.0 / dims[2] * self.z
@@ -50,10 +53,10 @@ class Annotation(object):
 
 class EmapaAnnotation(Annotation):
     def __init__(self, x, y, z, emapa_term, option, dims, stage, category):
-        super(MaPatoAnnotation, self).__init__(x, y, z, dims, stage)
+        super(EmapaAnnotation, self).__init__(x, y, z, dims, stage)
         self.term = str(emapa_term)
         self.option = str(option)
-        self.indexes = [self.emapa_term, self.option, self.stage.value]
+        self.indexes = [self.term, self.option, self.stage.value]
         self.type = 'emapa'
         self.category = category
 
@@ -71,17 +74,23 @@ class VolumeAnnotations(object):
         self.annotations = []
         self.col_count = 4
         self.dims = dims
-        self.terms[Stage.e15_5] = self.load_emap_yaml(E155_EMAP_TERMS_FILE)
+        self.load_emap_yaml(E155_EMAP_TERMS_FILE)
+        self.index = len(self.annotations)
 
     def add_emap_annotation(self, x, y, z, emapa, option, stage, category):
         """
         Add an emap/pato type annotaiotn unless exact is already present
         """
+
         for a in self.annotations:
-            new_params = (x, y, z, emapa, option)
-            old_parmas = (a.x, a.y, a.z, emapa, option)
-            if new_params == old_parmas:
-                return  # prevent duplicates
+            new_params = (x, y, z, emapa, option, emapa)
+            old_parmas = (a.x, a.y, a.z, emapa, option, a.term)
+            if new_params == old_parmas:  # update annotation
+                a.x = x
+                a.y = y
+                a.z = z
+                a.option = option
+                return
         ann = EmapaAnnotation(x, y, z, emapa, option, self.dims, stage, category)
         self.annotations.append(ann)
 
@@ -94,9 +103,18 @@ class VolumeAnnotations(object):
     def __len__(self):
         return len(self.annotations)
 
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.index == 0:
+            raise StopIteration
+        self.index -= 1
+        return self.annotations[self.index]
+
     def check_term(self, term: str) -> bool:
         for annotation in self:
-            if annotation.emap_term == term:
+            if annotation.term == term:
                 return annotation.op
         return False
 

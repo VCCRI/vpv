@@ -29,6 +29,9 @@ class ManagerDockWidget(QtGui.QDockWidget):
         self.data_manager = data_manager
         self.annotations = annotations_manager
         self.console = console
+        self.tab_map = {0: self.data_manager,
+                        1: self.annotations,
+                        2: self.console}
         self.hotred = lut._hot_red_blue()[0]
         self.hotblue = lut._hot_red_blue()[1]
         self.ui = Ui_ManageViews()
@@ -54,10 +57,14 @@ class ManagerDockWidget(QtGui.QDockWidget):
 
     def tab_changed(self, indx):
         """
-        When changing to annotations tab, make sure all views are linked
+        When changing tab, execute code required for that tab
         """
-        self.data_manager.link_views = True
-        self.annotations.tab_changed(indx)
+        self.tab_map[indx].tab_is_active()
+        if indx == 1:  # Need to link views for the annotations tab
+            self.data_manager.link_views = True
+            self.annotations.annotating = True
+        else:
+            self.annotations.annotating = False
 
     def switch_tab(self, idx):
         self.ui.tabWidget.setCurrentIndex(idx)

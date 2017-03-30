@@ -138,6 +138,7 @@ class Vpv(QtCore.QObject):
         -------
         model.ImageVolume instance
         """
+
         return self.current_view.layers[Layer.vol1].vol
 
     def on_console_enter_pressesd(self):

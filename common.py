@@ -29,6 +29,7 @@ class AnnotationOption(Enum):
     unobserved = "unobserved"
     normal = 'normal'
     abnormal = 'abnormal'
+    image_only = 'imageOnly'
 
 class Orientation(Enum):
     sagittal = 1
