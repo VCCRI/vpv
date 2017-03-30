@@ -130,7 +130,7 @@ class VolumeAnnotations(object):
                     for term in terms:
                         # Add a default annotation for the term, with no coordinates and option of unobserved
                         self.add_emap_annotation(None, None, None, term,
-                                                 AnnotationOption.unobserved, Stage.e15_5, category)
+                                                 AnnotationOption.image_only, Stage.e15_5, category)
 
         except OSError:
             print('could not open the annotations yaml file {}'.format(emap_path))
