@@ -114,10 +114,10 @@ class VolumeAnnotations(object):
         self.index -= 1
         return self.annotations[self.index]
 
-    def check_term(self, term: str) -> bool:
+    def get_by_term(self, term: str) -> Annotation:
         for annotation in self:
             if annotation.term == term:
-                return annotation.op
+                return annotation
         return False
 
     def load_emap_yaml(self, emap_file):

@@ -17,39 +17,39 @@ OPTION_COLOR_MAP = {
     AnnotationOption.abnormal: (255, 0, 0, 100)}
 
 
-class VolumeAnnotationsTableModel(QtCore.QAbstractTableModel):
-    def __init__(self, parent=None):
-        super(VolumeAnnotationsTableModel, self).__init__(parent)
-        self.ann_data = None  # model.volume.VolumeAnnotations
-        self.header_data = ['x:y:z', 'EMAPA', 'option', 'stage']
-
-    def set_data(self, annotations_model):
-        self.ann_data = annotations_model
-
-    def rowCount(self, parent):
-        if self.ann_data:
-            return len(self.ann_data)
-        else:
-            return 0
-
-    def columnCount(self, parent):
-        if self.ann_data:
-            return self.ann_data.col_count
-        else:
-            return 0
-
-    def data(self, index, role):
-        if self.ann_data:
-            if not index.isValid():
-                return None
-            elif role != QtCore.Qt.DisplayRole:
-                return None
-            return self.ann_data[index.row()][index.column()]
-
-    def headerData(self, col, orientation, role):
-        if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
-            return self.header_data[col]
-        return None
+# class VolumeAnnotationsTableModel(QtCore.QAbstractTableModel):
+#     def __init__(self, parent=None):
+#         super(VolumeAnnotationsTableModel, self).__init__(parent)
+#         self.ann_data = None  # model.volume.VolumeAnnotations
+#         self.header_data = ['x:y:z', 'EMAPA', 'option', 'stage']
+#
+#     def set_data(self, annotations_model):
+#         self.ann_data = annotations_model
+#
+#     def rowCount(self, parent):
+#         if self.ann_data:
+#             return len(self.ann_data)
+#         else:
+#             return 0
+#
+#     def columnCount(self, parent):
+#         if self.ann_data:
+#             return self.ann_data.col_count
+#         else:
+#             return 0
+#
+#     def data(self, index, role):
+#         if self.ann_data:
+#             if not index.isValid():
+#                 return None
+#             elif role != QtCore.Qt.DisplayRole:
+#                 return None
+#             return self.ann_data[index.row()][index.column()]
+#
+#     def headerData(self, col, orientation, role):
+#         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
+#             return self.header_data[col]
+#         return None
 
 
 class Annotations(QtGui.QWidget):
@@ -75,8 +75,32 @@ class Annotations(QtGui.QWidget):
         self.ui.spinBoxAnnotationCircleSize.valueChanged.connect(self.annotation_radius_changed)
         self.annotation_radius = 10
         self.annotating = False
+
+        self.ui.treeWidgetAvailableTerms.itemClicked.connect(self.on_tree_clicked)
+        # Make sure the tree is resized to fit contents
         self.ui.treeWidgetAvailableTerms.itemExpanded.connect(self.resize_table)
         self.ui.treeWidgetAvailableTerms.clear()
+
+    def on_tree_clicked(self, item):
+        """
+        Get the annotation for that term and display it on the annotation info box
+        Parameters
+        ----------
+        item: QTreeWidgetItem that has been clicked
+        """
+        term = item.text(1)
+        vol = self.controller.current_annotation_volume()
+        annotations = vol.annotations
+        ann = annotations.get_by_term(term)
+        if not ann:
+            return
+        info_str = "Annotation information\nterm: {}\noption: {}\nx:{}, y:{}, z:{}".format(
+          ann.term, ann.option.value, ann.x, ann.y, ann.z
+        )
+        self.ui.textEditAnnotationInfo.setText(info_str)
+        if None in (ann.x, ann.y, ann.z):
+            return
+        self.annotation_highlight_signal.emit(ann.x, ann.y, ann.z, [0, 255, 0], self.annotation_radius)
 
     def tab_is_active(self):
 
@@ -248,6 +272,7 @@ class Annotations(QtGui.QWidget):
 
         vol.annotations.add_emap_annotation(x, y, z, term, option, stage)
         self.mark_complete_categories()
+        self.on_tree_clicked(base_node)
 
     def mark_complete_categories(self):
         """
