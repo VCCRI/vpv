@@ -53,7 +53,7 @@ from appdata import AppData
 from stats import StatsWidget
 import common
 from common import Orientation, Layer
-from layers.slice_view import SliceWidget
+from layers.slice_widget import SliceWidget
 from data_manager import ManageData
 from annotations.annotations_widget import Annotations
 from console import Console

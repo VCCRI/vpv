@@ -44,7 +44,7 @@ class LayerBase(Qt.QObject):
 
             self.volume_label_signal.emit(self.vol.name)
         else:
-            self.volume_label_signal.emit("")
+            self.volume_label_signal.emit("None")
 
     def reload(self):
         """

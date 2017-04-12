@@ -52,7 +52,6 @@ class ViewBox(pg.ViewBox):
             self.wheel_scroll_signal.emit(False)
         ev.accept()
 
-
 class InformationOverlay(QtGui.QWidget):
     def __init__(self, parent=None):
         super(InformationOverlay, self).__init__(parent)
@@ -62,45 +61,78 @@ class InformationOverlay(QtGui.QWidget):
 
         self.setPalette(palette)
         self.vbox = QtGui.QVBoxLayout()
-        self.vol_label = QtGui.QLabel()
-        self.vol_label.setStyleSheet("font: 13pt; color: white")
-        self.vol2_label = QtGui.QLabel()
-        self.vol2_label.setStyleSheet("font: 13pt; color: white")
-        self.data_label = QtGui.QLabel()
-        self.data_label.setStyleSheet("font: 13pt; color: white")
-        self.vector_label = QtGui.QLabel()
-        self.vector_label.setStyleSheet("font: 13pt;")
-        self.vbox.addWidget(self.vol_label)
-        self.vbox.addWidget(self.vol2_label)
-        self.vbox.addWidget(self.data_label)
-        self.vbox.addWidget(self.vector_label)
+        self.label1 = self._make_label()
+        self.label2 = self._make_label()
+        self.label3 = self._make_label()
+        self.label4 = self._make_label()
+        self.vbox.addWidget(self.label1)
+        self.vbox.addWidget(self.label2)
+        self.vbox.addWidget(self.label3)
+        self.vbox.addWidget(self.label3)
         self.setLayout(self.vbox)
         self.adjustSize()
 
+        self.labels_active = OrderedDict()
+        self.labels_active['vol1'] = False
+        self.labels_active['vol2'] = False
+        self.labels_active['heatmap'] = False
+        self.labels_active['vectors'] = False
+
+
+    def _make_label(self):
+        label = QtGui.QLabel()
+        label.setStyleSheet("font: 12pt; color: white")
+        return label
+
     def set_volume_label(self, text):
         if text == 'None':
-            text = ''
-        self.vol_label.setText(text)
-        self.adjustSize()
+            self.labels_active['vol1'] = False
+        else:
+            text = 'vol1:' + text
+            self.labels_active['vol1'] = text
+        self.update()
 
     def set_volume2_label(self, text):
+        print(text)
         if text == 'None':
-            text = ''
-        self.vol2_label.setText(text)
-        self.adjustSize()
+            self.labels_active['vol2'] = False
+        else:
+            text = 'vol2:' + text
+            self.labels_active['vol2'] = text
+        self.update()
 
     def set_data_label(self, text):
         if text == 'None':
-            text = ''
-        self.data_label.setText(text)
-        self.adjustSize()
+            self.labels_active['heatmap'] = False
+        else:
+            text = 'hmap:' + text
+            self.labels_active['heatmap'] = text
+        self.update()
 
     def set_vector_label(self, text):
-        if text == 'None':
-            text = ''
-        self.vector_label.setText(text)
-        self.adjustSize()
+        if text == 'vec':
+            self.labels_active['vectors'] = False
+        else:
+            text = 'vec:' + text
+            self.labels_active['vectors'] = True
+        self.update()
 
+    def update(self):
+        """
+        Make sure there are no gaps between labels
+        Returns
+        -------
+        """
+        # clear the labels
+        for i in range(len(self.vbox)):
+            label = self.vbox.itemAt(i).widget()
+            label.setText('')
+        # Add labels where they exist
+        for j, (k, v) in enumerate(self.labels_active.items()):
+            if v:
+                label = self.vbox.itemAt(j).widget()
+                label.setText(v)
+        self.adjustSize()
 
 class RoiOverlay(object):
     def __init__(self, parent):
