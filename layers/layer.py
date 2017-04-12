@@ -42,10 +42,6 @@ class LayerBase(Qt.QObject):
             self.image_item.setLookupTable(self.lut[0])
             self.reload()
 
-            self.volume_label_signal.emit(self.vol.name)
-        else:
-            self.volume_label_signal.emit("None")
-
     def reload(self):
         """
         reload the current image. For example when the orientation has changed
@@ -58,9 +54,11 @@ class LayerBase(Qt.QObject):
         :param vol, Volume object from model.py
         """
         if volname == "None":
+            self.volume_label_signal.emit("None")
             self.vol = None
             self.image_item.setImage(opacity=0.0)
             return
+        self.volume_label_signal.emit(volname)
 
         self.vol = self.model.getvol(volname)
 

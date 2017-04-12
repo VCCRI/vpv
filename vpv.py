@@ -28,7 +28,9 @@ PYTHON_DIR = 'python-3.4.4.amd64'
 import os
 import sys
 from os.path import join
+p = sys.path
 
+import PyQt4
 if os.name == 'nt':
     # check where vpv has been installed
     vpv_installation_dir = os.path.dirname(os.path.realpath(__file__))

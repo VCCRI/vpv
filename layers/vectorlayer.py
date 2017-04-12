@@ -43,10 +43,12 @@ class VectorLayer(object):
 
     def set_volume(self, volname):
         if volname == "None":
+            self.volume_label_signal.emit("None")
             self.vol = None
             if self.item:
                 self.viewbox.removeItem(self.item)
             return
+        self.volume_label_signal.emit(volname)
 
         self.parent.overlay.set_vector_label(volname)
 

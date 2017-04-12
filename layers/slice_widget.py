@@ -128,10 +128,12 @@ class InformationOverlay(QtGui.QWidget):
             label = self.vbox.itemAt(i).widget()
             label.setText('')
         # Add labels where they exist
+        indx = 0
         for j, (k, v) in enumerate(self.labels_active.items()):
             if v:
-                label = self.vbox.itemAt(j).widget()
+                label = self.vbox.itemAt(indx).widget()
                 label.setText(v)
+                indx += 1
         self.adjustSize()
 
 class RoiOverlay(object):

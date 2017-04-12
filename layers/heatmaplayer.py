@@ -48,10 +48,13 @@ class HeatmapLayer(LayerBase):
         :param vol, Volume object from model.py
         """
         if volname == "None":
+            self.volume_label_signal.emit("None")
             for i, image_item in enumerate(self.image_items):
                 image_item.setImage(opacity=0.0)
             self.vol = None
             return
+
+        self.volume_label_signal.emit(volname)
 
         self.vol = self.model.getvol(volname)
         orientation = self.parent.orientation

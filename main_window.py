@@ -17,8 +17,6 @@
 
 
 import os
-import math
-
 from PyQt4 import QtGui, QtCore
 
 from ui.ui_main import Ui_MainWindow
