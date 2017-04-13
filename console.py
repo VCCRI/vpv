@@ -13,7 +13,7 @@ sip.setapi("QVariant", 2)
 from PyQt4.QtGui  import *
 # Import the console machinery from ipython
 try:
-    from qtconsole.rich_ipython_widget import RichJupyterWidget
+    from qtconsole.rich_jupyter_widget import RichJupyterWidget
     from qtconsole.inprocess import QtInProcessKernelManager
     from IPython.lib import guisupport
 except ImportError:
