@@ -12,9 +12,14 @@ sip.setapi("QString", 2)
 sip.setapi("QVariant", 2)
 from PyQt4.QtGui  import *
 # Import the console machinery from ipython
-from qtconsole.rich_ipython_widget import RichJupyterWidget
-from qtconsole.inprocess import QtInProcessKernelManager
-from IPython.lib import guisupport
+try:
+    from qtconsole.rich_ipython_widget import RichJupyterWidget
+    from qtconsole.inprocess import QtInProcessKernelManager
+    from IPython.lib import guisupport
+except ImportError:
+    ipython_import_error = True
+else:
+    ipython_import_error = False
 
 
 class Console(QtGui.QWidget):
@@ -32,7 +37,8 @@ class Console(QtGui.QWidget):
              "get_volume": self.get_volume,
              "print_process_id": print_process_id
         }
-
+        if ipython_import_error:
+            return
         widget = ExampleWidget(variables, parent=vpv)
         self.ui.mainLayout.addWidget(widget)
 
