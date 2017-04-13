@@ -81,7 +81,7 @@ class InformationOverlay(QtGui.QWidget):
 
     def _make_label(self):
         label = QtGui.QLabel()
-        label.setStyleSheet("font: 12pt; color: white")
+        label.setStyleSheet("font: 10pt; color: white")
         return label
 
     def set_volume_label(self, text):
