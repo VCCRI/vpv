@@ -37,8 +37,7 @@ class Console(QtGui.QWidget):
              "get_volume": self.get_volume,
              "print_process_id": print_process_id
         }
-        if ipython_import_error:
-            return
+
         widget = ExampleWidget(variables, parent=vpv)
         self.ui.mainLayout.addWidget(widget)
 
