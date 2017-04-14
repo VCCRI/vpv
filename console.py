@@ -12,15 +12,10 @@ sip.setapi("QString", 2)
 sip.setapi("QVariant", 2)
 from PyQt4.QtGui  import *
 # Import the console machinery from ipython
-try:
-    from qtconsole.rich_jupyter_widget import RichJupyterWidget
-    from qtconsole.inprocess import QtInProcessKernelManager
-    from IPython.lib import guisupport
-except ImportError:
-    ipython_import_error = True
-else:
-    ipython_import_error = False
 
+from qtconsole.rich_jupyter_widget import RichJupyterWidget
+from qtconsole.inprocess import QtInProcessKernelManager
+from IPython.lib import guisupport
 
 class Console(QtGui.QWidget):
     console_command_executed = QtCore.pyqtSignal()

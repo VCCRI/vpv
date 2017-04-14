@@ -30,8 +30,9 @@ class ManagerDockWidget(QtGui.QDockWidget):
         self.annotations = annotations_manager
         self.console = console
         self.tab_map = {0: self.data_manager,
-                        1: self.annotations,
-                        2: self.console}
+                        1: self.annotations}
+        if self.console:
+            self.tab_map[2] = self.console
         self.hotred = lut._hot_red_blue()[0]
         self.hotblue = lut._hot_red_blue()[1]
         self.ui = Ui_ManageViews()
@@ -53,7 +54,8 @@ class ManagerDockWidget(QtGui.QDockWidget):
         self.annotations.annotation_recent_dir_signal.connect(self.appdata.set_last_dir_browsed)
         self.ui.tabWidget.addTab(self.annotations, 'Annotations')
         self.ui.tabWidget.currentChanged.connect(self.tab_changed)
-        self.ui.tabWidget.addTab(self.console, 'Console')
+        if self.console:
+            self.ui.tabWidget.addTab(self.console, 'Console')
 
     def tab_changed(self, indx):
         """

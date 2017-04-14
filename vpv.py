@@ -58,7 +58,19 @@ from common import Orientation, Layer
 from layers.slice_widget import SliceWidget
 from data_manager import ManageData
 from annotations.annotations_widget import Annotations
-from console import Console
+
+try:
+    from console import Console
+    console_imported = True
+except ImportError:
+    print('cannot import qtconsole, so diabling console widget tab')
+    console_imported = False
+except Exception:  # I thnk it might not be an ImportError? look into it
+    print('cannot import qtconsole, so diabling console widget tab')
+    console_imported = False
+
+
+
 from gradient_editor import GradientEditor
 import zipfile
 from lib import addict
@@ -92,8 +104,12 @@ class Vpv(QtCore.QObject):
         self.annotations_manager.annotation_highlight_signal.connect(self.highlight_annotation)
         self.annotations_manager.annotation_radius_signal.connect(self.annotation_radius_changed)
 
-        self.console = Console(self.mainwindow, self)
-        #self.console.console_command_executed.connect(self.on_console_enter_pressesd)
+        # Sometimes QT console is a pain to install. If not availale do not make console tab
+        if console_imported:
+            self.console = Console(self.mainwindow, self)
+        else:
+            self.console = None
+
 
         self.dock_widget = ManagerDockWidget(self.model, self.mainwindow, self.appdata, self.data_manager,
                                              self.annotations_manager, self.console)
