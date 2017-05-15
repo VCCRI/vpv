@@ -164,9 +164,12 @@ class Vpv(QtCore.QObject):
         self.update_slice_views()
 
     def take_screen_shot(self):
-        sshot = QtGui.QPixmap.grabWidget(self.mainwindow.ui.centralwidget, )
+        # Hide the sliders, take screenshot, then show slider
+        sshot = QtGui.QPixmap.grabWidget(self.mainwindow.ui.centralwidget)
         QtGui.QApplication.clipboard().setPixmap(sshot)
         common.info_dialog(self.mainwindow, 'Message', "Screenshot copied to clipboard")
+        #common.infoDialogTimed.information(self.mainwindow, 'Message', "Screenshot copied to clipboard", 100)
+
 
     def volume_changed(self, vol_name):
         self.data_manager.volume_changed(vol_name)
@@ -298,6 +301,9 @@ class Vpv(QtCore.QObject):
             self.dock_widget.hide()
         else:
             self.update_manager()
+
+    def toggle_link_views(self):
+        pass
 
     def update_manager(self, slice_id=0):  # called from data_manager:update_manager
         """

@@ -188,11 +188,12 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
                 self.on_view_full_screen(True)
         elif event.key() == QtCore.Qt.Key_Space:
             self.controller.toggle_dock_widget_visibility()
+        elif event.key() == QtCore.Qt.Key_L:
+            self.controller.toggle_dock_widget_visibility()
         elif event.key() == QtCore.Qt.Key_Z:
             visible = self.view_slider_action.isChecked()
             self.view_slider_action.toggle()
             self.on_checkbox_index_slider(visible)
-
 
     def on_view_full_screen(self, checked):
         if checked:

@@ -1,4 +1,4 @@
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 from enum import Enum
 import SimpleITK as sitk
 import tempfile
@@ -79,3 +79,14 @@ def timing(f):
         print('%s function took %0.3f ms' % (f.__name__, (time2 - time1) * 1000.0))
         return ret
     return wrap
+
+# class infoDialogTimed(QtGui.QMessageBox):
+#     def __init__(self, timeout, message):
+#         super(infoDialogTimed, self).__init__(self, timeout, message)
+#         self.timeout = timeout
+#         timeoutMessage = "Closing in {} seconds".format(timeout)
+#         #self.setText('\n'.join((message, timeoutMessage)))
+#
+#     def showEvent(self, event):
+#         QtCore.QTimer().singleShot(self.timeout*1000, self.close)
+#         super(infoDialogTimed, self).showEvent(event)
