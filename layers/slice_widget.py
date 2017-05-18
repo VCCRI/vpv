@@ -78,7 +78,6 @@ class InformationOverlay(QtGui.QWidget):
         self.labels_active['heatmap'] = False
         self.labels_active['vectors'] = False
 
-
     def _make_label(self):
         label = QtGui.QLabel()
         label.setStyleSheet("font: 10pt; color: white")
@@ -558,7 +557,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
             #self.model.interpolate = True
             self.refresh_layers()
 
-    def emit_index_changed(self, idx):
+    def emit_index_changed(self, idx): # Is this used?
         self.slice_index_changed_signal.emit(self.orientation, self.id, idx)
 
     def wheel_scroll(self, forward):

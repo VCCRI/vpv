@@ -43,6 +43,22 @@ class HeatmapVolume(Volume):
         self.max = self._arr_data.max()
         self.min = self._arr_data.min()
 
+    # @property
+    # def negative_lut(self):
+    #     return self._negative_lut
+    #
+    # @negative_lut.setter
+    # def negative_lut(self, lut):
+    #     self._negative_lut = lut
+    #
+    # @property
+    # def positive_lut(self):
+    #     return self._negative_lut
+    #
+    # @positive_lut.setter
+    # def positive_lut(self, lut):
+    #     self._negative_lut = lut
+
     def _get_non_zero_mins(self):
         """
         return the minimum non-zero positive value an dthe maximum non-zero negative value
@@ -110,9 +126,15 @@ class HeatmapVolume(Volume):
 
     def set_lut(self, lut_name):
         if self.neg_levels[0] == self.neg_levels[1]:  # There are no negative values
-            self.positive_lut = self.negative_lut = self.lt.transparent()
+            pos_lut, neg_lut = self.lt.get_lut('hot_red_blue')
+            # neg_lut[:] = 0
+            self.positive_lut == pos_lut
+            self.negative_lut = neg_lut
+            print('l')
         else:
             self.positive_lut, self.negative_lut = self.lt.get_lut(lut_name)
+            print('m')
+        print('h')
 
     def get_lut(self):
         return self.negative_lut, self.positive_lut

@@ -106,7 +106,7 @@ class Lut(object):
         lut = np.zeros((256, 4), dtype=np.ubyte)
         # lut[:, 2] = np.repeat(255, 256)
         # lut[:, 3] = np.arange(255, -1, -1)
-        return lut, 'anatomy_labels'
+        return lut, 'transparent'
 
     def _red(self):
         lut = copy.deepcopy(self.base)

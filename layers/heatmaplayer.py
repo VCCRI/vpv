@@ -56,8 +56,10 @@ class HeatmapLayer(LayerBase):
 
         self.volume_label_signal.emit(volname)
 
-        self.vol = self.model.getvol(volname)
+        self.vol = self.model.getvol(volname) # this is the problem
+
         orientation = self.parent.orientation
+
 
         self.parent.overlay.set_data_label(volname)
         dim_len = self.vol.dimension_length(orientation)
@@ -72,8 +74,10 @@ class HeatmapLayer(LayerBase):
             slice_ = self.vol.get_data(orientation, self.parent.current_slice_idx)
         #self.vol.levels = self.image_item.getLevels()
         z = self.layer_type.value
+
         self.neg_image_item.setLookupTable(self.vol.negative_lut)
         self.pos_image_item.setLookupTable(self.vol.positive_lut)
+
         for i, image_item in enumerate(self.image_items):
             if self.vol == "None":
                 # self.vol = None
@@ -88,7 +92,10 @@ class HeatmapLayer(LayerBase):
         if self.vol and self.vol != "None":
             slices = self.vol.get_data(self.parent.orientation, index - 1)
             for i, ii in enumerate(self.image_items):
-                ii.setImage(slices[i], autoLevels=False)
+                slice_ = slices[i]
+                min_ = slice_.min()
+                max_ = slice_.max()
+                ii.setImage(slices[i], autoLevels=False)# this is not the problem
 
     def update_qvalue_cutoff(self, value):
         if self.vol:
@@ -100,6 +107,7 @@ class HeatmapLayer(LayerBase):
         Override as we have multiple imageitems for
         :return:
         """
+        # This is not the problem
         self.vol = None
         #clear the image item with an empty array
 
