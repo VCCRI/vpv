@@ -466,7 +466,6 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
             self.scalebar = ScaleBar()
             self.scalebar.setParentItem(self.viewbox)
             self.scalebar.anchor((1, 1), (1, 1), offset=(-60, -60))
-            self.scalebar.hide()
             layer.volume_label_signal.connect(self.overlay.set_volume_label)
 
         elif layer_enum == Layer.vol2:

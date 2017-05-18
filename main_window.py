@@ -79,7 +79,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 
         self.scale_bars_action = QtGui.QAction('Show scale bars', view_menu, checkable=True)
         self.scale_bars_action.triggered.connect(self.on_action_show_scale_bars)
-        self.scale_bars_action.setChecked(False)
+        self.scale_bars_action.setChecked(True)
         view_menu.addAction(self.scale_bars_action)
 
         self.color_bars_action = QtGui.QAction('Show colour scale bars', view_menu, checkable=True)
