@@ -125,16 +125,12 @@ class HeatmapVolume(Volume):
             self.connected_components[size, mean] = bbox_zyx
 
     def set_lut(self, lut_name):
-        if self.neg_levels[0] == self.neg_levels[1]:  # There are no negative values
-            pos_lut, neg_lut = self.lt.get_lut('hot_red_blue')
-            # neg_lut[:] = 0
-            self.positive_lut == pos_lut
-            self.negative_lut = neg_lut
-            print('l')
-        else:
-            self.positive_lut, self.negative_lut = self.lt.get_lut(lut_name)
-            print('m')
-        print('h')
+        self.positive_lut, self.negative_lut = self.lt.get_lut(lut_name)
+        # If there are no positive or negative values, se the LUT to full transparancy
+        if self.neg_levels[0] == self.neg_levels[1]:
+            self.negative_lut[:] = 0
+        if self.pos_levels[0] == self.pos_levels[1]:
+            self.positive_lut[:] = 0
 
     def get_lut(self):
         return self.negative_lut, self.positive_lut

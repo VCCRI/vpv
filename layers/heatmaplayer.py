@@ -92,10 +92,7 @@ class HeatmapLayer(LayerBase):
         if self.vol and self.vol != "None":
             slices = self.vol.get_data(self.parent.orientation, index - 1)
             for i, ii in enumerate(self.image_items):
-                slice_ = slices[i]
-                min_ = slice_.min()
-                max_ = slice_.max()
-                ii.setImage(slices[i], autoLevels=False)# this is not the problem
+                ii.setImage(slices[i], autoLevels=False)
 
     def update_qvalue_cutoff(self, value):
         if self.vol:
@@ -107,7 +104,6 @@ class HeatmapLayer(LayerBase):
         Override as we have multiple imageitems for
         :return:
         """
-        # This is not the problem
         self.vol = None
         #clear the image item with an empty array
 
