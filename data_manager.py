@@ -737,6 +737,9 @@ class ColorScaleBar(object):
         self.pushButtonInvertColor.clicked.connect(self.on_invert)
         self.layout.addWidget(self.pushButtonInvertColor)
         self.pushButtonInvertColor.hide()
+        self.neg_text_coords = [10, 13]
+        self.pos_text_coords = [10, 210]
+        self.tstat_label_coords = [-5, 140]
 
     def update(self, max_pos, min_pos, min_neg, max_neg):
         if self.color_scale_view:
@@ -786,27 +789,27 @@ class ColorScaleBar(object):
         self.min_pos_text.setFont(self.font)
         self.max_neg_text.setFont(self.font)
 
-        self.max_neg_text.setPos(10, 13)
-        self.max_pos_text.setPos(10, 210)
+        self.max_neg_text.setPos(*self.neg_text_coords)
+        self.max_pos_text.setPos(*self.pos_text_coords)
         #min_neg_text.setPos(10, 60)
 
         self.color_scale_view.addItem(ii)
 
         # Find how far up the color map the minimum positive  is
-        min_pos_y = full_img.shape[1] / 2 + 80
+        min_pos_y = (full_img.shape[1] / 2) + 20
         min_pos_y_mapped = self.color_scale_view.mapFromItemToView(ii, QtCore.QPointF(40, min_pos_y))
-        self.min_pos_text.setPos(10, min_pos_y_mapped.y())
+        self.min_pos_text.setPos(9, min_pos_y_mapped.y())
 
-        min_neg_y = full_img.shape[1] / 2 + 30
+        min_neg_y = full_img.shape[1] / 2 + 80
         min_neg_y_mapped = self.color_scale_view.mapFromItemToView(ii, QtCore.QPointF(40, min_neg_y))
-        self.min_neg_text.setPos(7, min_neg_y_mapped.y())
+        self.min_neg_text.setPos(13, min_neg_y_mapped.y())
 
         self.label = pg.TextItem('t-statistics', angle=-90)
         self.label.setFont(self.font)
         self.color = 'white'
         #self.label.setText('t-statistics', self.color)
         self.color_scale_view.addItem(self.label)
-        self.label.setPos(-20, 70)
+        self.label.setPos(*self.tstat_label_coords)
         self.inverted = False
 
 

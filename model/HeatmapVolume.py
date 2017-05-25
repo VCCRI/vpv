@@ -221,8 +221,7 @@ class DualHeatmap(HeatmapVolume):
         # Reset the min and max values on the newly filtered data
         self.min = float(self._arr_data.min())
         self.max = float(self._arr_data.max())
-        img = sitk.GetImageFromArray(self._arr_data.astype(np.float32))
-        self.find_largest_connected_components(img)
+        self.find_largest_connected_components()
 
     def get_qval_cutoff(self):
         return self.qcutoff

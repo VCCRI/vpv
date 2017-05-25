@@ -757,5 +757,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 2:
         test_files = []
         test_files = [sys.argv[2]]
-        ex.load_volumes(test_files, 'data')
+        ex.load_volumes(test_files, 'dual')
     sys.exit(app.exec_())
