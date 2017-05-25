@@ -18,17 +18,16 @@
 # @author Neil Horner <n.horner@har.mrc.ac.uk>
 
 from setuptools.command import easy_install
-dependencies = [ "pyqtgraph", "appdirs", "SimpleITK", "numpy" ]
+
+dependencies = ["pyqtgraph", "appdirs", "SimpleITK", "numpy"]
 
 for dep in dependencies:
-	
+
 	try:
-		mod = __import__(dep) # try to import module
-		print "{0} already installed.".format(dep)
+		mod = __import__(dep)  # try to import module
+		print("{0} already installed.".format(dep))
 
 	except ImportError:
 
 		# If it fails, try to easy install it
-		easy_install.main( ["--user", dep] )
-	
-
+		easy_install.main(["--user", dep])
