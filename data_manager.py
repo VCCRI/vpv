@@ -61,7 +61,7 @@ class ManageData(QtGui.QWidget):
         # We keep all the views in here {id: SliceWidget}
         #self.views = controller.views
 
-        self.link_views = True
+        self._link_views = True
         self.ui.checkBoxLinkViews.setChecked(True)
         self.ui.checkBoxLinkViews.clicked.connect(self.on_link_views)
         self.ui.comboBoxOrientation.activated['QString'].connect(self.on_orientation)
@@ -651,7 +651,15 @@ class ManageData(QtGui.QWidget):
         self.current_slice_view = self.model.slice_views[slice_id]
 
     def on_link_views(self, checked):
-        self.link_views = checked
+        self._link_views = checked
+
+    @property
+    def link_views(self):
+        return self._link_views
+
+    @link_views.setter
+    def link_views(self, checked):
+        self.ui.checkBoxLinkViews.setChecked(checked)
 
     def left_view_visibility(self, checked):
         if checked:
