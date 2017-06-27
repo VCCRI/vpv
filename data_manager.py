@@ -40,6 +40,7 @@ class ManageData(QtGui.QWidget):
     ui_changed_signal = QtCore.pyqtSignal()
     scale_bar_color_signal = QtCore.pyqtSignal(QtGui.QColor)
     gradient_editor_signal = QtCore.pyqtSignal()
+    flipxy_signal = QtCore.pyqtSignal(bool)
 
     def __init__(self, controller, model, mainwindow):
         super(ManageData, self).__init__(mainwindow)
@@ -64,6 +65,13 @@ class ManageData(QtGui.QWidget):
         self._link_views = True
         self.ui.checkBoxLinkViews.setChecked(True)
         self.ui.checkBoxLinkViews.clicked.connect(self.on_link_views)
+
+        # Flip the x and y diemnions so the stomach is on opposite sides in the axial and
+        # coranal sections
+        self._flipxy = False
+        self.ui.checkBoxFlipXY.setChecked(False)
+        self.ui.checkBoxFlipXY.clicked.connect(self.on_flipxy)
+
         self.ui.comboBoxOrientation.activated['QString'].connect(self.on_orientation)
 
         self.ui.pushButtonScreenShot.clicked.connect(self.controller.take_screen_shot)
@@ -651,7 +659,7 @@ class ManageData(QtGui.QWidget):
         self.current_slice_view = self.model.slice_views[slice_id]
 
     def on_link_views(self, checked):
-        self._link_views = checked
+        self.link_views = checked
 
     @property
     def link_views(self):
@@ -659,7 +667,22 @@ class ManageData(QtGui.QWidget):
 
     @link_views.setter
     def link_views(self, checked):
+        self._link_views = checked
         self.ui.checkBoxLinkViews.setChecked(checked)
+
+    def on_flipxy(self, checked):
+        self.flipxy = checked
+
+    @property
+    def flipxy(self):
+        return self._flipxy
+
+    @flipxy.setter
+    def flipxy(self, checked):
+        print('flip', checked)
+        self._flipxy = checked
+        self.ui.checkBoxFlipXY.setChecked(self._flipxy)
+        self.flipxy_signal.emit(self._flipxy)
 
     def left_view_visibility(self, checked):
         if checked:

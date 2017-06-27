@@ -110,12 +110,11 @@ class Vpv(QtCore.QObject):
         else:
             self.console = None
 
-
         self.dock_widget = ManagerDockWidget(self.model, self.mainwindow, self.appdata, self.data_manager,
                                              self.annotations_manager, self.console)
         self.dock_widget.setAllowedAreas(QtCore.Qt.LeftDockWidgetArea)
 
-        # Create the initial 3 orthogonal views
+        # Create the initial 3 orthogonal views. plus 3 hidden for the second row
         inital_views = [
             [Orientation.sagittal, 'red', 0, 1],
             [Orientation.coronal, 'blue', 0, 2],
@@ -247,6 +246,7 @@ class Vpv(QtCore.QObject):
         view.slice_index_changed_signal.connect(self.index_changed)
         view.move_to_next_vol_signal.connect(self.move_to_next_vol)
         self.data_manager.scale_bar_color_signal.connect(view.set_scalebar_color)
+        self.data_manager.flipxy_signal.connect(view.flipxy)
         self.crosshair_visible_signal.connect(view.show_crosshair)
         self.crosshair_invisible_signal.connect(view.hide_crosshair)
         self.view_id_counter += 1

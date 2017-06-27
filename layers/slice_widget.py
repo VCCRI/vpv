@@ -345,6 +345,12 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
 
         self.show()
 
+    def flipxy(self, do_invert):
+        if self.orientation == Orientation.axial:
+            self.viewbox.invertX(do_invert)
+        if self.orientation == Orientation.coronal:
+            self.viewbox.invertX(do_invert)
+
     def set_scalebar_color(self, qcolor):
         self.scalebar.set_color(qcolor)
 

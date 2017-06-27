@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>761</width>
-    <height>835</height>
+    <height>839</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -172,7 +172,7 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <layout class="QVBoxLayout" name="verticalLayout_9">
            <item>
             <widget class="QLabel" name="label_2">
              <property name="sizePolicy">
@@ -208,6 +208,17 @@
                <string>Isosurface - Not implemented</string>
               </property>
              </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QCheckBox" name="checkBoxFlipXY">
+             <property name="text">
+              <string>flip x/y</string>
+             </property>
             </widget>
            </item>
           </layout>
@@ -523,7 +534,6 @@ color: rgb(223, 223, 223);</string>
      </layout>
      <zorder></zorder>
      <zorder></zorder>
-     <zorder>verticalLayoutWidget</zorder>
     </widget>
    </item>
    <item>
