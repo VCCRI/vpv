@@ -1,4 +1,9 @@
+"""
+Not currently used!!!!
+"""
+
 from PyQt4 import QtCore, QtGui
+
 
 class AnnotationTreeItem(object):
     def __init__(self, data, parent=None):

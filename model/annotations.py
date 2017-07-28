@@ -117,7 +117,9 @@ class VolumeAnnotations(object):
     def get_by_term(self, term: str) -> Annotation:
         for annotation in self:
             if annotation.term == term:
+                self.index = len(self.annotations)  # Bodge. How am I supposed to reset index
                 return annotation
+        self.index = len(self.annotations)
         return False
 
     def load_emap_yaml(self, emap_file):

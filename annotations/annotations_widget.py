@@ -1,4 +1,11 @@
+"""
+A widget to display the manuall annotations in the annotations tab of the data manager.
+Works something like this:
+- When a model.Volume is loaded the available terms from model.Volume.Annotations is loaded. When first run, these 
+    should all be set to 'imageOnly'
+- ...
 
+"""
 import os
 import copy
 from PyQt4 import QtGui, QtCore
@@ -17,41 +24,6 @@ OPTION_COLOR_MAP = {
     AnnotationOption.abnormal: (255, 0, 0, 100)}
 
 
-# class VolumeAnnotationsTableModel(QtCore.QAbstractTableModel):
-#     def __init__(self, parent=None):
-#         super(VolumeAnnotationsTableModel, self).__init__(parent)
-#         self.ann_data = None  # model.volume.VolumeAnnotations
-#         self.header_data = ['x:y:z', 'EMAPA', 'option', 'stage']
-#
-#     def set_data(self, annotations_model):
-#         self.ann_data = annotations_model
-#
-#     def rowCount(self, parent):
-#         if self.ann_data:
-#             return len(self.ann_data)
-#         else:
-#             return 0
-#
-#     def columnCount(self, parent):
-#         if self.ann_data:
-#             return self.ann_data.col_count
-#         else:
-#             return 0
-#
-#     def data(self, index, role):
-#         if self.ann_data:
-#             if not index.isValid():
-#                 return None
-#             elif role != QtCore.Qt.DisplayRole:
-#                 return None
-#             return self.ann_data[index.row()][index.column()]
-#
-#     def headerData(self, col, orientation, role):
-#         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
-#             return self.header_data[col]
-#         return None
-
-
 class Annotations(QtGui.QWidget):
     annotation_highlight_signal = QtCore.pyqtSignal(int, int, int, list, int)
     annotation_radius_signal = QtCore.pyqtSignal(int)
@@ -60,30 +32,40 @@ class Annotations(QtGui.QWidget):
     def __init__(self, controller,  manager):
         super(Annotations, self).__init__(manager)
         self.controller = controller
+
         self.ui = Ui_Annotations()
+
         self.ui.setupUi(self)
+
         self.appdata = self.controller.appdata
 
         # Set E15_5 terms as the default
         self.ui.radioButtonE155.setChecked(True)
 
-        # Something after here makes it crash
+        # The signal to change volumes from the combobox
         self.ui.comboBoxAnnotationsVolumes.activated['QString'].connect(self.volume_changed)
+
         self.ui.pushButtonRemoveAnnotation.clicked.connect(self.remove_annotation)
 
         self.ui.pushButtonSaveAnnotations.clicked.connect(self.save_annotations)
+
         self.ui.spinBoxAnnotationCircleSize.valueChanged.connect(self.annotation_radius_changed)
+
         self.annotation_radius = 10
+
         self.annotating = False
 
         self.ui.treeWidgetAvailableTerms.itemClicked.connect(self.on_tree_clicked)
+
         # Make sure the tree is resized to fit contents
         self.ui.treeWidgetAvailableTerms.itemExpanded.connect(self.resize_table)
+
         self.ui.treeWidgetAvailableTerms.clear()
 
     def on_tree_clicked(self, item):
         """
         Get the annotation for that term and display it on the annotation info box
+        
         Parameters
         ----------
         item: QTreeWidgetItem that has been clicked
@@ -108,8 +90,11 @@ class Annotations(QtGui.QWidget):
 
         if not vol:
             return
+
+        #  Ensure all the view ports contain the same image
         for view in self.controller.views.values():
             view.layers[Layer.vol1].set_volume(vol.name)
+
         self.populate_available_terms()
         self.update()
 
@@ -119,8 +104,6 @@ class Annotations(QtGui.QWidget):
     def populate_available_terms(self):
         """
         Run this at start up
-        Returns
-        -------
         """
         self.ui.treeWidgetAvailableTerms.clear()
 
@@ -138,9 +121,9 @@ class Annotations(QtGui.QWidget):
         vol = self.controller.current_annotation_volume()
         if not vol:
             return
-        annotations = vol.annotations
 
-        for ann in annotations:
+        for ann in vol.annotations:
+            print(ann.category)
             ann_by_cat[ann.category].append(ann)
         for category, annotations in ann_by_cat.items():
             parent = QtGui.QTreeWidgetItem(self.ui.treeWidgetAvailableTerms)
@@ -292,7 +275,6 @@ class Annotations(QtGui.QWidget):
             if all_done:
                 cat.setBackgroundColor(0, QtGui.QColor(0, 255, 0, 100))
 
-
     def mouse_pressed_annotate(self, view_index, x, y, orientation, vol_id):
         """
         Translate the view coordinates to volume coordinates
@@ -307,7 +289,7 @@ class Annotations(QtGui.QWidget):
             vol = self.controller.current_view.layers[Layer.vol1].vol
 
             if orientation == Orientation.sagittal:
-                z = copy.copy(y)
+                z = copy.copy(y) # remove the copy
                 y = copy.copy(x)
                 x = view_index
             elif orientation == Orientation.axial:
