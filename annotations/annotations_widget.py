@@ -183,6 +183,7 @@ class Annotations(QtGui.QWidget):
                 annotations_dict[i]['z_percent'] = a.z_percent
                 # annotations_dict[vol_id][i]['free_text'] = a.free_text
                 annotations_dict[i]['volume_dimensions_xyz'] = a.dims
+                annotations_dict[i]['stage'] = a.stage.value
 
             # If no annotations available for the volume, do not save
             if not annotations_dict:

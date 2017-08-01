@@ -23,18 +23,9 @@ import os
 import tempfile
 from PIL import Image
 from PyQt4 import QtCore, Qt
-from collections import OrderedDict
-from scipy import ndimage
-from scipy.misc import imresize
 import json
 from lib.addict import Dict
-import SimpleITK as sitk
-from common import Orientation, Stage, read_image, timing
-
-from lib import nrrd
-from lookup_tables import Lut
-from read_minc import minc_to_numpy, mincstats_to_numpy
-
+from common import Orientation, Stage, AnnotationOption, read_image, timing
 
 from .ImageVolume import ImageVolume
 from .HeatmapVolume import HeatmapVolume, DualHeatmap
@@ -192,6 +183,8 @@ class DataModel(QtCore.QObject):
             with open(ann_path) as fh:
                 ann_dict = Dict(json.load(fh))
                 for a in ann_dict.values():
+                    if a['option'] == 'imageOnly':
+                        continue  # just leave the defult in there
                     # check that diemsions stored in annotation file are same os the loaded volume
                     xyz_in_file = a.volume_dimensions_xyz
                     # reverese as numpy works in zyx
@@ -202,10 +195,13 @@ class DataModel(QtCore.QObject):
                             ",".join([str(x) for x in xyz_in_file]),
                             ",".join([str(x) for x in vol_dims]))
 
-                    if a.annotation_type == 'mp':
-                        vol.annotations.add_mp(a.x, a.y, a.z, a.mp_term, Stage(a.stage))
-                    elif a.annotation_type == 'emap':
-                        vol.annotations.add_emap_annotation(a.x, a.y, a.z, a.emap_term, a.pato_term, Stage(a.stage))
+                    option = AnnotationOption(a.option)
+                    stage = Stage(a.stage)
+
+                    if a.annotation_type == 'mp': # can get rif of ths?
+                        vol.annotations.add_mp(a.x, a.y, a.z, a.mp_term, stage)
+                    elif a.annotation_type == 'emapa':
+                        vol.annotations.add_emap_annotation(a.x, a.y, a.z, a.emapa_term, option, stage)
         else:
             return "Could not load annotation: {}. Not able to find loaded volume with same id".format(file_id)
         return None

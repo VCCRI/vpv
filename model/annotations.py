@@ -77,9 +77,10 @@ class VolumeAnnotations(object):
         self.load_emap_yaml(E155_EMAP_TERMS_FILE)
         self.index = len(self.annotations)
 
+
     def add_emap_annotation(self, x, y, z, emapa, option, stage, category=None):
         """
-        Add an emap/pato type annotaiotn unless exact is already present
+        Add an emap/pato type annotaiotn from available terms on file, or update if the term is present already
         """
         assert isinstance(option, AnnotationOption)
         assert isinstance(stage, Stage)

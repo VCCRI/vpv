@@ -31,6 +31,7 @@ IMPC_ANALYSIS = "IMPC analysis"
 
 TYPE_CHOICES = (VOLUME, HEATMAP, ANNOTATIONS, LAMA_DATA, VECTORS, IMAGE_SERIES, IMPC_ANALYSIS)
 
+
 class Import(QtGui.QDialog):
     def __init__(self, parent, callback, virtual_stack_callback, last_dir, appdata, dragged_files=None):
         super(Import, self).__init__(parent)
