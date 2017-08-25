@@ -92,7 +92,6 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.view_perm_crosshair_action.setChecked(False)
         view_menu.addAction(self.view_perm_crosshair_action)
 
-
         self.load_data_action = QtGui.QAction('Load data', data_menu, checkable=False)
         self.load_data_action.triggered.connect(self.controller.load_data_slot)
         data_menu.addAction(self.load_data_action)
@@ -114,6 +113,10 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         version_text = version.__version__
         self.version_action = QtGui.QAction('Version: {}'.format(version_text), view_menu, checkable=False)
         info_menu.addAction(self.version_action)
+
+        self.window_title_action = QtGui.QAction('Edit Window title', info_menu, checkable=False)
+        self.window_title_action.triggered.connect(self.edit_window_title)
+        info_menu.addAction(self.window_title_action)
 
         menubar.addMenu(info_menu)
         menubar.addMenu(view_menu)
@@ -149,6 +152,10 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         with open(os.path.join(script_dir, 'stylesheet.qss'), 'r') as fh:
             self.setStyleSheet(fh.read())
 
+    def edit_window_title(self):
+        text, ok = QtGui.QInputDialog.getText(self, 'Change VPV window title', 'New title:')
+        if ok:
+            self.setWindowTitle(text)
 
     def show_manager(self, widget):
         self.manager_layout.addWidget(widget, 0)

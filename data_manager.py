@@ -199,9 +199,10 @@ class ManageData(QtGui.QWidget):
         self.ui.doubleSpinBoxNegThresh.valueChanged.connect(self.on_neg_thresh_spin)
         self.ui.doubleSpinBoxNegThresh.setMaximum(0)
         self.ui.doubleSpinBoxNegThresh.setMinimum(-100)
+        self.ui.doubleSpinBoxNegThresh.setSingleStep(0.1)
 
         self.ui.doubleSpinBoxPosThresh.valueChanged.connect(self.on_pos_thresh_spin)
-        #self.ui.doubleSpinBoxPosThresh.setMinimum(0)
+        self.ui.doubleSpinBoxPosThresh.setSingleStep(0.1)
 
     def tab_is_active(self):
         pass
