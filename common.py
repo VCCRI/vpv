@@ -4,7 +4,10 @@ import SimpleITK as sitk
 import tempfile
 import gzip
 from os.path import splitext
+import numpy as np
 
+RAS_DIRECTIONS = (-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0)
+LPS_DIRECTIONS = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 
 ZIP_EXTENSIONS = ['']
 
@@ -54,9 +57,8 @@ class Layer(Enum):
     vectors = 3
 
 
-def read_image(img_path):
+def read_image(img_path, convert_to_ras=True):
     if img_path.endswith('.gz'):
-        print('dkfjskd')
         # Get the image file extension
         ex = splitext(splitext(img_path)[0])[1]
         tmp = tempfile.NamedTemporaryFile(suffix=ex)
@@ -66,7 +68,12 @@ def read_image(img_path):
             outfile.write(data)
         img_path = tmp.name
     img = sitk.ReadImage(img_path)
-    arr = sitk.GetArrayFromImage(img)
+    direction = img.GetDirection()
+    arr = sitk.GetArrayFromImage(img)  # Leave this fix out for now until I make optin available to chose orientation
+    # if direction == RAS_DIRECTIONS:
+    #     #convert to RAS
+    #     arr = np.flip(arr, 1)
+    #     arr = np.flip(arr, 2)
     return arr
 
 
