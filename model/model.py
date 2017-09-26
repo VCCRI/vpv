@@ -232,8 +232,8 @@ class DataModel(QtCore.QObject):
             n = os.path.basename(os.path.split(volpath[0])[0])
             unique_name = self.create_unique_name(n)
 
-        if data_type == 'data':
-            vol = HeatmapVolume(volpath, self, 'data')
+        if data_type == 'heatmap':
+            vol = HeatmapVolume(volpath, self, 'heatmap')
             if lower_threshold:
                 if lower_threshold == 'max':
                     lower_threshold = vol.max

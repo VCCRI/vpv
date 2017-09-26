@@ -538,7 +538,7 @@ class Vpv(QtCore.QObject):
         if len(volumes) > 0:
             self.load_volumes(volumes, 'vol', memory_map)
         if len(datafiles) > 0:
-            self.load_volumes(datafiles, 'data', memory_map)
+            self.load_volumes(datafiles, 'heatmap', memory_map)
         if len(dual_datafiles) > 0:
             self.load_volumes(dual_datafiles, 'dual', memory_map)
         if len(vector_files) > 0:
@@ -746,14 +746,18 @@ def update_check():
 
 if __name__ == '__main__':
 
+    import argparse
+    parser = argparse.ArgumentParser("Volume Phenptype Viewer")
+    parser.add_argument('-v', '-volumes',  dest='volumes', nargs='*', help='Volume paths seperated by spaces', default=False)
+    parser.add_argument('-hm', '-heatmaps', dest='heatmaps', nargs='*', help='Heatmap paths seperated by spaces', default=False)
+    args = parser.parse_args()
+
     app = QtGui.QApplication(sys.argv)
     ex = Vpv()
-    if len(sys.argv) > 1:
-        test_files = []
-        test_files = [sys.argv[1]]
-        ex.load_volumes(test_files, 'vol')
-    if len(sys.argv) > 2:
-        test_files = []
-        test_files = [sys.argv[2]]
-        ex.load_volumes(test_files, 'dual')
+
+    if args.volumes:
+        ex.load_volumes(args.volumes, 'vol')
+        # Can't have heatmaps loaded without any volumes loaded first
+        if args.heatmaps:
+            ex.load_volumes(args.heatmaps, 'heatmap')
     sys.exit(app.exec_())
