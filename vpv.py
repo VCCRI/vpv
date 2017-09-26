@@ -648,9 +648,18 @@ class Vpv(QtCore.QObject):
             print('jacobian threshold at p=0.005 is {}'.format(jacobian_t_thresh))
             print('intensity threshold at p=0.005 is {}'.format(intensity_t_thresh))
 
+            heatmaps_to_load = []
+            thresholds = []
+            if jacobian_t_thresh > 0:
+                heatmaps_to_load.append(jac_tstat)
+                thresholds.append(jacobian_t_thresh)
+            if intensity_t_thresh > 0:
+                heatmaps_to_load.append(inten_tstat)
+                thresholds.append(intensity_t_thresh)
+
             # Load the population average and stats
-            self.load_volumes([inten_tstat, jac_tstat], 'data', memory_map=False,
-                              lower_thresholds= [intensity_t_thresh, jacobian_t_thresh])
+            self.load_volumes(heatmaps_to_load, 'heatmap', memory_map=False,
+                              lower_thresholds=thresholds)
 
             # Load any other volumes in the zip. Probably will be mutants
             mutants = [join(td.name, x) for x in files_remaining if x.endswith('nrrd')]
@@ -695,10 +704,12 @@ class Vpv(QtCore.QObject):
                     ))
                     return 'max'
                 if p == p_value:
+                    if line[3] == 'NA':  # There are no hits for this analysis at this p-value threshold
+                        return 0
                     try:
                         t = float(line[3])
-                    except ValueError: # NAs have been noticed here
-                        print("There is a problem with the stats info file. Cannot read the pvalue '{}'from file {}".format(
+                    except ValueError:  # NAs have been noticed here
+                        print("There is a problem with the stats info file. Cannot read the tvalue '{}'from file {}".format(
                             line[3], stats_info_csv
                             ))
                         return 'max'
