@@ -1,5 +1,5 @@
 """
-A widget to display the manuall annotations in the annotations tab of the data manager.
+A widget to display the manual annotations in the annotations tab of the data manager.
 Works something like this:
 - When a model.Volume is loaded the available terms from model.Volume.Annotations is loaded. When first run, these 
     should all be set to 'imageOnly'

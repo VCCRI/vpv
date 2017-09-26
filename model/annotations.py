@@ -6,7 +6,7 @@ from common import Stage, AnnotationOption
 # E145_PATO_TERMS_FILE = 'ontologies/e14.5/pato_terms.csv'
 # E145_EMAP_TERMS_FILE = 'ontologies/e14.5/emap_terms.csv'
 
-E155_OPTIONS_FILE = 'ontologies/e15.5/options.csv'
+# E155_OPTIONS_FILE = 'ontologies/e15.5/options.csv'
 # E155_EMAP_TERMS_FILE = 'ontologies/e15.5/emap_terms.csv'
 E155_EMAP_TERMS_FILE = '../annotations/ontologies/e15.5/VPV_e15_5_terms.yaml'
 # E185_PATO_TERMS_FILE = 'ontologies/e18.5/pato_terms.csv'
@@ -22,6 +22,7 @@ EMAP_OPTIONS = ['unobserved', 'normal', 'abnormal']
 #        # self.terms[Stage.e15_5]['emap'] = self.parse_emap(E155_EMAP_TERMS_FILE)
 #        self.terms[Stage.e15_5]['emap'] = self.parse_emap_yaml(E155_EMAP_TERMS_FILE)
 #
+
 
 class Annotation(object):
     """
