@@ -17,7 +17,7 @@
 
 
 import os
-import version
+import _version
 from PyQt4 import QtGui, QtCore
 
 from ui.ui_main import Ui_MainWindow
@@ -110,7 +110,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 
         self.recent_menu.triggered.connect(self.on_recent_menu)
 
-        version_text = version.__version__
+        version_text = _version.__version__
         self.version_action = QtGui.QAction('Version: {}'.format(version_text), view_menu, checkable=False)
         info_menu.addAction(self.version_action)
 

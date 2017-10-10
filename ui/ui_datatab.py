@@ -453,7 +453,7 @@ class Ui_data(object):
         self.label_14.setText(_translate("data", "Volume 2", None))
         self.labelData.setText(_translate("data", "Heatmap Data", None))
         self.pushButtonFilterQValue.setText(_translate("data", "Filter by qvalue", None))
-        self.pushButtonRecalcConnectComponents.setText(_translate("data", "recalculate blobs", None))
+        self.pushButtonRecalcConnectComponents.setText(_translate("data", "Find blobs", None))
         self.pushButtonPosLUT.setText(_translate("data", "Heatmap LUTs", None))
         self.label_9.setText(_translate("data", "Vectors", None))
         self.label_10.setText(_translate("data", "Subsample", None))

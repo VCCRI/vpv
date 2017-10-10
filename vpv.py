@@ -267,7 +267,6 @@ class Vpv(QtCore.QObject):
                 #view.layers[Layer.heatmap].vol.neg_lut = luts[1]
                 view.layers[Layer.heatmap].update()
 
-
     def move_to_next_vol(self, view_id, reverse=False):
         if self.data_manager.link_views:
             for view in self.views.values():
@@ -280,7 +279,7 @@ class Vpv(QtCore.QObject):
         self.current_view.layers[Layer.heatmap].vol.find_largest_connected_components()
         self.data_manager.update_connected_components(self.current_view.layers[Layer.heatmap].vol.name)
 
-    def add_view(self, id_, orientation, color, row, column):  # move to vpv
+    def add_view(self, id_, orientation, color, row, column):
         """
         Setup the controls for each layer)
         :param id, int

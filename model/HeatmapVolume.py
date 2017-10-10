@@ -37,7 +37,7 @@ class HeatmapVolume(Volume):
         self.pos_levels = [float(pos_lower), float(pos_upper)]
 
         self.non_zero_mins = self._get_non_zero_mins()
-        self.find_largest_connected_components()
+        #self.find_largest_connected_components() switch off for now as it slows down loading
         self.set_lut(initial_lut)
 
         self.max = self._arr_data.max()
