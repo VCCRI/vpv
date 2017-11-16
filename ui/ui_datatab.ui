@@ -487,26 +487,6 @@ color: rgb(223, 223, 223);</string>
          </spacer>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="doubleSpinBoxPosThresh"/>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayoutDataSliders"/>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_10">
-        <item>
-         <widget class="QPushButton" name="pushButtonFilterQValue">
-          <property name="text">
-           <string>Filter by qvalue</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QDoubleSpinBox" name="doubleSpinBoxQValue"/>
-        </item>
-        <item>
          <widget class="QPushButton" name="pushButtonRecalcConnectComponents">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -520,11 +500,37 @@ color: rgb(223, 223, 223);</string>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButtonPosLUT">
-          <property name="text">
-           <string>Heatmap LUTs</string>
+         <widget class="QDoubleSpinBox" name="doubleSpinBoxPosThresh"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelFdrThresholds">
+        <property name="text">
+         <string>FDR thresholds</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="gridLayoutFdrButtons"/>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayoutDataSliders"/>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_10">
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-         </widget>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>
@@ -534,6 +540,8 @@ color: rgb(223, 223, 223);</string>
      </layout>
      <zorder></zorder>
      <zorder></zorder>
+     <zorder>gridLayoutWidget</zorder>
+     <zorder>labelFdrThresholds</zorder>
     </widget>
    </item>
    <item>

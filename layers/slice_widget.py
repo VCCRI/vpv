@@ -52,6 +52,7 @@ class ViewBox(pg.ViewBox):
             self.wheel_scroll_signal.emit(False)
         ev.accept()
 
+
 class InformationOverlay(QtGui.QWidget):
     def __init__(self, parent=None):
         super(InformationOverlay, self).__init__(parent)

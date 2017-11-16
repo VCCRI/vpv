@@ -10,6 +10,10 @@ from read_minc import minc_to_numpy
 
 
 class Volume(Qt.QObject):
+    """
+    Basically a wrapper around a numpy 3D array
+    The classes that inherit from this add functionality specific to those volume type
+    """
     axial_slice_signal = QtCore.pyqtSignal(str, name='axial_signal')
 
     def __init__(self, vol, model, datatype,  memory_map=False):

@@ -521,7 +521,7 @@ class Vpv(QtCore.QObject):
         except IndexError:  # No Volume objects have been loaded
             pass
 
-    def importer_callback(self, volumes, datafiles, annotations, dual_datafiles, vector_files, image_series,
+    def importer_callback(self, volumes, datafiles, annotations, vector_files, image_series,
                           impc_analysis, last_dir, memory_map=False):
         """
         Recieves a list of files to open from the Importer widget
@@ -538,8 +538,6 @@ class Vpv(QtCore.QObject):
             self.load_volumes(volumes, 'vol', memory_map)
         if len(datafiles) > 0:
             self.load_volumes(datafiles, 'heatmap', memory_map)
-        if len(dual_datafiles) > 0:
-            self.load_volumes(dual_datafiles, 'dual', memory_map)
         if len(vector_files) > 0:
             self.load_volumes(vector_files, 'vector', memory_map)
         if len(image_series) > 0:
@@ -562,7 +560,7 @@ class Vpv(QtCore.QObject):
             self.data_manager.update()
             self.annotations_manager.update()
 
-    def load_volumes(self, file_list, data_type, memory_map=False, lower_thresholds=False):
+    def load_volumes(self, file_list, data_type, memory_map=False, fdr_thresholds=None):
         """
         Load some volumes from a list of paths.
         Parameters
@@ -572,18 +570,18 @@ class Vpv(QtCore.QObject):
         data_type: str
             vol data etc
         memory_map: bool
-            wheter to memory map after reading
-        lower_thresholds: list
-            optional lower thresholds to apply to the list of volumes. Ussually for data volumes
+            whether to memory map after reading
+        fdr_thresholds: dict
+            q -> t statistic mappings
+                {0.01: 3.4,
+                0.05:, 3.1}
 
         """
         non_loaded = []
         for i, vol_path in enumerate(file_list):
             try:
-                if lower_thresholds:
-                    self.model.add_volume(vol_path, data_type, memory_map, lower_thresholds[i])
-                else:
-                    self.model.add_volume(vol_path, data_type, memory_map)
+
+                self.model.add_volume(vol_path, data_type, memory_map, fdr_thresholds)
                 self.appdata.add_used_volume(vol_path)
                 if not self.any_data_loaded:
                     #  Load up one of the volumes just loaded into the bottom layer
@@ -629,90 +627,81 @@ class Vpv(QtCore.QObject):
             elif 'popavg' in name_lc:
                 file_names.popavg_file = name
             else:
-               files_remaining.append(name)
+                files_remaining.append(name)
 
-        if all(value for value in file_names.values()):
+        if all(file_names.values()):
             td = tempfile.TemporaryDirectory()
             zf.extractall(td.name)
             popavg = join(td.name, file_names.popavg_file)
             self.load_volumes([popavg], 'vol')
-            inten_tstat = join(td.name, file_names.intensity_tstats_file)
-            jac_tstat = join(td.name, file_names.jacobians_tstats_file)
 
             # get the trhesholds from the csv files
             qval_int_csv = join(td.name, file_names.qvals_intensity_file)
-            intensity_t_thresh = self.extract_threshold_value_from_csv(qval_int_csv, 0.05)
+            intensity_fdr_thresh = self.extract_fdr_thresholds(qval_int_csv)
+            inten_tstat = join(td.name, file_names.intensity_tstats_file)
+
+            self.load_volumes([inten_tstat], 'heatmap', memory_map=False,
+                              fdr_thresholds=intensity_fdr_thresh)
+
+
             qval_jac_csv = join(td.name, file_names.qvals_jacobians_file)
-            jacobian_t_thresh = self.extract_threshold_value_from_csv(qval_jac_csv, 0.05)
-            print('jacobian threshold at p=0.005 is {}'.format(jacobian_t_thresh))
-            print('intensity threshold at p=0.005 is {}'.format(intensity_t_thresh))
+            jacobian_fdr_thresh = self.extract_fdr_thresholds(qval_jac_csv)
+            jac_tstat = join(td.name, file_names.jacobians_tstats_file)
 
-            heatmaps_to_load = []
-            thresholds = []
-            if jacobian_t_thresh > 0:
-                heatmaps_to_load.append(jac_tstat)
-                thresholds.append(jacobian_t_thresh)
-            if intensity_t_thresh > 0:
-                heatmaps_to_load.append(inten_tstat)
-                thresholds.append(intensity_t_thresh)
-
-            # Load the population average and stats
-            self.load_volumes(heatmaps_to_load, 'heatmap', memory_map=False,
-                              lower_thresholds=thresholds)
+            self.load_volumes([jac_tstat], 'heatmap', memory_map=False,
+                              fdr_thresholds=jacobian_fdr_thresh)
 
             # Load any other volumes in the zip. Probably will be mutants
             mutants = [join(td.name, x) for x in files_remaining if x.endswith('nrrd')]
             self.load_volumes(mutants, 'vol', memory_map=False)
 
         else:
-            # Make this a dialog?
             failed = []
             for f in file_names:
                 if not f:
                     failed.append(f)
+            common.error_dialog(self, 'The following files could not be found in the zip\n {}'.format('\n'.join(failed)))
             print('IMPC analysis data failed to load. The following files could not be found in the zip')
             print(failed)
 
     @staticmethod
-    def extract_threshold_value_from_csv(stats_info_csv, p_value):
+    def extract_fdr_thresholds(stats_info_csv):
         """
-        Given a csv path containing the stats summary from the TCP pipeline and a p-value cutoff,
-        return the corresponding t-stat threshold
+        Given a csv path containing the stats summary from the TCP pipeline (or LAMA)
+        read the fdr threshold q value and corresponding t-statsitc into a dict
 
         Parameters
         ----------
         stats_info_csv: str
             path to csv
-        p_value: float
-            the p-value threshold at which the corresponding t-score should be set to invisible
         Returns
         -------
-            t_score_threshold: float
-            0 if t-threshold cannot be extracted from csv file
+        dict of q to t mappings
+            {0.1: 2.6,
+            0.2: 2.2...}
         """
+        from collections import OrderedDict
+        q_t = OrderedDict()
+
         with open(stats_info_csv, 'r') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             reader.__next__()  # remove header
-            t = 0
+
             for line in reader:
+
                 try:
-                    p = float(line[0])
+                    q = float(line[0])
                 except ValueError:
-                    print("There is a problem with the stats info file. Cannot read the pvalue '{}'from file {}".format(
+                    print("There is a problem with the stats info file. Cannot read the q-value '{}'from file {}".format(
                         line[0], stats_info_csv
                     ))
-                    return 'max'
-                if p == p_value:
-                    if line[3] == 'NA':  # There are no hits for this analysis at this p-value threshold
-                        return 0
-                    try:
-                        t = float(line[3])
-                    except ValueError:  # NAs have been noticed here
-                        print("There is a problem with the stats info file. Cannot read the tvalue '{}'from file {}".format(
-                            line[3], stats_info_csv
-                            ))
-                        return 'max'
-        return t
+                    return {}  # return an empty dict
+                try:
+                    t = float(line[3])
+                except ValueError:  # NAs are here when there are below the minimu, threshold
+                    t = None
+                q_t[q] = t
+        return q_t
 
 
     def activate_view_manager(self, view_widget_id):

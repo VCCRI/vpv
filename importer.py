@@ -197,7 +197,6 @@ class Import(QtGui.QDialog):
             return
         volumes = []
         datafiles = []
-        dual_files = []
         vector_files = []
         image_series = []
         annotations = []
@@ -211,8 +210,6 @@ class Import(QtGui.QDialog):
                     volumes.append(vol)
                 elif type_ == HEATMAP:
                     datafiles.append(self.ui.table.item(row, 0).data(QtCore.Qt.UserRole))
-                elif type_ == LAMA_DATA:
-                    dual_files.append(self.ui.table.item(row, 0).data(QtCore.Qt.UserRole))
                 elif type_ == VECTORS:
                     vector_files.append(self.ui.table.item(row, 0).data(QtCore.Qt.UserRole))
                 elif type_ == IMAGE_SERIES:
@@ -222,7 +219,7 @@ class Import(QtGui.QDialog):
                 elif type_ == IMPC_ANALYSIS:
                     impc_analysis.append(self.ui.table.item(row, 0).data(QtCore.Qt.UserRole))
 
-        self.callback(volumes, datafiles, annotations, dual_files, vector_files, image_series, impc_analysis,
+        self.callback(volumes, datafiles, annotations, vector_files, image_series, impc_analysis,
         self.last_dir, self.ui.checkBoxMemoryMap.isChecked())
 
         self.close()

@@ -28,7 +28,7 @@ from lib.addict import Dict
 from common import Orientation, Stage, AnnotationOption, read_image, timing
 
 from .ImageVolume import ImageVolume
-from .HeatmapVolume import HeatmapVolume, DualHeatmap
+from .HeatmapVolume import HeatmapVolume
 from .VectorVolume import VectorVolume
 from .ImageSeriesVolume import ImageSeriesVolume
 from .VirtualStackVolume import VirtualStackVolume
@@ -206,22 +206,18 @@ class DataModel(QtCore.QObject):
             return "Could not load annotation: {}. Not able to find loaded volume with same id".format(file_id)
         return None
 
-    def add_volume(self, volpath, data_type, memory_map, lower_threshold=None):
+    def add_volume(self, volpath, data_type, memory_map, fdr_thresholds=None):
         """
         Load a volume into a subclass of a Volume object
         Parameters
         ----------
-        volpath
-        data_type
-        memory_map
-        lower_threshold: float, None, str
-            A value used to threshold low values. Currently only used for heatmap objects
-            If None, do not set
-            If 'max' set lower threshold to maximum value. ie. do not show any results
-
-        Returns
-        -------
-
+        volpath: str
+        data_type: str
+        memory_map: bool
+        fdr_thresholds: fdict
+            q -> t statistic mappings
+                {0.01: 3.4,
+                0.05:, 3.1}
         """
 
         if data_type != 'virtual_stack':
@@ -234,11 +230,8 @@ class DataModel(QtCore.QObject):
 
         if data_type == 'heatmap':
             vol = HeatmapVolume(volpath, self, 'heatmap')
-            if lower_threshold:
-                if lower_threshold == 'max':
-                    lower_threshold = vol.max
-                vol.set_upper_negative_lut(-lower_threshold)
-                vol.set_lower_positive_lut(lower_threshold)
+            if fdr_thresholds:
+                vol.fdr_thresholds = fdr_thresholds
             vol.name = unique_name
             self._data[vol.name] = vol
         elif data_type == 'vol':
@@ -249,10 +242,6 @@ class DataModel(QtCore.QObject):
             vol = VirtualStackVolume(volpath, self, 'virtual_stack', memory_map)
             vol.name = unique_name
             self._volumes[vol.name] = vol
-        elif data_type == 'dual':
-            vol = DualHeatmap(volpath, self, 'dual')
-            vol.name = unique_name
-            self._data[vol.name] = vol
         elif data_type == 'vector':
             vol = VectorVolume(volpath, self, 'vector')
             vol.name = unique_name

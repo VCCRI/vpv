@@ -94,10 +94,10 @@ class HeatmapLayer(LayerBase):
             for i, ii in enumerate(self.image_items):
                 ii.setImage(slices[i], autoLevels=False)
 
-    def update_qvalue_cutoff(self, value):
+    def set_t_threshold(self, t):
         if self.vol:
             # This takes a while, so let's have a progress indicator
-            self.vol.set_qval_cutoff(value)
+            self.vol.set_t_threshold(t)
 
     def clear(self):
         """

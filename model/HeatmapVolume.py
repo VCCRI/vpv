@@ -19,6 +19,8 @@ class HeatmapVolume(Volume):
         self.positive_lut = None
         initial_lut = self.lt.heatmap_lut_list()[0]
 
+        self.fdr_thresholds = {}
+
         neg_lower = float(self._arr_data.min())
 
         # Fix problem when we have no negative values
@@ -161,67 +163,12 @@ class HeatmapVolume(Volume):
 
     def set_lower_negative_lut(self, value):
         self.neg_levels[0] = value
-        #self.neg_lut_pos[0] = value
-        #self._set_negative_lut()
 
     def set_upper_negative_lut(self, value):
         if value < self.min:
             value = self.min + 0.1
         self.neg_levels[1] = value
-        #self.neg_lut_pos[1] = value
-        #self._set_negative_lut()
 
-
-class DualHeatmap(HeatmapVolume):
-    """
-    When the dual t/p value data npz file is loaded, it is stored here
-    """
-    def __init__(self, *args):
-        self.qvals = None  # Set in _load_data
-        self.thread = None
-        self.qcutoff = 0.05
-        super(DualHeatmap, self).__init__(*args)
-        self.TVAL_VOPY = np.copy(self._arr_data)
-        self.set_qval_cutoff(self.qcutoff)
-
-    @staticmethod
-    def memory_map_array(array):
-        """
-        Create a copy of the tscores in a memory map. This should never be modified
-        """
-        t = tempfile.TemporaryFile()
-        m = np.memmap(t, dtype=array.dtype, mode='w+', shape=array.shape)
-        m[:] = array[:]
-        return m
-
-    def _load_data(self, path, memmap=False):
-        """
-        Override
-        """
-        data = np.load(path)
-        try:
-            qvals = data['qvals'][0].astype(np.float16)
-            tvals = data['tvals'][0].astype(np.float16)
-        except KeyError:
-            print("Cant access data in LAMA file")
-        else:
-            self.qvals = qvals
-            return tvals
-
-    # TODO: this needs to be put on a seperate thread as it slows down the gui
-    def set_qval_cutoff(self, qval):
-        """
-        Set the qval filter cutoff. Filter out tscores according
-        :param qval:
-        :return:
-        """
-        self.qcutoff = qval
-        self._arr_data = self.TVAL_VOPY.copy()
-        self._arr_data[self.qvals > self.qcutoff] = 0
-        # Reset the min and max values on the newly filtered data
-        self.min = float(self._arr_data.min())
-        self.max = float(self._arr_data.max())
-        self.find_largest_connected_components()
-
-    def get_qval_cutoff(self):
-        return self.qcutoff
+    def set_t_threshold(self, t):
+        self.set_lower_positive_lut(t)
+        self.set_upper_negative_lut(-t)

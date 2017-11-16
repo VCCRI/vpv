@@ -7,6 +7,7 @@ from ui.ui_datatab import Ui_data
 from ui.ui_change_vol_name import Ui_VolNameDialog
 import copy
 from common import Orientation, Layer
+from functools import partial
 
 DEFAULT_SCALE_BAR_SIZE = 14.0
 
@@ -58,6 +59,8 @@ class ManageData(QtGui.QWidget):
         self.model = model
         self.volume_ids = None
         self.luts = Lut()
+
+        self.fdr_buttons = []
 
         # We keep all the views in here {id: SliceWidget}
         #self.views = controller.views
@@ -121,18 +124,6 @@ class ManageData(QtGui.QWidget):
 
         self.ui.comboBoxLutHeatmap.activated['QString'].connect(self.on_heatmap_lut_changed)
 
-        # Qval filter spin box
-        self.ui.doubleSpinBoxQValue.setMinimum(0.0)
-        self.ui.doubleSpinBoxQValue.setMaximum(1.0)
-        self.ui.doubleSpinBoxQValue.setSingleStep(0.01)
-        self.ui.doubleSpinBoxQValue.setDecimals(10)
-
-        self.ui.pushButtonFilterQValue.clicked.connect(self.filter_by_qvalue)
-
-        # Set to inactive and activate only when we have dual data loaded
-        self.ui.doubleSpinBoxQValue.setEnabled(False)
-        self.ui.pushButtonFilterQValue.setEnabled(False)
-
         self.ui.comboBoxData.activated['QString'].connect(self.data_changed)
 
         # connect the levels slider to the model
@@ -192,9 +183,6 @@ class ManageData(QtGui.QWidget):
         self.ui.pushButtonEditVolName.clicked.connect(self.on_change_vol_name)
 
         self.ui.pushButtonScaleBarColor.clicked.connect(self.on_scalebar_color)
-
-        self.ui.pushButtonPosLUT.hide()  # Don't shiw for now. Needs more development
-        self.ui.pushButtonPosLUT.clicked.connect(self.on_pos_lut)
 
         self.ui.doubleSpinBoxNegThresh.valueChanged.connect(self.on_neg_thresh_spin)
         self.ui.doubleSpinBoxNegThresh.setMaximum(0)
@@ -326,16 +314,17 @@ class ManageData(QtGui.QWidget):
     def showCyanViewManagerSlot(self):
         self.switch_selected_view(5)
 
-    def filter_by_qvalue(self):
+    def on_fdr_button_clicked(self, t):
+        """
+        Upon clicking the fdr threshold button the signal with the corresponding t value arives here
+        Set the threshold on the current Heatmap volume
 
-        pd = pg.ProgressDialog
-
-        with pd("processing..", 0, 0) as dlg:
-            value = self.ui.doubleSpinBoxQValue.value()
-            self.modify_layer(Layer.heatmap, 'update_qvalue_cutoff', value)
-            self.update_connected_components(self.controller.current_view.layers[Layer.heatmap].vol.name)
-            dlg.setValue(1)
-            # self.data_processing_finished_signal.emit()
+        Parameters
+        ----------
+        t: float
+            the t-statistic
+        """
+        self.modify_layer(Layer.heatmap, 'set_t_threshold', t)
 
     def volume_changed(self, vol_name):
         """
@@ -351,8 +340,6 @@ class ManageData(QtGui.QWidget):
 
     def data_changed(self, vol_name):
         """
-        Not connected directly to the layer widget slot. As if linked == true it needs to apply to all slice views of
-        the same layer
         """
         self.modify_layer(Layer.heatmap, 'set_volume', vol_name)
         self.update_connected_components(vol_name)
@@ -437,6 +424,50 @@ class ManageData(QtGui.QWidget):
         self.ui.comboBoxLutHeatmap.addItems(self.luts.heatmap_lut_list())
         self.update_data_controls()
 
+    def clear_layout(self, layout):
+        if layout is not None:
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
+                else:
+                    self.clear_layout(item.layout())
+
+    def update_fdr_buttons(self):
+        """
+        When the heatmap volume has been changed, check for the presence of q->t threshold mapping dict and set buttons if present
+
+        """
+        slice_layers = self.controller.current_view.layers
+        heatmap_vol = slice_layers[Layer.heatmap].vol
+        if not heatmap_vol:
+            return
+
+        row = 0
+        col = 0
+
+        self.clear_layout(self.ui.gridLayoutFdrButtons)
+
+        if heatmap_vol.fdr_thresholds:
+            self.ui.labelFdrThresholds.show()
+            group = QtGui.QButtonGroup(self)
+            for q, t in heatmap_vol.fdr_thresholds.items():
+                try:
+                    float(t)
+                except (ValueError, TypeError):
+                    continue
+                button = QtGui.QPushButton(str(q))
+                group.addButton(button)
+                button.clicked.connect(partial(self.on_fdr_button_clicked, t))
+                self.ui.gridLayoutFdrButtons.addWidget(button, row, col)
+                col += 1
+                if col > 5:
+                    row += 1
+                    col = 0
+        else:
+            self.ui.labelFdrThresholds.hide()
+
     def populate_volume_controls(self):
         """
         when a new view manager is activatewd from a new slice view
@@ -518,6 +549,7 @@ class ManageData(QtGui.QWidget):
 
     def update_data_controls(self):
         vol = self.controller.current_view.layers[Layer.heatmap].vol
+        self.update_fdr_buttons()
         if vol:
             min_, max_ = [round(x, 2) for x in vol.intensity_range()]
             neg_min_nonzero, pos_min_nonzero = vol.non_zero_mins
@@ -527,15 +559,6 @@ class ManageData(QtGui.QWidget):
 
             # if there are no values for negative or positive stats, we need to inactivate the respective sliders
             # as we can't have sliders with min=0 and max = 0
-
-            if vol.data_type == 'dual':
-                isdual = True
-                self.ui.doubleSpinBoxQValue.setValue(vol.get_qval_cutoff())
-            else:
-                isdual = False
-
-            self.ui.doubleSpinBoxQValue.setEnabled(isdual)
-            self.ui.pushButtonFilterQValue.setEnabled(isdual)
 
             self.ui.comboBoxData.setCurrentIndex(self.ui.comboBoxData.findText(vol.name))
 
