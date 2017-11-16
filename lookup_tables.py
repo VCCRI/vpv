@@ -114,7 +114,7 @@ class Lut(object):
         return lut, 'red'
 
     def _anatomy_labels(self):
-        return self.anatomy_lut,
+        return self.anatomy_lut, 'anatomy_labels'
 
     def _green(self):
         lut = copy.deepcopy(self.base)
