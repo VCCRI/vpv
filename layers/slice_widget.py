@@ -296,7 +296,6 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
 
         self.viewbox.scene().sigMouseMoved.connect(self.mouse_moved)
         self.viewbox.scene().sigMouseClicked.connect(self.mouse_pressed)
-        self.shift_pressed = False
 
         # Reduce the padding/border between slice views
         self.ui.graphicsView.ci.layout.setContentsMargins(0, 0, 0, 0)
@@ -415,8 +414,10 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
     def mouse_moved(self, pos):
         """
         On mouse move, get mouse position, volume and data levels and do synchronised slicing between views
-        :param pos:
-        :return:
+        Parameters
+        ----------
+        pos: QtCOre.QPointF
+            (x,y)
         """
  
         self.setFocus()
@@ -441,7 +442,10 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
             else:
                 self.data_pixel_signal.emit(round(float(pix), 6))
 
-        if self.link_orthoganal_views:
+        modifiers = QtGui.QApplication.keyboardModifiers()
+
+        # If shift is pressed emit signal to get other views to get to the same or interscting slice
+        if modifiers == QtCore.Qt.ShiftModifier:
             self.mouse_shift.emit(self.current_slice_idx, x, y, self.orientation)
 
     def get_pixel(self, layer_index, z, y, x):
@@ -690,10 +694,8 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         self.vLine.setOpacity(1.0)
 
     def keyPressEvent(self, event):
-
         if event.key() == QtCore.Qt.Key_Shift:
             self.crosshair_visible_signal.emit(True)
-            self.link_orthoganal_views = True
         elif event.key() == QtCore.Qt.Key_Left:
             self.left_key_pressed()
         elif event.key() == QtCore.Qt.Key_Right:
@@ -706,12 +708,24 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
             self.set_orientation(Orientation.axial)
         elif event.key() == QtCore.Qt.Key_PageUp or event.key() == QtCore.Qt.Key_Up:
             self.move_to_next_vol_signal.emit(self.id, True)
-        elif event.key() == QtCore.Qt.Key_PageDown or event.key() ==QtCore.Qt.Key_Down:
+        elif event.key() == QtCore.Qt.Key_PageDown or event.key() == QtCore.Qt.Key_Down:
             self.move_to_next_vol_signal.emit(self.id, False)
-
         # Propagate unused signals to parent widget
         else:
             event.ignore()
+
+    def keyReleaseEvent(self, event):
+        if event.isAutoRepeat():
+            return
+        if event.key() == QtCore.Qt.Key_Shift:
+            self.crosshair_visible_signal.emit(False)
+        elif event.key() == QtCore.Qt.Key_Left:
+            self.scroll_button_released()
+        elif event.key() == QtCore.Qt.Key_Right:
+            self.scroll_button_released()
+            # Propagate unused signals to parent widget
+            # else:
+        event.ignore()
 
     def move_to_next_volume(self, reverse=False):
         vol_ids = self.model.volume_id_list()
@@ -733,19 +747,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         new_vol_name = vol_ids[new_index]
         self.layers[Layer.vol1].set_volume(new_vol_name)
 
-    def keyReleaseEvent(self, event):
-        if event.isAutoRepeat():
-            return
-        if event.key() == QtCore.Qt.Key_Shift:
-            self.crosshair_visible_signal.emit(False)
-            self.link_orthoganal_views = False  # show intersecting slices on other views when mouse is moved
-        elif event.key() == QtCore.Qt.Key_Left:
-            self.scroll_button_released()
-        elif event.key() == QtCore.Qt.Key_Right:
-            self.scroll_button_released()
-        # Propagate unused signals to parent widget
-        # else:
-        #     event.ignore()
+
 
     def mousePressEvent(self, e):
         """

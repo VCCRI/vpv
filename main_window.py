@@ -201,6 +201,9 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
             visible = self.view_slider_action.isChecked()
             self.view_slider_action.toggle()
             self.on_checkbox_index_slider(visible)
+        elif event.key() == QtCore.Qt.Key_P:
+            self.controller.take_screen_shot()
+
 
     def on_view_full_screen(self, checked):
         if checked:
