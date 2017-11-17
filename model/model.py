@@ -206,7 +206,7 @@ class DataModel(QtCore.QObject):
             return "Could not load annotation: {}. Not able to find loaded volume with same id".format(file_id)
         return None
 
-    def add_volume(self, volpath, data_type, memory_map, fdr_thresholds=None):
+    def add_volume(self, volpath, data_type, memory_map, fdr_thresholds=False):
         """
         Load a volume into a subclass of a Volume object
         Parameters
@@ -230,7 +230,7 @@ class DataModel(QtCore.QObject):
 
         if data_type == 'heatmap':
             vol = HeatmapVolume(volpath, self, 'heatmap')
-            if fdr_thresholds:
+            if fdr_thresholds or fdr_thresholds is None:
                 vol.fdr_thresholds = fdr_thresholds
             vol.name = unique_name
             self._data[vol.name] = vol

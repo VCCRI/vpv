@@ -19,7 +19,7 @@ class HeatmapVolume(Volume):
         self.positive_lut = None
         initial_lut = self.lt.heatmap_lut_list()[0]
 
-        self.fdr_thresholds = {}
+        self._fdr_thresholds = {}
 
         neg_lower = float(self._arr_data.min())
 
@@ -45,21 +45,16 @@ class HeatmapVolume(Volume):
         self.max = self._arr_data.max()
         self.min = self._arr_data.min()
 
-    # @property
-    # def negative_lut(self):
-    #     return self._negative_lut
-    #
-    # @negative_lut.setter
-    # def negative_lut(self, lut):
-    #     self._negative_lut = lut
-    #
-    # @property
-    # def positive_lut(self):
-    #     return self._negative_lut
-    #
-    # @positive_lut.setter
-    # def positive_lut(self, lut):
-    #     self._negative_lut = lut
+    @property
+    def fdr_thresholds(self):
+        return self._fdr_thresholds
+
+    @fdr_thresholds.setter
+    def fdr_thresholds(self, thresholds):
+        self._fdr_thresholds = thresholds
+        if thresholds is None:  # Set the lower t-statistic slider to max as there's no hits at any FDR cutoff
+            self.set_lower_positive_lut(self._arr_data.max() - 0.1)
+            self.set_upper_negative_lut(self._arr_data.min() + 0.2)  # Had to add extra as it would go nuts
 
     def _get_non_zero_mins(self):
         """
