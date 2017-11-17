@@ -60,10 +60,7 @@ class ManageData(QtGui.QWidget):
         self.volume_ids = None
         self.luts = Lut()
 
-        self.fdr_buttons = []
-
-        # We keep all the views in here {id: SliceWidget}
-        #self.views = controller.views
+        self.ui.labelFdrThresholds.hide()
 
         self._link_views = True
         self.ui.checkBoxLinkViews.setChecked(True)
