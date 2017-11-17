@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>576</width>
-    <height>802</height>
+    <height>803</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -262,6 +262,16 @@
         <widget class="QPushButton" name="pushButtonSaveAnnotations">
          <property name="text">
           <string>Save annotations</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonDiableRoi">
+         <property name="toolTip">
+          <string>Clear ROI coordinates</string>
+         </property>
+         <property name="text">
+          <string>Reset roi</string>
          </property>
         </widget>
        </item>

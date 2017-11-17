@@ -103,6 +103,7 @@ class Vpv(QtCore.QObject):
         self.annotations_manager = Annotations(self, self.mainwindow)
         self.annotations_manager.annotation_highlight_signal.connect(self.highlight_annotation)
         self.annotations_manager.annotation_radius_signal.connect(self.annotation_radius_changed)
+        self.annotations_manager.roi_highlight_off_signal.connect(self.reset_roi)
 
         # Sometimes QT console is a pain to install. If not availale do not make console tab
         if console_imported:
@@ -175,6 +176,10 @@ class Vpv(QtCore.QObject):
 
     def set_current_view(self, slice_id):
         self.current_view = self.views[slice_id]
+
+    def reset_roi(self):
+        for view in self.views.values():
+            view.switch_off_annotation()
 
     def highlight_annotation(self, x, y, z, color, radius):
         for view in self.views.values():

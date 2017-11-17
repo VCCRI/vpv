@@ -388,6 +388,9 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
     def set_annotation(self, x, y, color, size):
         self.annotation.set(x, y, self.current_slice_idx, color, size)
 
+    def switch_off_annotation(self):
+        self.annotation.clear()
+
     def range_changed(self):
         self.scale_changed_signal.emit(self.orientation, self.id,  self.viewbox.viewRange())
         QtCore.QTimer.singleShot(1000, lambda: self.scalebar.updateBar())
@@ -746,8 +749,6 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
                 new_index = current_vol_idx + 1
         new_vol_name = vol_ids[new_index]
         self.layers[Layer.vol1].set_volume(new_vol_name)
-
-
 
     def mousePressEvent(self, e):
         """
