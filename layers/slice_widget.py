@@ -344,12 +344,14 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
 
         self.ui.seriesSlider.hide()
 
+        # A temp bodge: 17th Nov 17. Do the xy flip on sagittal sections to match that of IEV
+        if orientation == Orientation.sagittal:
+            self.viewbox.invertX(True)
+
         self.show()
 
     def flipxy(self, do_invert):
-        if self.orientation == Orientation.axial:
-            self.viewbox.invertX(do_invert)
-        if self.orientation == Orientation.coronal:
+        if self.orientation in (Orientation.axial, Orientation.coronal):
             self.viewbox.invertX(do_invert)
 
     def set_scalebar_color(self, qcolor):
