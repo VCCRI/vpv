@@ -30,6 +30,7 @@ from common import Orientation, Layer
 from .heatmaplayer import HeatmapLayer
 from .vectorlayer import VectorLayer
 from .volumelayer import VolumeLayer
+from model import ImageVolume
 
 DEFAULT_SCALE_BAR_SIZE = 1000.00
 DEFAULT_VOXEL_SIZE = 14.0
@@ -242,7 +243,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
     The qt widget that displays a signle ortohogoal view.
     Has attribute layers: {z_index: Layer}
     """
-    mouse_shift = QtCore.pyqtSignal(int, int, int, Orientation, name='mouse_shift')
+    mouse_shift = QtCore.pyqtSignal(int, int, int, Orientation, object,  name='mouse_shift')
     mouse_pressed_signal = QtCore.pyqtSignal(int, int, int, Orientation, str, name='mouse_pressed')
     crosshair_visible_signal = QtCore.pyqtSignal(bool)
     volume_position_signal = QtCore.pyqtSignal(int, int, int)
@@ -449,7 +450,14 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
 
         # If shift is pressed emit signal to get other views to get to the same or interscting slice
         if modifiers == QtCore.Qt.ShiftModifier:
-            self.mouse_shift.emit(self.current_slice_idx, x, y, self.orientation)
+
+            # With mouse move signal, also send currebt vol.
+            # If veiews are not synchronised, syncyed sliceing only occurs within volumes
+            if self.layers[Layer.vol1].vol:
+                current_vol = self.layers[Layer.vol1].vol
+            else:
+                current_vol = None
+            self.mouse_shift.emit(self.current_slice_idx, x, y, self.orientation, current_vol)
 
     def get_pixel(self, layer_index, z, y, x):
         pos = []

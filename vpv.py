@@ -406,7 +406,7 @@ class Vpv(QtCore.QObject):
     def data_processing_finished_slot(self):
         self.data_processing_finished_signal.emit()
 
-    def mouse_shift(self, own_index, x, y, orientation):
+    def mouse_shift(self, own_index, x, y, orientation, emitting_vol=None):
         """
         Gets mouse moved signal
 
@@ -420,9 +420,15 @@ class Vpv(QtCore.QObject):
             the y position of the mouse
         orientation: str
             the orientation of the calling view
+        emitting_vol: ImageVolume
+            Synced slicing to occur only between volumes if linked views is off
         """
         for view in self.views.values():
-            # TODO: make this better
+
+            if not self.data_manager.link_views:
+                if view.layers[Layer.vol1].vol != emitting_vol:
+                    view.hide_crosshair()
+                    continue
             if orientation == Orientation.sagittal:
                 if view.orientation == Orientation.axial:
                     try:

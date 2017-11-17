@@ -29,7 +29,7 @@ ANNOTATIONS = "Annotations"
 IMAGE_SERIES = "Image series"
 IMPC_ANALYSIS = "IMPC analysis"
 
-TYPE_CHOICES = (VOLUME, HEATMAP, ANNOTATIONS, LAMA_DATA, VECTORS, IMAGE_SERIES, IMPC_ANALYSIS)
+TYPE_CHOICES = (VOLUME, HEATMAP, ANNOTATIONS, VECTORS, IMAGE_SERIES, IMPC_ANALYSIS)
 
 
 class Import(QtGui.QDialog):
@@ -331,9 +331,6 @@ class Import(QtGui.QDialog):
 
         if extension == '.json':
             return ANNOTATIONS
-
-        if extension == '.npz':
-            return LAMA_DATA
 
         if extension not in volume_types:
             print('not found')
