@@ -45,7 +45,7 @@ class Annotations(QtGui.QWidget):
         # The signal to change volumes from the combobox
         self.ui.comboBoxAnnotationsVolumes.activated['QString'].connect(self.volume_changed)
 
-        self.ui.pushButtonRemoveAnnotation.clicked.connect(self.remove_annotation)
+        # self.ui.pushButtonRemoveAnnotation.clicked.connect(self.remove_annotation)
 
         self.ui.pushButtonSaveAnnotations.clicked.connect(self.save_annotations)
 
@@ -103,7 +103,7 @@ class Annotations(QtGui.QWidget):
 
     def populate_available_terms(self):
         """
-        Run this at start up
+        Run this at start up and wehn volume is changed
         """
         self.ui.treeWidgetAvailableTerms.clear()
 
@@ -211,13 +211,12 @@ class Annotations(QtGui.QWidget):
         self.update()
         self.populate_available_terms()
 
-    def remove_annotation(self):
-        return # currently not working
-        indexes = self.ui.treeViewAvailableAnnotations.selectionModel().selectedRows()
-        # if len(indexes) > 0:
-        #     selected_row = indexes[0].row()
-        #     self.controller.current_view.layers[Layer.vol1].vol.annotations.remove(selected_row)
-        #     self.annotations_table.layoutChanged.emit()
+    # def remove_annotation(self):
+    #     indexes = self.ui.treeWidgetAvailableTerms.selectionModel().selectedRows()
+    #     if len(indexes) > 0:
+    #         selected_row = indexes[0].row()
+    #         self.controller.current_view.layers[Layer.vol1].vol.annotations.remove(selected_row)
+    #         self.update()
 
     def update_annotation(self, child, cbox):
         """

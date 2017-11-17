@@ -163,9 +163,8 @@ class Ui_Annotations(object):
         self.pushButtonSaveAnnotations = QtGui.QPushButton(Annotations)
         self.pushButtonSaveAnnotations.setObjectName(_fromUtf8("pushButtonSaveAnnotations"))
         self.horizontalLayout_5.addWidget(self.pushButtonSaveAnnotations)
-        self.pushButtonRemoveAnnotation = QtGui.QPushButton(Annotations)
-        self.pushButtonRemoveAnnotation.setObjectName(_fromUtf8("pushButtonRemoveAnnotation"))
-        self.horizontalLayout_5.addWidget(self.pushButtonRemoveAnnotation)
+        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem1)
         self.verticalLayout.addLayout(self.horizontalLayout_5)
         self.verticalLayout_16 = QtGui.QVBoxLayout()
         self.verticalLayout_16.setObjectName(_fromUtf8("verticalLayout_16"))
@@ -190,5 +189,4 @@ class Ui_Annotations(object):
         self.radioButtonE95.setText(_translate("Annotations", "E9.5", None))
         self.label_2.setText(_translate("Annotations", "Circle radius", None))
         self.pushButtonSaveAnnotations.setText(_translate("Annotations", "Save annotations", None))
-        self.pushButtonRemoveAnnotation.setText(_translate("Annotations", "Remove annotation", None))
 
