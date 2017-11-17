@@ -638,14 +638,19 @@ class Vpv(QtCore.QObject):
             # get the trhesholds from the csv files
             qval_int_csv = join(td.name, file_names.qvals_intensity_file)
             intensity_fdr_thresh = self.extract_fdr_thresholds(qval_int_csv)
+            if not intensity_fdr_thresh:
+                common.info_dialog(self.mainwindow, "No hits",
+                                   "There are no hits in the intensity heatmap. The threshold is set to max")
             inten_tstat = join(td.name, file_names.intensity_tstats_file)
 
             self.load_volumes([inten_tstat], 'heatmap', memory_map=False,
                               fdr_thresholds=intensity_fdr_thresh)
 
-
             qval_jac_csv = join(td.name, file_names.qvals_jacobians_file)
             jacobian_fdr_thresh = self.extract_fdr_thresholds(qval_jac_csv)
+            if not jacobian_fdr_thresh:
+                common.info_dialog(self.mainwindow, "No hits",
+                                   "There are no hits in the jacobian heatmap. The threshold is set to max")
             jac_tstat = join(td.name, file_names.jacobians_tstats_file)
 
             self.load_volumes([jac_tstat], 'heatmap', memory_map=False,
@@ -679,6 +684,7 @@ class Vpv(QtCore.QObject):
         dict of q to t mappings
             {0.1: 2.6,
             0.2: 2.2...}
+        None if there are no t-thresholds for any given q-value cutoff
         """
         from collections import OrderedDict
         q_t = OrderedDict()
@@ -701,8 +707,10 @@ class Vpv(QtCore.QObject):
                 except ValueError:  # NAs are here when there are below the minimu, threshold
                     t = None
                 q_t[q] = t
-        return q_t
-
+        if any(q_t.values()):
+            return q_t
+        else:
+            return None  # No t thresholds. Proably no hits in this heatmap
 
     def activate_view_manager(self, view_widget_id):
         """
