@@ -251,7 +251,7 @@ class Vpv(QtCore.QObject):
         view.slice_index_changed_signal.connect(self.index_changed)
         view.move_to_next_vol_signal.connect(self.move_to_next_vol)
         self.data_manager.scale_bar_color_signal.connect(view.set_scalebar_color)
-        self.data_manager.flipxy_signal.connect(view.flipxy)
+        self.data_manager.flipxy_signal.connect(view.flipx)
         self.crosshair_visible_signal.connect(view.show_crosshair)
         self.crosshair_invisible_signal.connect(view.hide_crosshair)
         self.view_id_counter += 1

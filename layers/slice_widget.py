@@ -53,6 +53,11 @@ class ViewBox(pg.ViewBox):
             self.wheel_scroll_signal.emit(False)
         ev.accept()
 
+    def invertX(self, invert):
+        super().invertX(invert)
+
+
+
 
 class InformationOverlay(QtGui.QWidget):
     def __init__(self, parent=None):
@@ -137,6 +142,7 @@ class InformationOverlay(QtGui.QWidget):
                 indx += 1
         self.adjustSize()
 
+
 class RoiOverlay(object):
     def __init__(self, parent):
         self.parent = parent
@@ -198,6 +204,7 @@ class AnnotationOverlay(object):
 class ScaleBar(pg.ScaleBar):
     def __init__(self):
         color = QtGui.QColor(255, 255, 255)
+        self.scale_bar_label_visible = False
         pen = QtGui.QPen(color)
         brush = QtGui.QBrush(color)
         self.scalebar_size = DEFAULT_SCALE_BAR_SIZE
@@ -223,8 +230,10 @@ class ScaleBar(pg.ScaleBar):
             size = size / 1000
         else:
             suffix = 'um'
-        # self.text.setText(pg.fn.siFormat(size, suffix=suffix))
-        self.text.setText('')
+        if self.scale_bar_label_visible:
+            self.text.setText(pg.fn.siFormat(size, suffix=suffix))
+        else:
+            self.text.setText('')
         self.updateBar()
 
     def updateBar(self):
@@ -344,15 +353,31 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
 
         self.ui.seriesSlider.hide()
 
-        # A temp bodge: 17th Nov 17. Do the xy flip on sagittal sections to match that of IEV
-        if orientation == Orientation.sagittal:
-            self.viewbox.invertX(True)
-
         self.show()
 
-    def flipxy(self, do_invert):
-        if self.orientation in (Orientation.axial, Orientation.coronal):
+    @property
+    def scale_bar_visible(self):
+        return self.scalebar.scale_bar_label_visible
+
+    @scale_bar_visible.setter
+    def scale_bar_visible(self, is_visible):
+        self.scalebar.scale_bar_label_visible = is_visible
+        self.scalebar.updateBar()
+
+    def flipx(self, do_invert, override_sagitall=False):
+
+        if any([self.orientation == Orientation.axial,
+                self.orientation == Orientation.coronal,
+                (self.orientation == Orientation.sagittal and override_sagitall)
+                ]):
             self.viewbox.invertX(do_invert)
+            if not self.scalebar:
+                return
+            if do_invert:
+                self.scalebar.offset = (30, -60)
+            else:
+                self.scalebar.offset = (-60, -60)
+            self.scalebar.setParentItem(self.viewbox)
 
     def set_scalebar_color(self, qcolor):
         self.scalebar.set_color(qcolor)
@@ -489,7 +514,11 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
             self.scalebar = ScaleBar()
             self.scalebar.setParentItem(self.viewbox)
             self.scalebar.anchor((1, 1), (1, 1), offset=(-60, -60))
+            self.scalebar.updateBar()
             layer.volume_label_signal.connect(self.overlay.set_volume_label)
+            if self.orientation == Orientation.sagittal:
+                # A temp bodge: 17th Nov 17. Do the xy flip on sagittal sections to match that of IEV
+                self.flipx(True, override_sagitall=True)
 
         elif layer_enum == Layer.vol2:
             layer = VolumeLayer(self, layer_enum, self.model, viewmanager)

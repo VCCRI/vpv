@@ -189,8 +189,14 @@ class ManageData(QtGui.QWidget):
         self.ui.doubleSpinBoxPosThresh.valueChanged.connect(self.on_pos_thresh_spin)
         self.ui.doubleSpinBoxPosThresh.setSingleStep(0.1)
 
+        self.ui.checkBoxScaleBarLabel.clicked.connect(self.on_scalebar_label_checked)
+
+    def on_scalebar_label_checked(self, checked):
+        for view in self.views.values():
+            view.scale_bar_visible = checked
+
     def tab_is_active(self):
-        pass
+            pass
 
     def on_neg_thresh_spin(self, value):
         self.data_levels_negative_slider.setEnd(value)

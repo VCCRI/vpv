@@ -540,7 +540,6 @@ color: rgb(223, 223, 223);</string>
      </layout>
      <zorder></zorder>
      <zorder></zorder>
-     <zorder>gridLayoutWidget</zorder>
      <zorder>labelFdrThresholds</zorder>
     </widget>
    </item>
@@ -692,13 +691,20 @@ color: rgb(223, 223, 223);</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="3">
+     <item row="0" column="4">
       <widget class="QDoubleSpinBox" name="doubleSpinBoxScaleBarLength"/>
      </item>
-     <item row="0" column="2">
+     <item row="0" column="3">
       <widget class="QLabel" name="label_16">
        <property name="text">
         <string>Scale bar length</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QCheckBox" name="checkBoxScaleBarLabel">
+       <property name="text">
+        <string>scale label</string>
        </property>
       </widget>
      </item>
