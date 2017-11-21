@@ -532,7 +532,7 @@ class Vpv(QtCore.QObject):
         except IndexError:  # No Volume objects have been loaded
             pass
 
-    def importer_callback(self, volumes, datafiles, annotations, vector_files, image_series,
+    def importer_callback(self, volumes, heatmaps, annotations, vector_files, image_series,
                           impc_analysis, last_dir, memory_map=False):
         """
         Recieves a list of files to open from the Importer widget
@@ -547,8 +547,8 @@ class Vpv(QtCore.QObject):
             self.load_impc_analysis(impc_analysis[0])
         if len(volumes) > 0:
             self.load_volumes(volumes, 'vol', memory_map)
-        if len(datafiles) > 0:
-            self.load_volumes(datafiles, 'heatmap', memory_map)
+        if len(heatmaps) > 0:
+            self.load_volumes(heatmaps, 'heatmap', memory_map, fdr_thresholds=False)
         if len(vector_files) > 0:
             self.load_volumes(vector_files, 'vector', memory_map)
         if len(image_series) > 0:
