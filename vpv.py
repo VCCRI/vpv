@@ -435,7 +435,8 @@ class Vpv(QtCore.QObject):
                         x1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - x
                     except:
                         pass
-                    view.set_slice(y, crosshair_xy=(own_index, x1))
+                    y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - y
+                    view.set_slice(y1, crosshair_xy=(own_index, x))
                 elif view.orientation == Orientation.coronal:
                     view.set_slice(x, crosshair_xy=(own_index, y))
                 elif view.orientation == Orientation.sagittal:
@@ -446,16 +447,20 @@ class Vpv(QtCore.QObject):
                     y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - y
                     view.set_slice(x, crosshair_xy=(y1, own_index))
                 elif view.orientation == Orientation.coronal:
-                    view.set_slice(y, True, crosshair_xy=(x, own_index))
+                    y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - y
+                    x1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - x
+                    view.set_slice(y1, True, crosshair_xy=(x, own_index))
                 elif view.orientation == Orientation.axial:
                     view.set_slice(own_index, crosshair_xy=(x, y))
 
             elif orientation ==Orientation.coronal:
                 if view.orientation ==  Orientation.axial:
+                    y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - y
                     oi = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - own_index
-                    view.set_slice(y, crosshair_xy=(x, oi))
+                    view.set_slice(y1, crosshair_xy=(x, oi))
                 elif view.orientation == Orientation.sagittal:
-                    view.set_slice(x, crosshair_xy=(own_index, y))
+                    oi = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - own_index
+                    view.set_slice(x, crosshair_xy=(x, y))
                 elif view.orientation == Orientation.coronal:
                     view.set_slice(own_index, crosshair_xy=(x, y))
 

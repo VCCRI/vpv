@@ -516,9 +516,9 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
             self.scalebar.anchor((1, 1), (1, 1), offset=(-60, -60))
             self.scalebar.updateBar()
             layer.volume_label_signal.connect(self.overlay.set_volume_label)
-            if self.orientation == Orientation.sagittal:
-                # A temp bodge: 17th Nov 17. Do the xy flip on sagittal sections to match that of IEV
-                self.flipx(True, override_sagitall=True)
+            # if self.orientation == Orientation.sagittal:
+            #     # A temp bodge: 17th Nov 17. Do the xy flip on sagittal sections to match that of IEV
+            #     self.flipx(True, override_sagitall=True)
 
         elif layer_enum == Layer.vol2:
             layer = VolumeLayer(self, layer_enum, self.model, viewmanager)

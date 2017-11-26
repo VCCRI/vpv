@@ -57,7 +57,7 @@ class Layer(Enum):
     vectors = 3
 
 
-def read_image(img_path, convert_to_ras=True):
+def read_image(img_path, convert_to_ras=False):
     if img_path.endswith('.gz'):
         # Get the image file extension
         ex = splitext(splitext(img_path)[0])[1]
@@ -68,12 +68,12 @@ def read_image(img_path, convert_to_ras=True):
             outfile.write(data)
         img_path = tmp.name
     img = sitk.ReadImage(img_path)
-    direction = img.GetDirection()
+    #direction = img.GetDirection()
     arr = sitk.GetArrayFromImage(img)  # Leave this fix out for now until I make optin available to chose orientation
-    # if direction == RAS_DIRECTIONS:
-    #     #convert to RAS
-    #     arr = np.flip(arr, 1)
-    #     arr = np.flip(arr, 2)
+    if convert_to_ras: # testing to get orientation the same as in IEV by default
+        #convert to RAS (testing)
+        arr = np.flip(arr, 0)
+        # arr = np.flip(arr, 2)
     return arr
 
 

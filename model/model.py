@@ -43,7 +43,7 @@ class LoadVirtualStackWorker(QtCore.QThread):
         self.memmap_result = None  # Populated at end of run()
 
     def sitk_load(self, p):
-        return read_image(p)
+        read_image(p, convert_to_ras=True)
 
     def pil_load(self, p):
         im = Image.open(p)

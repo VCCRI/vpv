@@ -123,13 +123,13 @@ class Volume(Qt.QObject):
         return slice_
 
     # Testing. Adding reverse option to try and get same view sequence as IEV. Need to flip now
-    def _get_sagittal(self, index, reverse=True):
+    def _get_sagittal(self, index, reverse=False):
         if reverse:
             index = self._arr_data.shape[2] - index
         slice_ = np.rot90(self._arr_data[:, :, index], 1)
         if self.interpolate:
             return np.flipud(self._interpolate(slice_))
-        return np.flipud(slice_)
+        return slice_
 
     def _get_axial(self, index, reverse=True):
         if reverse:
