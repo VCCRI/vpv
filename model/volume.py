@@ -79,19 +79,28 @@ class Volume(Qt.QObject):
         else:
             return vol
 
-    def get_data(self, orientation, index=0):
+    def get_data(self, orientation, index=0, flip=False):
         """
-        Return a 2d slice of image data of the specified axis. If index=None, midpoint is returned
-        :param orientation:
-        :param index:
-        :return:
+        Get a 2D slice given the index and orthogonal orientation. Optioanlly return the slice flipped in x
+        Parameters
+        ----------
+        orientation: Orientation
+        index: int
+            the slice to returb
+        flip: bool
+            to flip in x or not
+
+        Returns
+        -------
+        np.ndarry 2D
+
         """
         if orientation == Orientation.sagittal:
-            return self._get_sagittal(index)
+            return self._get_sagittal(index, flip)
         if orientation == Orientation.coronal:
-            return self._get_coronal(index)
+            return self._get_coronal(index, flip)
         if orientation == Orientation.axial:
-            return self._get_axial(index)
+            return self._get_axial(index, flip)
 
     def dimension_length(self, orientation):
         """
@@ -114,29 +123,25 @@ class Volume(Qt.QObject):
         """
         self.voxel_size = size
 
-    def _get_coronal(self, index, reverse=True):
-        if reverse:
-            index = self._arr_data.shape[1] - index
+    def _get_coronal(self, index, flip):
+        index = self._arr_data.shape[1] - index  # Go in reverse so we go from front to back
         slice_ = np.flipud(np.rot90(self._arr_data[:, index, :], 1))
-        if self.interpolate:
-            return self._interpolate(slice_)
+        if flip:
+            return slice_
         return np.flipud(slice_)
 
     # Testing. Adding reverse option to try and get same view sequence as IEV. Need to flip now
-    def _get_sagittal(self, index, reverse=False):
-        if reverse:
-            index = self._arr_data.shape[2] - index
+    def _get_sagittal(self, index, flip):
         slice_ = np.rot90(self._arr_data[:, :, index], 1)
-        if self.interpolate:
-            return np.flipud(self._interpolate(slice_))
+        if flip:
+            return np.flipud(slice_)
         return slice_
 
-    def _get_axial(self, index, reverse=True):
-        if reverse:
-            index = self._arr_data.shape[0] - index
+    def _get_axial(self, index, flip):
+        index = self._arr_data.shape[0] - index  # Go in reverse so we go from head to tail
         slice_ = np.rot90(self._arr_data[index, :, :], 3)
-        if self.interpolate:
-            return self._interpolate(slice_)
+        if flip:
+            return slice_
         return np.flipud(slice_)
 
     def set_lower_level(self, level):

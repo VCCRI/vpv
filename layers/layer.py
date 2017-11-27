@@ -84,9 +84,9 @@ class LayerBase(Qt.QObject):
         self.parent.viewbox.autoRange()
         self.parent.scalebar.updateBar()
 
-    def set_slice(self, index):
+    def set_slice(self, index, flip=False):
         if self.vol:
-            self.image_item.setImage(self.vol.get_data(self.parent.orientation, index - 1), autoLevels=False)
+            self.image_item.setImage(self.vol.get_data(self.parent.orientation, index - 1, flip=flip), autoLevels=False)
 
     def set_series_slider(self):
         if self.vol.data_type == 'series':

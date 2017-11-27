@@ -289,8 +289,6 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         self.overlay = InformationOverlay(self)
         self.overlay.show()
 
-        self.link_orthoganal_views = False
-
         # ViewBox. Holds the pg.ImageItems
         self.viewbox = ViewBox()
         self.viewbox.wheel_scroll_signal.connect(self.wheel_scroll)
@@ -352,6 +350,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         self.annotation = AnnotationOverlay(self)
 
         self.ui.seriesSlider.hide()
+        self.flipped_x = False  # We have the default view at init
 
         self.show()
 
@@ -364,20 +363,10 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         self.scalebar.scale_bar_label_visible = is_visible
         self.scalebar.updateBar()
 
-    def flipx(self, do_invert, override_sagitall=False):
+    def flipx(self, flip, override_sagitall=False):
 
-        if any([self.orientation == Orientation.axial,
-                self.orientation == Orientation.coronal,
-                (self.orientation == Orientation.sagittal and override_sagitall)
-                ]):
-            self.viewbox.invertX(do_invert)
-            if not self.scalebar:
-                return
-            if do_invert:
-                self.scalebar.offset = (30, -60)
-            else:
-                self.scalebar.offset = (-60, -60)
-            self.scalebar.setParentItem(self.viewbox)
+        self.flipped_x = flip
+        self.update_view()
 
     def set_scalebar_color(self, qcolor):
         self.scalebar.set_color(qcolor)
@@ -624,7 +613,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
     def on_manage_views(self):
         self.manage_views_signal.emit(self.id)
 
-    def set_slice(self, index, reverse=False, crosshair_xy=None):
+    def set_slice(self, index, crosshair_xy=None):
         """
         Used when setting slice from external module.
         Parameters
@@ -636,8 +625,8 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         crosshair_xy: tuple
             xy coordinates of the cross hair
         """
-        if reverse:
-            index = self.layers[Layer.vol1].vol.dimension_length(self.orientation) - index
+        # if reverse:
+        #     index = self.layers[Layer.vol1].vol.dimension_length(self.orientation) - index
 
         self.ui.sliderSlice.setValue(index)
         self._set_slice(index, crosshair_xy)
@@ -656,7 +645,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
             return
         for layer in self.all_layers():
             if layer.vol:
-                layer.set_slice(index)
+                layer.set_slice(index, flip=self.flipped_x)
 
         self.current_slice_idx = index
 
@@ -713,6 +702,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         """
         Reload each layers' imageItem after properties set. If it has a volume set
         """
+        self.set_slice(self.current_slice_idx)
         for view in list(self.layers.values())[0:3]:
             if view.vol:
                 view.update()
@@ -798,10 +788,6 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         datavols = tuple(l.vol for l in self.layers.values() if l.vol and l.vol.data_type == 'stats')
         self.voxel_clicked_signal.emit(datavols, self.orientation, clickpos)
 
-    # def mouseMoveEvent(self, e):
-    #     xy = self.viewbox.mapFromItemToView(self.viewbox, QtCore.QPointF(e.pos().x(), e.pos().y()))
-    #     # if self.link_orthoganal_views:
-    #     #     self.orthoview_link_signal.emit(self.orientation, xy)
 
 
 

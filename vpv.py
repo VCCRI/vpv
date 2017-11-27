@@ -452,8 +452,7 @@ class Vpv(QtCore.QObject):
                     view.set_slice(x1, crosshair_xy=(y, rev(src_index, Orientation.axial)))
 
                 elif view.orientation == Orientation.coronal:
-                    y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - y
-                    view.set_slice(y1, True, crosshair_xy=(x, rev(src_index, Orientation.axial)))
+                    view.set_slice(y, crosshair_xy=(x, rev(src_index, Orientation.axial)))
 
                 elif view.orientation == Orientation.axial:
                     view.set_slice(src_index, crosshair_xy=(x, y))
