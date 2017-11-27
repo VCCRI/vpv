@@ -323,7 +323,87 @@ class Vpv(QtCore.QObject):
     def remove_views(self, row, column):
         self.mainwindow.remove_view(row, column)
 
+    def map_roi_view_to_view(self, xx, yy, zz, src_ori, dest_ori):
+        """
+        Map a roi from one view to another
+        Parameters
+        ----------
+        xx: tuple
+        yy: tuple
+        zz: tuple
+        src_ori: Orientation
+        dest_ori: Orientation
+
+        Returns
+        -------
+        tuple
+            ((x,x), (y,y), (z,z)
+        """
+        starts = self.map_view_to_view(xx[0], yy[0], zz[0], src_ori, dest_ori)
+        ends = self.map_view_to_view([xx[1], yy[1], zz[1]], src_ori, dest_ori)
+        return (starts[0], ends[0]), \
+               (starts[1], ends[1]), \
+               (starts[2], ends[2])
+
+    def map_view_to_view(self, x, y, z, src_view, dest_view):
+        """
+        Given a coordinate on one view with a given orientation map to another view with a given orientation
+        Parameters
+        ----------
+        x: int
+        y: int
+        z: int
+        src_ori: Orientation
+        dest_ori: Orientation
+
+        Returns
+        -------
+        tuple
+            (x,y,z)
+
+        """
+        src_ori = src_view.orientation
+        dest_ori = dest_view.orientation
+        src_dims = src_view.layers[Layer.vol1].vol.get_shape()
+        dest_dims = dest_view.layers[Layer.vol1].vol.get_shape()
+
+        if src_ori == Orientation.sagittal:
+            if dest_ori == Orientation.axial:
+                y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - y
+                view.set_slice(y1, crosshair_xy=(rev(src_index, Orientation.sagittal), x))
+
+            elif view.orientation == Orientation.coronal:
+                view.set_slice(x, crosshair_xy=(rev(src_index, Orientation.sagittal), y))
+
+            elif view.orientation == Orientation.sagittal:
+                view.set_slice(src_index, crosshair_xy=(x, y))
+
+        # elif src_orientation == Orientation.axial:
+        #
+        #     if view.orientation == Orientation.sagittal:
+        #         x1 = rev(x, Orientation.sagittal)
+        #         view.set_slice(x1, crosshair_xy=(y, rev(src_index, Orientation.axial)))
+        #
+        #     elif view.orientation == Orientation.coronal:
+        #         view.set_slice(y, crosshair_xy=(x, rev(src_index, Orientation.axial)))
+        #
+        #     elif view.orientation == Orientation.axial:
+        #         view.set_slice(src_index, crosshair_xy=(x, y))
+        #
+        # elif src_orientation == Orientation.coronal:
+        #
+        #     if view.orientation == Orientation.axial:
+        #         y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - y
+        #         view.set_slice(y1, crosshair_xy=(x, src_index))
+        #
+        #     elif view.orientation == Orientation.sagittal:
+        #         view.set_slice(rev(x, Orientation.sagittal), crosshair_xy=(src_index, y))
+        #
+        #     elif view.orientation == Orientation.coronal:
+        #         view.set_slice(src_index, crosshair_xy=(x, y))
+
     def set_to_centre_of_roi(self, zindices, yindices, xindices):
+        return
 
         z = [int(x) for x in zindices]
         y = [int(x) for x in yindices]

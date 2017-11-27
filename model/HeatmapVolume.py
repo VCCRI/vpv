@@ -132,14 +132,14 @@ class HeatmapVolume(Volume):
     def get_lut(self):
         return self.negative_lut, self.positive_lut
 
-    def get_data(self, orientation, index=1):
+    def get_data(self, orientation, index=1, flip=None):
         """
         overide the base method. return two arrays instead of one. One with negative values and the other with positives
         :param orientation:
         :param index:
         :return:
         """
-        array = super(HeatmapVolume, self).get_data(orientation, index)
+        array = super(HeatmapVolume, self).get_data(orientation, index, flip)
 
         neg_array = np.copy(array)
         neg_array[neg_array > 0] = 0

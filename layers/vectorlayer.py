@@ -85,7 +85,8 @@ class VectorLayer(object):
         elif self.parent.orientation == Orientation.sagittal:
             self.vector_axes = (1, 2)
 
-    def set_slice(self, index=None):
+    def set_slice(self, index=None, flip=None):
+        # The flip has not been tested for vector layers and is probably broke
         # if not self.vol:
         #     if self.item:
         #         self.viewbox.removeItem(self.item)

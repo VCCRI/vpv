@@ -89,9 +89,9 @@ class HeatmapLayer(LayerBase):
                 z += 1
         self.update()
 
-    def set_slice(self, index):
+    def set_slice(self, index, flip=None):
         if self.vol and self.vol != "None":
-            slices = self.vol.get_data(self.parent.orientation, index - 1)
+            slices = self.vol.get_data(self.parent.orientation, index - 1, flip=flip)
             for i, ii in enumerate(self.image_items):
                 ii.setImage(slices[i], autoLevels=False)
 
