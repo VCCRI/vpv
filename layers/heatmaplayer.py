@@ -87,6 +87,7 @@ class HeatmapLayer(LayerBase):
                 image_item.setZValue(z)
                 image_item.setImage(slice_[i], autoLevels=True, opacity=1.0)
                 z += 1
+        self.update()
 
     def set_slice(self, index):
         if self.vol and self.vol != "None":

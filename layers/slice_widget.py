@@ -30,6 +30,7 @@ from common import Orientation, Layer
 from .heatmaplayer import HeatmapLayer
 from .vectorlayer import VectorLayer
 from .volumelayer import VolumeLayer
+from model import ImageVolume
 
 DEFAULT_SCALE_BAR_SIZE = 1000.00
 DEFAULT_VOXEL_SIZE = 14.0
@@ -51,6 +52,11 @@ class ViewBox(pg.ViewBox):
         elif d < 0:
             self.wheel_scroll_signal.emit(False)
         ev.accept()
+
+    def invertX(self, invert):
+        super().invertX(invert)
+
+
 
 
 class InformationOverlay(QtGui.QWidget):
@@ -136,6 +142,7 @@ class InformationOverlay(QtGui.QWidget):
                 indx += 1
         self.adjustSize()
 
+
 class RoiOverlay(object):
     def __init__(self, parent):
         self.parent = parent
@@ -197,6 +204,7 @@ class AnnotationOverlay(object):
 class ScaleBar(pg.ScaleBar):
     def __init__(self):
         color = QtGui.QColor(255, 255, 255)
+        self.scale_bar_label_visible = False
         pen = QtGui.QPen(color)
         brush = QtGui.QBrush(color)
         self.scalebar_size = DEFAULT_SCALE_BAR_SIZE
@@ -222,8 +230,10 @@ class ScaleBar(pg.ScaleBar):
             size = size / 1000
         else:
             suffix = 'um'
-        # self.text.setText(pg.fn.siFormat(size, suffix=suffix))
-        self.text.setText('')
+        if self.scale_bar_label_visible:
+            self.text.setText(pg.fn.siFormat(size, suffix=suffix))
+        else:
+            self.text.setText('')
         self.updateBar()
 
     def updateBar(self):
@@ -242,7 +252,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
     The qt widget that displays a signle ortohogoal view.
     Has attribute layers: {z_index: Layer}
     """
-    mouse_shift = QtCore.pyqtSignal(int, int, int, Orientation, name='mouse_shift')
+    mouse_shift = QtCore.pyqtSignal(int, int, int, Orientation, object,  name='mouse_shift')
     mouse_pressed_signal = QtCore.pyqtSignal(int, int, int, Orientation, str, name='mouse_pressed')
     crosshair_visible_signal = QtCore.pyqtSignal(bool)
     volume_position_signal = QtCore.pyqtSignal(int, int, int)
@@ -345,11 +355,29 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
 
         self.show()
 
-    def flipxy(self, do_invert):
-        if self.orientation == Orientation.axial:
+    @property
+    def scale_bar_visible(self):
+        return self.scalebar.scale_bar_label_visible
+
+    @scale_bar_visible.setter
+    def scale_bar_visible(self, is_visible):
+        self.scalebar.scale_bar_label_visible = is_visible
+        self.scalebar.updateBar()
+
+    def flipx(self, do_invert, override_sagitall=False):
+
+        if any([self.orientation == Orientation.axial,
+                self.orientation == Orientation.coronal,
+                (self.orientation == Orientation.sagittal and override_sagitall)
+                ]):
             self.viewbox.invertX(do_invert)
-        if self.orientation == Orientation.coronal:
-            self.viewbox.invertX(do_invert)
+            if not self.scalebar:
+                return
+            if do_invert:
+                self.scalebar.offset = (30, -60)
+            else:
+                self.scalebar.offset = (-60, -60)
+            self.scalebar.setParentItem(self.viewbox)
 
     def set_scalebar_color(self, qcolor):
         self.scalebar.set_color(qcolor)
@@ -387,6 +415,9 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
 
     def set_annotation(self, x, y, color, size):
         self.annotation.set(x, y, self.current_slice_idx, color, size)
+
+    def switch_off_annotation(self):
+        self.annotation.clear()
 
     def range_changed(self):
         self.scale_changed_signal.emit(self.orientation, self.id,  self.viewbox.viewRange())
@@ -446,7 +477,14 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
 
         # If shift is pressed emit signal to get other views to get to the same or interscting slice
         if modifiers == QtCore.Qt.ShiftModifier:
-            self.mouse_shift.emit(self.current_slice_idx, x, y, self.orientation)
+
+            # With mouse move signal, also send currebt vol.
+            # If veiews are not synchronised, syncyed sliceing only occurs within volumes
+            if self.layers[Layer.vol1].vol:
+                current_vol = self.layers[Layer.vol1].vol
+            else:
+                current_vol = None
+            self.mouse_shift.emit(self.current_slice_idx, x, y, self.orientation, current_vol)
 
     def get_pixel(self, layer_index, z, y, x):
         pos = []
@@ -476,7 +514,11 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
             self.scalebar = ScaleBar()
             self.scalebar.setParentItem(self.viewbox)
             self.scalebar.anchor((1, 1), (1, 1), offset=(-60, -60))
+            self.scalebar.updateBar()
             layer.volume_label_signal.connect(self.overlay.set_volume_label)
+            # if self.orientation == Orientation.sagittal:
+            #     # A temp bodge: 17th Nov 17. Do the xy flip on sagittal sections to match that of IEV
+            #     self.flipx(True, override_sagitall=True)
 
         elif layer_enum == Layer.vol2:
             layer = VolumeLayer(self, layer_enum, self.model, viewmanager)
@@ -746,8 +788,6 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
                 new_index = current_vol_idx + 1
         new_vol_name = vol_ids[new_index]
         self.layers[Layer.vol1].set_volume(new_vol_name)
-
-
 
     def mousePressEvent(self, e):
         """

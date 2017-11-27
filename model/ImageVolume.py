@@ -10,5 +10,3 @@ class ImageVolume(Volume):
         self.annotations = VolumeAnnotations(list(reversed(list(self.get_shape()))))
         self.levels = [float(self._arr_data.min()), float(self._arr_data.max())]
 
-    # def add_annotation(self, x, y, z, ma, pato):
-    #     self.annotations.add(x, y, z, ma, pato)

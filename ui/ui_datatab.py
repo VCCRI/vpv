@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui_datatab.ui'
+# Form implementation generated from reading ui file 'ui/ui_datatab.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -414,10 +414,13 @@ class Ui_data(object):
         self.gridLayoutScalebar.addWidget(self.label_15, 0, 0, 1, 1)
         self.doubleSpinBoxScaleBarLength = QtGui.QDoubleSpinBox(data)
         self.doubleSpinBoxScaleBarLength.setObjectName(_fromUtf8("doubleSpinBoxScaleBarLength"))
-        self.gridLayoutScalebar.addWidget(self.doubleSpinBoxScaleBarLength, 0, 3, 1, 1)
+        self.gridLayoutScalebar.addWidget(self.doubleSpinBoxScaleBarLength, 0, 4, 1, 1)
         self.label_16 = QtGui.QLabel(data)
         self.label_16.setObjectName(_fromUtf8("label_16"))
-        self.gridLayoutScalebar.addWidget(self.label_16, 0, 2, 1, 1)
+        self.gridLayoutScalebar.addWidget(self.label_16, 0, 3, 1, 1)
+        self.checkBoxScaleBarLabel = QtGui.QCheckBox(data)
+        self.checkBoxScaleBarLabel.setObjectName(_fromUtf8("checkBoxScaleBarLabel"))
+        self.gridLayoutScalebar.addWidget(self.checkBoxScaleBarLabel, 0, 2, 1, 1)
         self.verticalLayout.addLayout(self.gridLayoutScalebar)
         self.line_9 = QtGui.QFrame(data)
         self.line_9.setLineWidth(4)
@@ -461,5 +464,6 @@ class Ui_data(object):
         self.pushButtonVectorMagnitudeFilter.setText(_translate("data", "filter magnitude", None))
         self.label_15.setText(_translate("data", "Voxel size", None))
         self.label_16.setText(_translate("data", "Scale bar length", None))
+        self.checkBoxScaleBarLabel.setText(_translate("data", "scale label", None))
 
 import resources_rc

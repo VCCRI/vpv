@@ -28,6 +28,8 @@ class Annotations(QtGui.QWidget):
     annotation_highlight_signal = QtCore.pyqtSignal(int, int, int, list, int)
     annotation_radius_signal = QtCore.pyqtSignal(int)
     annotation_recent_dir_signal = QtCore.pyqtSignal(str)
+    roi_highlight_off_signal = QtCore.pyqtSignal()
+    #reset_roi_signal = QtCore.pyqtSignal()  # Set the roi to None so can annotate without giving coords
 
     def __init__(self, controller,  manager):
         super(Annotations, self).__init__(manager)
@@ -45,9 +47,11 @@ class Annotations(QtGui.QWidget):
         # The signal to change volumes from the combobox
         self.ui.comboBoxAnnotationsVolumes.activated['QString'].connect(self.volume_changed)
 
-        self.ui.pushButtonRemoveAnnotation.clicked.connect(self.remove_annotation)
+        # self.ui.pushButtonRemoveAnnotation.clicked.connect(self.remove_annotation)
 
         self.ui.pushButtonSaveAnnotations.clicked.connect(self.save_annotations)
+
+        self.ui.pushButtonDiableRoi.clicked.connect(self.reset_roi)
 
         self.ui.spinBoxAnnotationCircleSize.valueChanged.connect(self.annotation_radius_changed)
 
@@ -61,6 +65,8 @@ class Annotations(QtGui.QWidget):
         self.ui.treeWidgetAvailableTerms.itemExpanded.connect(self.resize_table)
 
         self.ui.treeWidgetAvailableTerms.clear()
+
+        self.reset_roi()
 
     def on_tree_clicked(self, item):
         """
@@ -103,7 +109,7 @@ class Annotations(QtGui.QWidget):
 
     def populate_available_terms(self):
         """
-        Run this at start up
+        Run this at start up and when volume is changed
         """
         self.ui.treeWidgetAvailableTerms.clear()
 
@@ -123,7 +129,6 @@ class Annotations(QtGui.QWidget):
             return
 
         for ann in vol.annotations:
-            print(ann.category)
             ann_by_cat[ann.category].append(ann)
         for category, annotations in ann_by_cat.items():
             parent = QtGui.QTreeWidgetItem(self.ui.treeWidgetAvailableTerms)
@@ -146,6 +151,9 @@ class Annotations(QtGui.QWidget):
                 self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)
                 child.setBackgroundColor(1, QtGui.QColor(*color))  # Unpack the tuple of colors and opacity
         self.mark_complete_categories()
+
+        # Set the roi coords to None
+        self.roi_highlight_off_signal.emit()
 
     def annotation_radius_changed(self, radius):
         self.annotation_radius = radius
@@ -211,27 +219,25 @@ class Annotations(QtGui.QWidget):
         self.update()
         self.populate_available_terms()
 
-    def remove_annotation(self):
-        return # currently not working
-        indexes = self.ui.treeViewAvailableAnnotations.selectionModel().selectedRows()
-        # if len(indexes) > 0:
-        #     selected_row = indexes[0].row()
-        #     self.controller.current_view.layers[Layer.vol1].vol.annotations.remove(selected_row)
-        #     self.annotations_table.layoutChanged.emit()
-
     def update_annotation(self, child, cbox):
         """
-        Returns
-        -------
+        On getting a change signal from the parameter option combobox, set options on the vol.annotations object
+        Parameters
+        ----------
+        child: is the node in the QTreeWidget that corresponds to our paramter option selection
+        cbox: Qt combobox that was clicked
 
         """
         vol = self.controller.current_annotation_volume()
         if not vol:
-            common.info_dialog(self, "Error", "No volume selected")
+            common.error_dialog(self, "Error", "No volume selected")
             return
-        x = int(self.ui.labelXPos.text())
-        y = int(self.ui.labelYPos.text())
-        z = int(self.ui.labelZPos.text())
+        try:
+            x = int(self.ui.labelXPos.text())
+            y = int(self.ui.labelYPos.text())
+            z = int(self.ui.labelZPos.text())
+        except ValueError:
+            x = y = z = None
 
         if self.ui.radioButtonE145.isChecked():
             stage = Stage.e14_5
@@ -244,12 +250,20 @@ class Annotations(QtGui.QWidget):
 
         base_node = child
         term = base_node.text(1)
-        if not term:
-            common.info_dialog(self, "Error", "No term is selected!")
-            return
-
 
         option = cbox.itemData(cbox.currentIndex(), QtCore.Qt.UserRole)
+
+        if option == AnnotationOption.abnormal:
+            if None in (x, y, z):
+                common.info_dialog(self, 'Select a region!',
+                                   "For option '{}' a coordinate must be specified".format(AnnotationOption.abnormal.name))
+                # this will rest the option backt o what it is on the volume.annotation object
+                cbox.setCurrentIndex(cbox.findText(vol.annotations.get_by_term(term).option.value))
+                return
+
+        if not term:
+            common.error_dialog(self, "Error", "No term is selected!")
+            return
 
         color = OPTION_COLOR_MAP[option]
         base_node.setBackgroundColor(1, QtGui.QColor(*color))
@@ -257,6 +271,12 @@ class Annotations(QtGui.QWidget):
         vol.annotations.add_emap_annotation(x, y, z, term, option, stage)
         self.mark_complete_categories()
         self.on_tree_clicked(base_node)
+
+    def reset_roi(self):
+        self.ui.labelXPos.setText(None)
+        self.ui.labelYPos.setText(None)
+        self.ui.labelZPos.setText(None)
+        self.roi_highlight_off_signal.emit()
 
     def mark_complete_categories(self):
         """
@@ -302,7 +322,7 @@ class Annotations(QtGui.QWidget):
                 y = view_index
                 x = x
 
-            # Populate the location boxes in the annotations manager
+            # Populate the location box in the annotations manager
             self.ui.labelXPos.setText(str(x))
             self.ui.labelYPos.setText(str(y))
             self.ui.labelZPos.setText(str(z))

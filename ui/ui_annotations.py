@@ -25,7 +25,7 @@ except AttributeError:
 class Ui_Annotations(object):
     def setupUi(self, Annotations):
         Annotations.setObjectName(_fromUtf8("Annotations"))
-        Annotations.resize(576, 802)
+        Annotations.resize(576, 803)
         Annotations.setMinimumSize(QtCore.QSize(0, 40))
         self.verticalLayout_17 = QtGui.QVBoxLayout(Annotations)
         self.verticalLayout_17.setObjectName(_fromUtf8("verticalLayout_17"))
@@ -163,9 +163,11 @@ class Ui_Annotations(object):
         self.pushButtonSaveAnnotations = QtGui.QPushButton(Annotations)
         self.pushButtonSaveAnnotations.setObjectName(_fromUtf8("pushButtonSaveAnnotations"))
         self.horizontalLayout_5.addWidget(self.pushButtonSaveAnnotations)
-        self.pushButtonRemoveAnnotation = QtGui.QPushButton(Annotations)
-        self.pushButtonRemoveAnnotation.setObjectName(_fromUtf8("pushButtonRemoveAnnotation"))
-        self.horizontalLayout_5.addWidget(self.pushButtonRemoveAnnotation)
+        self.pushButtonDiableRoi = QtGui.QPushButton(Annotations)
+        self.pushButtonDiableRoi.setObjectName(_fromUtf8("pushButtonDiableRoi"))
+        self.horizontalLayout_5.addWidget(self.pushButtonDiableRoi)
+        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem1)
         self.verticalLayout.addLayout(self.horizontalLayout_5)
         self.verticalLayout_16 = QtGui.QVBoxLayout()
         self.verticalLayout_16.setObjectName(_fromUtf8("verticalLayout_16"))
@@ -190,5 +192,6 @@ class Ui_Annotations(object):
         self.radioButtonE95.setText(_translate("Annotations", "E9.5", None))
         self.label_2.setText(_translate("Annotations", "Circle radius", None))
         self.pushButtonSaveAnnotations.setText(_translate("Annotations", "Save annotations", None))
-        self.pushButtonRemoveAnnotation.setText(_translate("Annotations", "Remove annotation", None))
+        self.pushButtonDiableRoi.setToolTip(_translate("Annotations", "Clear ROI coordinates", None))
+        self.pushButtonDiableRoi.setText(_translate("Annotations", "Reset roi", None))
 

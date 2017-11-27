@@ -114,20 +114,26 @@ class Volume(Qt.QObject):
         """
         self.voxel_size = size
 
-    def _get_coronal(self, index):
+    def _get_coronal(self, index, reverse=True):
+        if reverse:
+            index = self._arr_data.shape[1] - index
         slice_ = np.flipud(np.rot90(self._arr_data[:, index, :], 1))
         if self.interpolate:
             return self._interpolate(slice_)
         return slice_
 
-    def _get_sagittal(self, index):
-
+    # Testing. Adding reverse option to try and get same view sequence as IEV. Need to flip now
+    def _get_sagittal(self, index, reverse=False):
+        if reverse:
+            index = self._arr_data.shape[2] - index
         slice_ = np.rot90(self._arr_data[:, :, index], 1)
         if self.interpolate:
             return np.flipud(self._interpolate(slice_))
-        return np.flipud(slice_)
+        return slice_
 
-    def _get_axial(self, index):
+    def _get_axial(self, index, reverse=True):
+        if reverse:
+            index = self._arr_data.shape[0] - index
         slice_ = np.rot90(self._arr_data[index, :, :], 3)
         if self.interpolate:
             return self._interpolate(slice_)

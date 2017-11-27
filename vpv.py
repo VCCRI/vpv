@@ -103,6 +103,7 @@ class Vpv(QtCore.QObject):
         self.annotations_manager = Annotations(self, self.mainwindow)
         self.annotations_manager.annotation_highlight_signal.connect(self.highlight_annotation)
         self.annotations_manager.annotation_radius_signal.connect(self.annotation_radius_changed)
+        self.annotations_manager.roi_highlight_off_signal.connect(self.reset_roi)
 
         # Sometimes QT console is a pain to install. If not availale do not make console tab
         if console_imported:
@@ -176,6 +177,10 @@ class Vpv(QtCore.QObject):
     def set_current_view(self, slice_id):
         self.current_view = self.views[slice_id]
 
+    def reset_roi(self):
+        for view in self.views.values():
+            view.switch_off_annotation()
+
     def highlight_annotation(self, x, y, z, color, radius):
         for view in self.views.values():
             if view.orientation == Orientation.axial:
@@ -246,7 +251,7 @@ class Vpv(QtCore.QObject):
         view.slice_index_changed_signal.connect(self.index_changed)
         view.move_to_next_vol_signal.connect(self.move_to_next_vol)
         self.data_manager.scale_bar_color_signal.connect(view.set_scalebar_color)
-        self.data_manager.flipxy_signal.connect(view.flipxy)
+        self.data_manager.flipxy_signal.connect(view.flipx)
         self.crosshair_visible_signal.connect(view.show_crosshair)
         self.crosshair_invisible_signal.connect(view.hide_crosshair)
         self.view_id_counter += 1
@@ -401,7 +406,7 @@ class Vpv(QtCore.QObject):
     def data_processing_finished_slot(self):
         self.data_processing_finished_signal.emit()
 
-    def mouse_shift(self, own_index, x, y, orientation):
+    def mouse_shift(self, own_index, x, y, orientation, emitting_vol=None):
         """
         Gets mouse moved signal
 
@@ -415,16 +420,23 @@ class Vpv(QtCore.QObject):
             the y position of the mouse
         orientation: str
             the orientation of the calling view
+        emitting_vol: ImageVolume
+            Synced slicing to occur only between volumes if linked views is off
         """
         for view in self.views.values():
-            # TODO: make this better
+
+            if not self.data_manager.link_views:
+                if view.layers[Layer.vol1].vol != emitting_vol:
+                    view.hide_crosshair()
+                    continue
             if orientation == Orientation.sagittal:
                 if view.orientation == Orientation.axial:
                     try:
                         x1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - x
                     except:
                         pass
-                    view.set_slice(y, crosshair_xy=(own_index, x1))
+                    y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - y
+                    view.set_slice(y1, crosshair_xy=(own_index, x))
                 elif view.orientation == Orientation.coronal:
                     view.set_slice(x, crosshair_xy=(own_index, y))
                 elif view.orientation == Orientation.sagittal:
@@ -435,16 +447,20 @@ class Vpv(QtCore.QObject):
                     y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - y
                     view.set_slice(x, crosshair_xy=(y1, own_index))
                 elif view.orientation == Orientation.coronal:
-                    view.set_slice(y, True, crosshair_xy=(x, own_index))
+                    y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - y
+                    x1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - x
+                    view.set_slice(y1, True, crosshair_xy=(x, own_index))
                 elif view.orientation == Orientation.axial:
                     view.set_slice(own_index, crosshair_xy=(x, y))
 
             elif orientation ==Orientation.coronal:
                 if view.orientation ==  Orientation.axial:
+                    y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - y
                     oi = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - own_index
-                    view.set_slice(y, crosshair_xy=(x, oi))
+                    view.set_slice(y1, crosshair_xy=(x, oi))
                 elif view.orientation == Orientation.sagittal:
-                    view.set_slice(x, crosshair_xy=(own_index, y))
+                    oi = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - own_index
+                    view.set_slice(x, crosshair_xy=(x, y))
                 elif view.orientation == Orientation.coronal:
                     view.set_slice(own_index, crosshair_xy=(x, y))
 
@@ -521,7 +537,7 @@ class Vpv(QtCore.QObject):
         except IndexError:  # No Volume objects have been loaded
             pass
 
-    def importer_callback(self, volumes, datafiles, annotations, vector_files, image_series,
+    def importer_callback(self, volumes, heatmaps, annotations, vector_files, image_series,
                           impc_analysis, last_dir, memory_map=False):
         """
         Recieves a list of files to open from the Importer widget
@@ -536,8 +552,8 @@ class Vpv(QtCore.QObject):
             self.load_impc_analysis(impc_analysis[0])
         if len(volumes) > 0:
             self.load_volumes(volumes, 'vol', memory_map)
-        if len(datafiles) > 0:
-            self.load_volumes(datafiles, 'heatmap', memory_map)
+        if len(heatmaps) > 0:
+            self.load_volumes(heatmaps, 'heatmap', memory_map, fdr_thresholds=False)
         if len(vector_files) > 0:
             self.load_volumes(vector_files, 'vector', memory_map)
         if len(image_series) > 0:
