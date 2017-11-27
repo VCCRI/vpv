@@ -406,63 +406,69 @@ class Vpv(QtCore.QObject):
     def data_processing_finished_slot(self):
         self.data_processing_finished_signal.emit()
 
-    def mouse_shift(self, own_index, x, y, orientation, emitting_vol=None):
+    def mouse_shift(self, src_index, x, y, src_orientation, emitting_vol=None):
         """
         Gets mouse moved signal
 
         Parameters
         ----------
-        own_index: int
+        src_index: int
             the current slice of the calling view
         x: int
             the x position of the mouse
         y: int
             the y position of the mouse
-        orientation: str
+        src_orientation: str
             the orientation of the calling view
         emitting_vol: ImageVolume
             Synced slicing to occur only between volumes if linked views is off
         """
+        def rev(x, orientation):
+            return view.layers[Layer.vol1].vol.dimension_length(orientation) - x
+
         for view in self.views.values():
 
             if not self.data_manager.link_views:
                 if view.layers[Layer.vol1].vol != emitting_vol:
                     view.hide_crosshair()
                     continue
-            if orientation == Orientation.sagittal:
+
+            if src_orientation == Orientation.sagittal:
+
                 if view.orientation == Orientation.axial:
-                    try:
-                        x1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - x
-                    except:
-                        pass
                     y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - y
-                    view.set_slice(y1, crosshair_xy=(own_index, x))
-                elif view.orientation == Orientation.coronal:
-                    view.set_slice(x, crosshair_xy=(own_index, y))
-                elif view.orientation == Orientation.sagittal:
-                    view.set_slice(own_index, crosshair_xy=(x, y))
+                    view.set_slice(y1, crosshair_xy=(rev(src_index, Orientation.sagittal), x))
 
-            elif orientation == Orientation.axial:
+                elif view.orientation == Orientation.coronal:
+                    view.set_slice(x, crosshair_xy=(rev(src_index, Orientation.sagittal), y))
+
+                elif view.orientation == Orientation.sagittal:
+                    view.set_slice(src_index, crosshair_xy=(x, y))
+
+            elif src_orientation == Orientation.axial:
+
                 if view.orientation == Orientation.sagittal:
-                    y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - y
-                    view.set_slice(x, crosshair_xy=(y1, own_index))
-                elif view.orientation == Orientation.coronal:
-                    y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - y
-                    x1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - x
-                    view.set_slice(y1, True, crosshair_xy=(x, own_index))
-                elif view.orientation == Orientation.axial:
-                    view.set_slice(own_index, crosshair_xy=(x, y))
+                    x1 = rev(x, Orientation.sagittal)
+                    view.set_slice(x1, crosshair_xy=(y, rev(src_index, Orientation.axial)))
 
-            elif orientation ==Orientation.coronal:
-                if view.orientation ==  Orientation.axial:
-                    y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - y
-                    oi = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - own_index
-                    view.set_slice(y1, crosshair_xy=(x, oi))
-                elif view.orientation == Orientation.sagittal:
-                    oi = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - own_index
-                    view.set_slice(x, crosshair_xy=(x, y))
                 elif view.orientation == Orientation.coronal:
-                    view.set_slice(own_index, crosshair_xy=(x, y))
+                    y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - y
+                    view.set_slice(y1, True, crosshair_xy=(x, rev(src_index, Orientation.axial)))
+
+                elif view.orientation == Orientation.axial:
+                    view.set_slice(src_index, crosshair_xy=(x, y))
+
+            elif src_orientation == Orientation.coronal:
+
+                if view.orientation == Orientation.axial:
+                    y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - y
+                    view.set_slice(y1, crosshair_xy=(x, src_index))
+
+                elif view.orientation == Orientation.sagittal:
+                    view.set_slice(rev(x, Orientation.sagittal), crosshair_xy=(src_index, y))
+
+                elif view.orientation == Orientation.coronal:
+                    view.set_slice(src_index, crosshair_xy=(x, y))
 
     def stats(self):
         """

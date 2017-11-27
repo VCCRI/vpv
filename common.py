@@ -70,9 +70,9 @@ def read_image(img_path, convert_to_ras=False):
     img = sitk.ReadImage(img_path)
     #direction = img.GetDirection()
     arr = sitk.GetArrayFromImage(img)  # Leave this fix out for now until I make optin available to chose orientation
-    if convert_to_ras: # testing to get orientation the same as in IEV by default
-        #convert to RAS (testing)
-        arr = np.flip(arr, 0)
+    # if convert_to_ras: # testing to get orientation the same as in IEV by default
+    #     #convert to RAS (testing)
+    #     arr = np.flip(arr, 0)
         # arr = np.flip(arr, 2)
     return arr
 
