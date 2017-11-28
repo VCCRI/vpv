@@ -443,7 +443,9 @@ class Vpv(QtCore.QObject):
 
             w = r_x[1] - r_x[0]
             h = r_y[0] - r_y[1]
-            dest_view.set_roi(r_x[0], r_y[0], w, h)
+            dim_len = dest_view.main_volume.dimension_length(Orientation.coronal)
+            y1 = dim_len - r_y[0]
+            dest_view.set_roi(r_x[0], y1, w, h)
 
                 # dim_len = dest_view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal)
                 # w = r_x[1] - r_x[0]
@@ -475,18 +477,42 @@ class Vpv(QtCore.QObject):
         tuple
             ((x,x), (y,y), (z,z)
         """
-        starts = self.map_view_to_view(xx[0], yy[0], zz[0],
-                                       src_orientation, dest_orientation)
+        z = [int(x) for x in zz]
+        y = [int(x) for x in yy]
+        x = [int(x) for x in xx]
 
-        ends = self.map_view_to_view(xx[1], yy[1], zz[1],
-                                     src_orientation, dest_orientation)
+        xslice = int(np.mean(x))
+        yslice = int(np.mean(y))
+        zslice = int(np.mean(z))
 
-        return ((starts[0], ends[0]),
-                (starts[1], ends[1]),
-                (starts[2], ends[2]))
+        # Set the slice views to the centre of the ROI
+        for view in self.views.values():
+            if view.orientation == Orientation.axial:
+                view._set_slice(zslice)
+            if view.orientation == Orientation.coronal:
+                view._set_slice(yslice)
+            if view.orientation == Orientation.sagittal:
+                view._set_slice(xslice)
+
+        # Send a 2D ROI to each view
+        for view in self.views.values():
+            if view.orientation == Orientation.axial:
+                dim_len = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal)
+                w = x[1] - x[0]
+                h = y[0] - y[1]
+                view.set_roi(x[0], y[0], w, h)
+            if view.orientation == Orientation.coronal:
+                w = x[1] - x[0]
+                h = z[0] - z[1]
+                view.set_roi(x[0], z[1], w, h)
+            if view.orientation == Orientation.sagittal:
+                w = y[1] - y[0]
+                h = z[0] - z[1]
+                view.set_roi(y[0], z[1], w, h)
+
 
     @staticmethod
-    def map_view_to_view(x, y, idx, src_view, dest_view):
+    def map_view_to_view(x, y, idx, src_view, dest_view, forceflip=False):
         """
         Given a coordinate on one view with a given orientation map to another view with a given orientation
         Parameters
@@ -510,11 +536,13 @@ class Vpv(QtCore.QObject):
         """
         # the Data is flipped to make it compatibile with the IEV view. So we have to account for this when mapping
         # between views by using the pint counting from the opposite side
+
+        dest_orientation = dest_view.orientation
+        dest_flipped = dest_view.flipped_x
+
         src_orientation = src_view.orientation
         src_dims = src_view.main_volume.get_shape_xyz()
-        dest_orientation = dest_view.orientation
         src_flipped = src_view.flipped_x
-        dest_flipped = dest_view.flipped_x
 
         if src_orientation == Orientation.axial:
             xyz = src_dims

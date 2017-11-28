@@ -154,11 +154,11 @@ class ManageData(QtGui.QWidget):
         self.ui.checkBox6Views.setChecked(False)
         self.ui.checkBox6Views.clicked.connect(self.showThreeOverThreeViews)
 
-        self.connected_table = QtGui.QTableWidget(self)
-        self.ui.verticalLayoutConnectedComponents.addWidget(self.connected_table, 0)
-        self.connected_table.cellClicked.connect(self.on_connected_table_clicked)
-        self.connected_table.setColumnCount(3)
-        self.connected_table.setHorizontalHeaderLabels(['Count', 'Mean', 'location'])
+        self.blob_table = QtGui.QTableWidget(self)
+        self.ui.verticalLayoutConnectedComponents.addWidget(self.blob_table, 0)
+        self.blob_table.cellClicked.connect(self.on_connected_table_clicked)
+        self.blob_table.setColumnCount(3)
+        self.blob_table.setHorizontalHeaderLabels(['Count', 'Mean', 'location'])
 
         self.ui.doubleSpinBoxVoxelSize.setMaximum(1000.0)
         self.ui.doubleSpinBoxVoxelSize.setValue(DEFAULT_SCALE_BAR_SIZE)
@@ -348,23 +348,23 @@ class ManageData(QtGui.QWidget):
         self.update_connected_components(vol_name)
 
     def update_connected_components(self, vol_name):
-        self.connected_table.clear()
-        self.connected_table.setRowCount(0)
-        self.connected_table.setHorizontalHeaderLabels(['Count', 'Mean', 'location'])
+        self.blob_table.clear()
+        self.blob_table.setRowCount(0)
+        self.blob_table.setHorizontalHeaderLabels(['Count', 'Mean', 'location'])
 
         # set the connected component list
         conn = self.model.getdata(vol_name).connected_components
 
         for i, (size_mean, bbox) in enumerate(conn.items()):
-            self.connected_table.insertRow(i)
+            self.blob_table.insertRow(i)
             bbox_string = ', '.join(str(x) for x in bbox)
-            self.connected_table.setItem(i, 0, QtGui.QTableWidgetItem(str(size_mean[0])))
-            self.connected_table.setItem(i, 1, QtGui.QTableWidgetItem(str(size_mean[1])))
-            self.connected_table.setItem(i, 2, QtGui.QTableWidgetItem(bbox_string))
-        self.connected_table.resizeColumnsToContents()
+            self.blob_table.setItem(i, 0, QtGui.QTableWidgetItem(str(size_mean[0])))
+            self.blob_table.setItem(i, 1, QtGui.QTableWidgetItem(str(size_mean[1])))
+            self.blob_table.setItem(i, 2, QtGui.QTableWidgetItem(bbox_string))
+        self.blob_table.resizeColumnsToContents()
 
     def on_connected_table_clicked(self, row, _):
-        roi_widget = self.connected_table.item(row, 2)
+        roi_widget = self.blob_table.item(row, 2)
         roi_str = roi_widget.text()
         roi = [x.strip() for x in roi_str.split(', ')]
         self.roi_signal.emit(roi[0:2], roi[2:4], roi[4:6])
@@ -680,7 +680,7 @@ class ManageData(QtGui.QWidget):
             view.update_view()
 
     def clear(self):
-        self.connected_table.clear()
+        self.blob_table.clear()
 
     def set_current_sliceview(self, slice_id):
         self.current_slice_view = self.model.slice_views[slice_id]
