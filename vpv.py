@@ -118,11 +118,11 @@ class Vpv(QtCore.QObject):
         # Create the initial 3 orthogonal views. plus 3 hidden for the second row
         inital_views = [
             [Orientation.sagittal, 'red', 0, 1, False],
-            [Orientation.coronal, 'blue', 0, 2, False, False],
-            [Orientation.axial, 'green', 0, 3, False, False],
+            [Orientation.coronal, 'blue', 0, 2, False, True],
+            [Orientation.axial, 'green', 0, 3, False, True],
             [Orientation.sagittal, 'orange', 1, 1, True],
-            [Orientation.coronal, 'grey', 1, 2, True, False],
-            [Orientation.axial, 'cyan', 1, 3, True, False]
+            [Orientation.coronal, 'grey', 1, 2, True, True],
+            [Orientation.axial, 'cyan', 1, 3, True, True]
             # ['sagittal', 'yellow', 1, 1, True],
             # ['axial', 'pink', 1, 3, True],
             # ['coronal', 'cyan', 1, 2, True]
@@ -402,7 +402,7 @@ class Vpv(QtCore.QObject):
     def set_to_centre_of_roi(self, zz, yy, xx):
         """
         Recieves coordinates of a coonnected components roi
-        Then sends to cooresponding 2D roi to each view dependent on its orientation
+        Then sends to cooresponding 2D roi to each dest_view dependent on its orientation
         Parameters
         ----------
         zindices
@@ -422,43 +422,44 @@ class Vpv(QtCore.QObject):
         yslice = int(np.mean(yy))
         zslice = int(np.mean(zz))
 
-        # Send a 2D ROI to each view
-        for view in self.views.values():
+        src_view = self.current_view
+        # Send a 2D ROI to each dest_view
+        for dest_view in self.views.values():
             src_dims = self.current_view.layers[Layer.vol1].vol.get_shape_xyz()
 
-            # Get the x y corrdinates of the ROI along with the slice index for each orthogonal view
+            # Get the x y corrdinates of the ROI along with the slice index for each orthogonal dest_view
             # ROI is in normal coordinates so src orientation will always be axial
-            if view.orientation == Orientation.axial:
-                view._set_slice(zslice)
+            if dest_view.orientation == Orientation.axial:
+                dest_view._set_slice(zslice)
                 r_x, r_y, r_z = xx, yy, zz
 
-            elif view.orientation == Orientation.coronal:
-                view._set_slice(yslice)
-                r_x, r_y, r_z = self.map_roi_view_to_view(xx, yy, zz, Orientation.axial, Orientation.coronal, src_dims)
+            elif dest_view.orientation == Orientation.coronal:
+                dest_view._set_slice(yslice)
+                r_x, r_y, r_z = self.map_roi_view_to_view(xx, yy, zz, src_view, dest_view)
 
-            elif view.orientation == Orientation.sagittal:
-                r_x, r_y, r_z = self.map_roi_view_to_view(xx, yy, zz, Orientation.axial, Orientation.sagittal, src_dims)
-                view._set_slice(xslice)
+            elif dest_view.orientation == Orientation.sagittal:
+                r_x, r_y, r_z = self.map_roi_view_to_view(xx, yy, zz, src_view, dest_view)
+                dest_view._set_slice(xslice)
 
             w = r_x[1] - r_x[0]
             h = r_y[0] - r_y[1]
-            view.set_roi(r_x[0], r_y[0], w, h)
+            dest_view.set_roi(r_x[0], r_y[0], w, h)
 
-                # dim_len = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal)
+                # dim_len = dest_view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal)
                 # w = r_x[1] - r_x[0]
                 # h = r_y[0] - r_y[1]
                 # y1 = dim_len - r_y[0]
-                # view.set_roi(r_x[0], y1, w, h)
+                # dest_view.set_roi(r_x[0], y1, w, h)
                 #
                 # w = r_x[1] - r_x[0]
                 # h = r_y[0] - r_y[1]
-                # view.set_roi(r_x[0], z[1], w, h)
+                # dest_view.set_roi(r_x[0], z[1], w, h)
                 #
                 # w = y[1] - y[0]
                 # h = z[0] - z[1]
-                # view.set_roi(y[0], z[1], w, h)
+                # dest_view.set_roi(y[0], z[1], w, h)
 
-    def map_roi_view_to_view(self, xx, yy, zz, src_orientation, dest_orientatio):
+    def map_roi_view_to_view(self, xx, yy, zz, src_orientation, dest_orientation):
         """
         Map a roi from one view to another
         Parameters
@@ -475,10 +476,10 @@ class Vpv(QtCore.QObject):
             ((x,x), (y,y), (z,z)
         """
         starts = self.map_view_to_view(xx[0], yy[0], zz[0],
-                                       src_orientation, dest_orientation, src_dims)
+                                       src_orientation, dest_orientation)
 
         ends = self.map_view_to_view(xx[1], yy[1], zz[1],
-                                     src_orientation, dest_orientation, src_dims)
+                                     src_orientation, dest_orientation)
 
         return ((starts[0], ends[0]),
                 (starts[1], ends[1]),
@@ -513,7 +514,7 @@ class Vpv(QtCore.QObject):
         src_dims = src_view.main_volume.get_shape_xyz()
         dest_orientation = dest_view.orientation
         src_flipped = src_view.flipped_x
-        dest_flipped = src_view.flipped_x
+        dest_flipped = dest_view.flipped_x
 
         if src_orientation == Orientation.axial:
             xyz = src_dims
