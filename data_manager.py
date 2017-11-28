@@ -72,6 +72,9 @@ class ManageData(QtGui.QWidget):
         self.ui.checkBoxFlipXY.setChecked(False)
         self.ui.checkBoxFlipXY.clicked.connect(self.on_flipxy)
 
+        # deactivate the flipbox for now
+        self.ui.checkBoxFlipXY.hide()
+
         self.ui.comboBoxOrientation.activated['QString'].connect(self.on_orientation)
 
         self.ui.pushButtonScreenShot.clicked.connect(self.controller.take_screen_shot)

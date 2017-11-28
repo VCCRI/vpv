@@ -243,7 +243,7 @@ class Vpv(QtCore.QObject):
         """
         Create all the orthogonal views and setup the signals and slots
         """
-        view = self.add_view(self.view_id_counter, orientation, color, row, column, flipped_x=flipped_x)
+        view = self.add_view(self.view_id_counter, orientation, color, flipped_x=flipped_x)
         view.mouse_shift.connect(self.mouse_shift)
         view.mouse_pressed_signal.connect(self.dock_widget.mouse_pressed)
         view.crosshair_visible_signal.connect(self.crosshair_visible_slot)
@@ -284,7 +284,7 @@ class Vpv(QtCore.QObject):
         self.current_view.layers[Layer.heatmap].vol.find_largest_connected_components()
         self.data_manager.update_connected_components(self.current_view.layers[Layer.heatmap].vol.name)
 
-    def add_view(self, id_, orientation, color, row, column, flipped_x=False):
+    def add_view(self, id_, orientation, color, flipped_x=False):
         """
         Setup the controls for each layer)
         :param id, int
@@ -407,7 +407,11 @@ class Vpv(QtCore.QObject):
         ----------
         zindices
         yindices
-        xindices
+
+
+        Notes
+        -----
+        I wan to integrate this with map_view_to_view but that function will need some reworking to do that
 
         Returns
         -------
@@ -422,44 +426,49 @@ class Vpv(QtCore.QObject):
         yslice = int(np.mean(yy))
         zslice = int(np.mean(zz))
 
-        src_view = self.current_view
+
         # Send a 2D ROI to each dest_view
         for dest_view in self.views.values():
             src_dims = self.current_view.layers[Layer.vol1].vol.get_shape_xyz()
-
+            print('x')
             # Get the x y corrdinates of the ROI along with the slice index for each orthogonal dest_view
             # ROI is in normal coordinates so src orientation will always be axial
             if dest_view.orientation == Orientation.axial:
+                zslice = src_dims[2] - zslice
                 dest_view._set_slice(zslice)
                 r_x, r_y, r_z = xx, yy, zz
 
+                w = r_x[1] - r_x[0]
+                h = r_y[1] - r_y[0]
+      dims = dest_view.main_volume.get_shape_xyz()
+                y1 = r_x[0] - h
+                x1 = r_y[0] - w
+                dest_view.set_roi(x1, y1, w, h)
+
             elif dest_view.orientation == Orientation.coronal:
+                yslice = src_dims[1] - yslice
                 dest_view._set_slice(yslice)
-                r_x, r_y, r_z = self.map_roi_view_to_view(xx, yy, zz, src_view, dest_view)
+                r_x, r_y, r_z = xx, yy, zz
 
-            elif dest_view.orientation == Orientation.sagittal:
-                r_x, r_y, r_z = self.map_roi_view_to_view(xx, yy, zz, src_view, dest_view)
+                w = r_x[1] - r_x[0]
+                h = r_z[1] - r_z[0]
+                dims = dest_view.main_volume.get_shape_xyz()
+                y1 = r_x[1] - h
+                x1 = dims[1] - r_y[1] - w
+                dest_view.set_roi(x1, y1, w, h)
+
+            if dest_view.orientation == Orientation.sagittal:
+                xslice = src_dims[0] - xslice
                 dest_view._set_slice(xslice)
+                r_x, r_y, r_z = xx, yy, zz
 
-            w = r_x[1] - r_x[0]
-            h = r_y[0] - r_y[1]
-            dim_len = dest_view.main_volume.dimension_length(Orientation.coronal)
-            y1 = dim_len - r_y[0]
-            dest_view.set_roi(r_x[0], y1, w, h)
+                w = r_y[1] - r_y[0]
+                h = r_z[1] - r_z[0]
+                dims = dest_view.main_volume.get_shape_xyz()
+                y1 = r_x[1] - h
+                x1 = dims[1] - r_y[1] - w
+                dest_view.set_roi(x1, y1, w, h)
 
-                # dim_len = dest_view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal)
-                # w = r_x[1] - r_x[0]
-                # h = r_y[0] - r_y[1]
-                # y1 = dim_len - r_y[0]
-                # dest_view.set_roi(r_x[0], y1, w, h)
-                #
-                # w = r_x[1] - r_x[0]
-                # h = r_y[0] - r_y[1]
-                # dest_view.set_roi(r_x[0], z[1], w, h)
-                #
-                # w = y[1] - y[0]
-                # h = z[0] - z[1]
-                # dest_view.set_roi(y[0], z[1], w, h)
 
     def map_roi_view_to_view(self, xx, yy, zz, src_orientation, dest_orientation):
         """

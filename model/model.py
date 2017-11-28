@@ -113,8 +113,6 @@ class DataModel(QtCore.QObject):
     def clear_data(self):
         for key in self._volumes.keys():
             self._volumes[key].destroy()
-        for key in self._data.keys():
-            self._data[key].destroy()
         self._volumes = {}
         self._data = {}
 
@@ -127,6 +125,8 @@ class DataModel(QtCore.QObject):
     def vector_id_list(self):
         return sorted([id_ for id_ in self._vectors])
 
+        for key in self._data.keys():
+            self._data[key].destroy()
     def all_volumes(self):
         return [vol for vol in self._volumes.values()]
 
