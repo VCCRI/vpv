@@ -117,12 +117,12 @@ class Vpv(QtCore.QObject):
 
         # Create the initial 3 orthogonal views. plus 3 hidden for the second row
         inital_views = [
-            [Orientation.sagittal, 'red', 0, 1],
-            [Orientation.coronal, 'blue', 0, 2],
-            [Orientation.axial, 'green', 0, 3],
+            [Orientation.sagittal, 'red', 0, 1, False],
+            [Orientation.coronal, 'blue', 0, 2, False, False],
+            [Orientation.axial, 'green', 0, 3, False, False],
             [Orientation.sagittal, 'orange', 1, 1, True],
-            [Orientation.coronal, 'grey', 1, 2, True],
-            [Orientation.axial, 'cyan', 1, 3, True]
+            [Orientation.coronal, 'grey', 1, 2, True, False],
+            [Orientation.axial, 'cyan', 1, 3, True, False]
             # ['sagittal', 'yellow', 1, 1, True],
             # ['axial', 'pink', 1, 3, True],
             # ['coronal', 'cyan', 1, 2, True]
@@ -239,11 +239,11 @@ class Vpv(QtCore.QObject):
         for view in self.views.values():
             view.update_view()
 
-    def setup_views(self, orientation, color, row, column, hidden=False):
+    def setup_views(self, orientation, color, row, column, hidden=False, flipped_x=False):
         """
         Create all the orthogonal views and setup the signals and slots
         """
-        view = self.add_view(self.view_id_counter, orientation, color, row, column)
+        view = self.add_view(self.view_id_counter, orientation, color, row, column, flipped_x=flipped_x)
         view.mouse_shift.connect(self.mouse_shift)
         view.mouse_pressed_signal.connect(self.dock_widget.mouse_pressed)
         view.crosshair_visible_signal.connect(self.crosshair_visible_slot)
@@ -284,7 +284,7 @@ class Vpv(QtCore.QObject):
         self.current_view.layers[Layer.heatmap].vol.find_largest_connected_components()
         self.data_manager.update_connected_components(self.current_view.layers[Layer.heatmap].vol.name)
 
-    def add_view(self, id_, orientation, color, row, column):
+    def add_view(self, id_, orientation, color, row, column, flipped_x=False):
         """
         Setup the controls for each layer)
         :param id, int
@@ -292,7 +292,7 @@ class Vpv(QtCore.QObject):
         :param color: str, jsut a color word at the moment eg: red
         :return SliceWidget
         """
-        view = SliceWidget(orientation, self.model, color)
+        view = SliceWidget(orientation, self.model, color, flipped_x=flipped_x)
         view.volume_pixel_signal.connect(self.mainwindow.set_volume_pix_intensity)
         view.data_pixel_signal.connect(self.mainwindow.set_data_pix_intensity)
         view.volume_position_signal.connect(self.mainwindow.set_mouse_position)
@@ -322,43 +322,6 @@ class Vpv(QtCore.QObject):
 
     def remove_views(self, row, column):
         self.mainwindow.remove_view(row, column)
-
-    def set_to_centre_of_roi(self, zindices, yindices, xindices):
-        return
-
-        z = [int(x) for x in zindices]
-        y = [int(x) for x in yindices]
-        x = [int(x) for x in xindices]
-
-        xslice = int(np.mean(x))
-        yslice = int(np.mean(y))
-        zslice = int(np.mean(z))
-
-        # Set the slice views to the centre of the ROI
-        for view in self.views.values():
-            if view.orientation == Orientation.axial:
-                view._set_slice(zslice)
-            if view.orientation == Orientation.coronal:
-                view._set_slice(yslice)
-            if view.orientation == Orientation.sagittal:
-                view._set_slice(xslice)
-
-        # Send a 2D ROI to each view
-        for view in self.views.values():
-            if view.orientation == Orientation.axial:
-                dim_len = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal)
-                w = x[1] - x[0]
-                h = y[0] - y[1]
-                y1 = dim_len - y[0]
-                view.set_roi(x[0], y1, w, h)
-            if view.orientation == Orientation.coronal:
-                w = x[1] - x[0]
-                h = z[0] - z[1]
-                view.set_roi(x[0], z[1], w, h)
-            if view.orientation == Orientation.sagittal:
-                w = y[1] - y[0]
-                h = z[0] - z[1]
-                view.set_roi(y[0], z[1], w, h)
 
     def index_changed(self, orientation, id_, idx):
         orientation = str(orientation)
@@ -407,7 +370,7 @@ class Vpv(QtCore.QObject):
     def data_processing_finished_slot(self):
         self.data_processing_finished_signal.emit()
 
-    def mouse_shift(self, src_index, x, y, src_orientation, src_vol=None):
+    def mouse_shift(self, src_index, x, y, src_view):
         """
         Gets mouse moved signal
 
@@ -424,19 +387,78 @@ class Vpv(QtCore.QObject):
         src_vol: ImageVolume
             The volume belonging to the source view
         """
-        for view in self.views.values():
+        for dest_view in self.views.values():
 
             if not self.data_manager.link_views:
-                if view.layers[Layer.vol1].vol != src_vol:
-                    view.hide_crosshair()
+                if dest_view.layers[Layer.vol1].vol != src_view.Layers:
+                    dest_view.hide_crosshair()
                     continue
 
             dest_x, dest_y, dest_index = self.map_view_to_view(
-                x, y, src_index, src_orientation, view.orientation, src_vol.get_shape_xyz())
+                x, y, src_index, src_view, dest_view)
 
-            view.set_slice(dest_index, crosshair_xy=(dest_x, dest_y))
+            dest_view.set_slice(dest_index, crosshair_xy=(dest_x, dest_y))
 
-    def map_roi_view_to_view(self, xx, yy, zz, src_ori, dest_ori):
+    def set_to_centre_of_roi(self, zz, yy, xx):
+        """
+        Recieves coordinates of a coonnected components roi
+        Then sends to cooresponding 2D roi to each view dependent on its orientation
+        Parameters
+        ----------
+        zindices
+        yindices
+        xindices
+
+        Returns
+        -------
+
+        """
+
+        zz = [int(x) for x in zz]
+        yy = [int(x) for x in yy]
+        xx = [int(x) for x in xx]
+
+        xslice = int(np.mean(xx))
+        yslice = int(np.mean(yy))
+        zslice = int(np.mean(zz))
+
+        # Send a 2D ROI to each view
+        for view in self.views.values():
+            src_dims = self.current_view.layers[Layer.vol1].vol.get_shape_xyz()
+
+            # Get the x y corrdinates of the ROI along with the slice index for each orthogonal view
+            # ROI is in normal coordinates so src orientation will always be axial
+            if view.orientation == Orientation.axial:
+                view._set_slice(zslice)
+                r_x, r_y, r_z = xx, yy, zz
+
+            elif view.orientation == Orientation.coronal:
+                view._set_slice(yslice)
+                r_x, r_y, r_z = self.map_roi_view_to_view(xx, yy, zz, Orientation.axial, Orientation.coronal, src_dims)
+
+            elif view.orientation == Orientation.sagittal:
+                r_x, r_y, r_z = self.map_roi_view_to_view(xx, yy, zz, Orientation.axial, Orientation.sagittal, src_dims)
+                view._set_slice(xslice)
+
+            w = r_x[1] - r_x[0]
+            h = r_y[0] - r_y[1]
+            view.set_roi(r_x[0], r_y[0], w, h)
+
+                # dim_len = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal)
+                # w = r_x[1] - r_x[0]
+                # h = r_y[0] - r_y[1]
+                # y1 = dim_len - r_y[0]
+                # view.set_roi(r_x[0], y1, w, h)
+                #
+                # w = r_x[1] - r_x[0]
+                # h = r_y[0] - r_y[1]
+                # view.set_roi(r_x[0], z[1], w, h)
+                #
+                # w = y[1] - y[0]
+                # h = z[0] - z[1]
+                # view.set_roi(y[0], z[1], w, h)
+
+    def map_roi_view_to_view(self, xx, yy, zz, src_orientation, dest_orientatio):
         """
         Map a roi from one view to another
         Parameters
@@ -452,14 +474,18 @@ class Vpv(QtCore.QObject):
         tuple
             ((x,x), (y,y), (z,z)
         """
-        starts = self.map_view_to_view(xx[0], yy[0], zz[0], src_ori, dest_ori)
-        ends = self.map_view_to_view([xx[1], yy[1], zz[1]], src_ori, dest_ori)
-        return (starts[0], ends[0]), \
-               (starts[1], ends[1]), \
-               (starts[2], ends[2])
+        starts = self.map_view_to_view(xx[0], yy[0], zz[0],
+                                       src_orientation, dest_orientation, src_dims)
+
+        ends = self.map_view_to_view(xx[1], yy[1], zz[1],
+                                     src_orientation, dest_orientation, src_dims)
+
+        return ((starts[0], ends[0]),
+                (starts[1], ends[1]),
+                (starts[2], ends[2]))
 
     @staticmethod
-    def map_view_to_view(x, y, idx, src_orientation, dest_orientation, src_dims):
+    def map_view_to_view(x, y, idx, src_view, dest_view):
         """
         Given a coordinate on one view with a given orientation map to another view with a given orientation
         Parameters
@@ -483,7 +509,12 @@ class Vpv(QtCore.QObject):
         """
         # the Data is flipped to make it compatibile with the IEV view. So we have to account for this when mapping
         # between views by using the pint counting from the opposite side
-        
+        src_orientation = src_view.orientation
+        src_dims = src_view.main_volume.get_shape_xyz()
+        dest_orientation = dest_view.orientation
+        src_flipped = src_view.flipped_x
+        dest_flipped = src_view.flipped_x
+
         if src_orientation == Orientation.axial:
             xyz = src_dims
         elif src_orientation == Orientation.coronal:
@@ -499,23 +530,38 @@ class Vpv(QtCore.QObject):
             if dest_orientation == Orientation.axial:
                 return x, y, idx
             elif dest_orientation == Orientation.coronal:
-                return x, rev_idx, y
+                if src_flipped != dest_flipped:
+                    return x, idx, y
+                else:
+                    return x, rev_idx, y
             elif dest_orientation == Orientation.sagittal:
                 return y, rev_idx, rev_x
 
         if src_orientation == Orientation.coronal:
             if dest_orientation == Orientation.axial:
-                return x, idx, rev_y
+                if src_flipped != dest_flipped:
+                    return x, idx, y
+                else:
+                    return x, idx, rev_y
             elif dest_orientation == Orientation.coronal:
                 return x, y, idx
             elif dest_orientation == Orientation.sagittal:
-                return idx, y, rev_x
+                if dest_flipped != src_flipped:
+                    return idx, y, rev_x
+                else:
+                    return idx, y, x
 
         if src_orientation == Orientation.sagittal:
             if dest_orientation == Orientation.axial:
-                return rev_idx, x, rev_y
+                if src_flipped != dest_flipped:
+                    return rev_idx, x, rev_y
+                else:
+                    return idx, x, rev_y
             elif dest_orientation == Orientation.coronal:
-                return rev_idx, y, x
+                if src_flipped != dest_flipped:
+                    return rev_idx, y, x
+                else:
+                    return idx, y, x
             elif dest_orientation == Orientation.sagittal:
                 return x, y, idx
 

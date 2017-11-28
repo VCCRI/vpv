@@ -130,8 +130,8 @@ class Volume(Qt.QObject):
         index = self._arr_data.shape[1] - index  # Go in reverse so we go from front to back
         slice_ = np.flipud(np.rot90(self._arr_data[:, index, :], 1))
         if flip:
-            return slice_
-        return np.flipud(slice_)
+            return np.flipud(slice_)
+        return slice_
 
     # Testing. Adding reverse option to try and get same view sequence as IEV. Need to flip now
     def _get_sagittal(self, index, flip):
@@ -144,8 +144,8 @@ class Volume(Qt.QObject):
         index = self._arr_data.shape[0] - index  # Go in reverse so we go from head to tail
         slice_ = np.rot90(self._arr_data[index, :, :], 3)
         if flip:
-            return slice_
-        return np.flipud(slice_)
+            return np.flipud(slice_)
+        return slice_
 
     def set_lower_level(self, level):
         #print 'l', level

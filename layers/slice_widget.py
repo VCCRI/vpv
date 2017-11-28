@@ -57,8 +57,6 @@ class ViewBox(pg.ViewBox):
         super().invertX(invert)
 
 
-
-
 class InformationOverlay(QtGui.QWidget):
     def __init__(self, parent=None):
         super(InformationOverlay, self).__init__(parent)
@@ -252,7 +250,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
     The qt widget that displays a signle ortohogoal view.
     Has attribute layers: {z_index: Layer}
     """
-    mouse_shift = QtCore.pyqtSignal(int, int, int, Orientation, object,  name='mouse_shift')
+    mouse_shift = QtCore.pyqtSignal(int, int, int, object,  name='mouse_shift')
     mouse_pressed_signal = QtCore.pyqtSignal(int, int, int, Orientation, str, name='mouse_pressed')
     crosshair_visible_signal = QtCore.pyqtSignal(bool)
     volume_position_signal = QtCore.pyqtSignal(int, int, int)
@@ -267,7 +265,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
     slice_index_changed_signal = QtCore.pyqtSignal(Orientation, int, int)
     move_to_next_vol_signal = QtCore.pyqtSignal(int, bool)  # Slice id, reverse order
 
-    def __init__(self, orientation, model, border_color):
+    def __init__(self, orientation, model, border_color, flipped_x=False):
         super(SliceWidget, self).__init__()
         self.ui = Ui_SliceWidget()
         # Bug in Windows - https://groups.google.com/forum/#!msg/pyqtgraph/O7E2sWaEWDg/7KPVeiO6qooJ
@@ -275,6 +273,8 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
             pg.functions.USE_WEAVE = False
         else:
             pg.functions.USE_WEAVE = True
+
+        self.flipped_x = flipped_x  # We have the default view at init
 
         self.scalebar = None
         self.ui.setupUi(self)
@@ -350,9 +350,19 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         self.annotation = AnnotationOverlay(self)
 
         self.ui.seriesSlider.hide()
-        self.flipped_x = False  # We have the default view at init
 
         self.show()
+
+    @property
+    def main_volume(self):
+        """
+        Wrapper to get volume associated with the first layer
+        Returns
+        -------
+
+        """
+        return self.layers[Layer.vol1].vol
+
 
     @property
     def scale_bar_visible(self):
@@ -469,11 +479,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
 
             # With mouse move signal, also send currebt vol.
             # If veiews are not synchronised, syncyed sliceing only occurs within volumes
-            if self.layers[Layer.vol1].vol:
-                current_vol = self.layers[Layer.vol1].vol
-            else:
-                current_vol = None
-            self.mouse_shift.emit(self.current_slice_idx, x, y, self.orientation, current_vol)
+            self.mouse_shift.emit(self.current_slice_idx, x, y, self)
 
     def get_pixel(self, layer_index, z, y, x):
         pos = []
