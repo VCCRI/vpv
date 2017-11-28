@@ -323,85 +323,6 @@ class Vpv(QtCore.QObject):
     def remove_views(self, row, column):
         self.mainwindow.remove_view(row, column)
 
-    def map_roi_view_to_view(self, xx, yy, zz, src_ori, dest_ori):
-        """
-        Map a roi from one view to another
-        Parameters
-        ----------
-        xx: tuple
-        yy: tuple
-        zz: tuple
-        src_ori: Orientation
-        dest_ori: Orientation
-
-        Returns
-        -------
-        tuple
-            ((x,x), (y,y), (z,z)
-        """
-        starts = self.map_view_to_view(xx[0], yy[0], zz[0], src_ori, dest_ori)
-        ends = self.map_view_to_view([xx[1], yy[1], zz[1]], src_ori, dest_ori)
-        return (starts[0], ends[0]), \
-               (starts[1], ends[1]), \
-               (starts[2], ends[2])
-
-    def map_view_to_view(self, x, y, z, src_view, dest_view):
-        """
-        Given a coordinate on one view with a given orientation map to another view with a given orientation
-        Parameters
-        ----------
-        x: int
-        y: int
-        z: int
-        src_ori: Orientation
-        dest_ori: Orientation
-
-        Returns
-        -------
-        tuple
-            (x,y,z)
-
-        """
-        src_ori = src_view.orientation
-        dest_ori = dest_view.orientation
-        src_dims = src_view.layers[Layer.vol1].vol.get_shape()
-        dest_dims = dest_view.layers[Layer.vol1].vol.get_shape()
-
-        if src_ori == Orientation.sagittal:
-            if dest_ori == Orientation.axial:
-                y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - y
-                view.set_slice(y1, crosshair_xy=(rev(src_index, Orientation.sagittal), x))
-
-            elif view.orientation == Orientation.coronal:
-                view.set_slice(x, crosshair_xy=(rev(src_index, Orientation.sagittal), y))
-
-            elif view.orientation == Orientation.sagittal:
-                view.set_slice(src_index, crosshair_xy=(x, y))
-
-        # elif src_orientation == Orientation.axial:
-        #
-        #     if view.orientation == Orientation.sagittal:
-        #         x1 = rev(x, Orientation.sagittal)
-        #         view.set_slice(x1, crosshair_xy=(y, rev(src_index, Orientation.axial)))
-        #
-        #     elif view.orientation == Orientation.coronal:
-        #         view.set_slice(y, crosshair_xy=(x, rev(src_index, Orientation.axial)))
-        #
-        #     elif view.orientation == Orientation.axial:
-        #         view.set_slice(src_index, crosshair_xy=(x, y))
-        #
-        # elif src_orientation == Orientation.coronal:
-        #
-        #     if view.orientation == Orientation.axial:
-        #         y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - y
-        #         view.set_slice(y1, crosshair_xy=(x, src_index))
-        #
-        #     elif view.orientation == Orientation.sagittal:
-        #         view.set_slice(rev(x, Orientation.sagittal), crosshair_xy=(src_index, y))
-        #
-        #     elif view.orientation == Orientation.coronal:
-        #         view.set_slice(src_index, crosshair_xy=(x, y))
-
     def set_to_centre_of_roi(self, zindices, yindices, xindices):
         return
 
@@ -486,7 +407,7 @@ class Vpv(QtCore.QObject):
     def data_processing_finished_slot(self):
         self.data_processing_finished_signal.emit()
 
-    def mouse_shift(self, src_index, x, y, src_orientation, emitting_vol=None):
+    def mouse_shift(self, src_index, x, y, src_orientation, src_vol=None):
         """
         Gets mouse moved signal
 
@@ -500,54 +421,103 @@ class Vpv(QtCore.QObject):
             the y position of the mouse
         src_orientation: str
             the orientation of the calling view
-        emitting_vol: ImageVolume
-            Synced slicing to occur only between volumes if linked views is off
+        src_vol: ImageVolume
+            The volume belonging to the source view
         """
-        def rev(x, orientation):
-            return view.layers[Layer.vol1].vol.dimension_length(orientation) - x
-
         for view in self.views.values():
 
             if not self.data_manager.link_views:
-                if view.layers[Layer.vol1].vol != emitting_vol:
+                if view.layers[Layer.vol1].vol != src_vol:
                     view.hide_crosshair()
                     continue
 
-            if src_orientation == Orientation.sagittal:
+            dest_x, dest_y, dest_index = self.map_view_to_view(
+                x, y, src_index, src_orientation, view.orientation, src_vol.get_shape_xyz())
 
-                if view.orientation == Orientation.axial:
-                    y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - y
-                    view.set_slice(y1, crosshair_xy=(rev(src_index, Orientation.sagittal), x))
+            view.set_slice(dest_index, crosshair_xy=(dest_x, dest_y))
 
-                elif view.orientation == Orientation.coronal:
-                    view.set_slice(x, crosshair_xy=(rev(src_index, Orientation.sagittal), y))
+    def map_roi_view_to_view(self, xx, yy, zz, src_ori, dest_ori):
+        """
+        Map a roi from one view to another
+        Parameters
+        ----------
+        xx: tuple
+        yy: tuple
+        zz: tuple
+        src_ori: Orientation
+        dest_ori: Orientation
 
-                elif view.orientation == Orientation.sagittal:
-                    view.set_slice(src_index, crosshair_xy=(x, y))
+        Returns
+        -------
+        tuple
+            ((x,x), (y,y), (z,z)
+        """
+        starts = self.map_view_to_view(xx[0], yy[0], zz[0], src_ori, dest_ori)
+        ends = self.map_view_to_view([xx[1], yy[1], zz[1]], src_ori, dest_ori)
+        return (starts[0], ends[0]), \
+               (starts[1], ends[1]), \
+               (starts[2], ends[2])
 
-            elif src_orientation == Orientation.axial:
+    @staticmethod
+    def map_view_to_view(x, y, idx, src_orientation, dest_orientation, src_dims):
+        """
+        Given a coordinate on one view with a given orientation map to another view with a given orientation
+        Parameters
+        ----------
+        x: int
+            the x position in the view
+        y: int
+            the y position in the view
+        idx: int
+            the slice index
+        src_orientation: Orientation
+        dest_orientation: Orientation
+        src_dims: tuple
+            xyz: dimensions of the volume currently in view in the source view
 
-                if view.orientation == Orientation.sagittal:
-                    x1 = rev(x, Orientation.sagittal)
-                    view.set_slice(x1, crosshair_xy=(y, rev(src_index, Orientation.axial)))
+        Returns
+        -------
+        tuple
+            (x,y,idx)
 
-                elif view.orientation == Orientation.coronal:
-                    view.set_slice(y, crosshair_xy=(x, rev(src_index, Orientation.axial)))
+        """
+        # the Data is flipped to make it compatibile with the IEV view. So we have to account for this when mapping
+        # between views by using the pint counting from the opposite side
+        
+        if src_orientation == Orientation.axial:
+            xyz = src_dims
+        elif src_orientation == Orientation.coronal:
+            xyz = (src_dims[0], src_dims[2], src_dims[1])
+        elif src_orientation == Orientation.sagittal:
+            xyz = (src_dims[1], src_dims[2], src_dims[0])
 
-                elif view.orientation == Orientation.axial:
-                    view.set_slice(src_index, crosshair_xy=(x, y))
+        rev_x = xyz[0] - x
+        rev_y = xyz[1] - y
+        rev_idx = xyz[2] - idx
 
-            elif src_orientation == Orientation.coronal:
+        if src_orientation == Orientation.axial:
+            if dest_orientation == Orientation.axial:
+                return x, y, idx
+            elif dest_orientation == Orientation.coronal:
+                return x, rev_idx, y
+            elif dest_orientation == Orientation.sagittal:
+                return y, rev_idx, rev_x
 
-                if view.orientation == Orientation.axial:
-                    y1 = view.layers[Layer.vol1].vol.dimension_length(Orientation.axial) - y
-                    view.set_slice(y1, crosshair_xy=(x, src_index))
+        if src_orientation == Orientation.coronal:
+            if dest_orientation == Orientation.axial:
+                return x, idx, rev_y
+            elif dest_orientation == Orientation.coronal:
+                return x, y, idx
+            elif dest_orientation == Orientation.sagittal:
+                return idx, y, rev_x
 
-                elif view.orientation == Orientation.sagittal:
-                    view.set_slice(rev(x, Orientation.sagittal), crosshair_xy=(src_index, y))
-
-                elif view.orientation == Orientation.coronal:
-                    view.set_slice(src_index, crosshair_xy=(x, y))
+        if src_orientation == Orientation.sagittal:
+            if dest_orientation == Orientation.axial:
+                return rev_idx, x, rev_y
+            elif dest_orientation == Orientation.coronal:
+                return rev_idx, y, x
+            elif dest_orientation == Orientation.sagittal:
+                return x, y, idx
 
     def stats(self):
         """

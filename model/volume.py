@@ -31,8 +31,11 @@ class Volume(Qt.QObject):
         self.min = float(self._arr_data.min())
         self.max = float(self._arr_data.max())
 
-    def get_shape(self):
+    def get_shape_zyx(self):
         return self._arr_data.shape
+
+    def get_shape_xyz(self):
+        return tuple(reversed(self._arr_data.shape))
 
     def get_axial_slot(self):
         print('get_axial_slot')

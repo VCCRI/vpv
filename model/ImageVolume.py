@@ -7,6 +7,6 @@ class ImageVolume(Volume):
         super(ImageVolume, self).__init__(*args)
 
         # We have annotations only on ImageVolumes
-        self.annotations = VolumeAnnotations(list(reversed(list(self.get_shape()))))
+        self.annotations = VolumeAnnotations(list(reversed(list(self.get_shape_zyx()))))
         self.levels = [float(self._arr_data.min()), float(self._arr_data.max())]
 
