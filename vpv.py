@@ -440,9 +440,9 @@ class Vpv(QtCore.QObject):
 
                 w = r_x[1] - r_x[0]
                 h = r_y[1] - r_y[0]
-      dims = dest_view.main_volume.get_shape_xyz()
-                y1 = r_x[0] - h
-                x1 = r_y[0] - w
+                dims = dest_view.main_volume.get_shape_xyz()
+                y1 = dims[1] - r_y[0] - h
+                x1 = dims[0] - r_x[0] - w
                 dest_view.set_roi(x1, y1, w, h)
 
             elif dest_view.orientation == Orientation.coronal:
@@ -453,20 +453,20 @@ class Vpv(QtCore.QObject):
                 w = r_x[1] - r_x[0]
                 h = r_z[1] - r_z[0]
                 dims = dest_view.main_volume.get_shape_xyz()
-                y1 = r_x[1] - h
-                x1 = dims[1] - r_y[1] - w
+                y1 = r_z[0]
+                x1 = dims[0] - r_x[0] - w
                 dest_view.set_roi(x1, y1, w, h)
 
             if dest_view.orientation == Orientation.sagittal:
-                xslice = src_dims[0] - xslice
+                xslice = xslice
                 dest_view._set_slice(xslice)
                 r_x, r_y, r_z = xx, yy, zz
 
                 w = r_y[1] - r_y[0]
                 h = r_z[1] - r_z[0]
                 dims = dest_view.main_volume.get_shape_xyz()
-                y1 = r_x[1] - h
-                x1 = dims[1] - r_y[1] - w
+                y1 = r_z[0]
+                x1 = dims[1] -r_y[1]
                 dest_view.set_roi(x1, y1, w, h)
 
 
