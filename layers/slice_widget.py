@@ -161,6 +161,9 @@ class RoiOverlay(object):
 
 
 class AnnotationOverlay(object):
+    """
+    Controls the circle that is overlaid on images to pinpoint manual annotations
+    """
     def __init__(self, parent):
         self.parent = parent
         self.annotation_item = None
@@ -247,8 +250,17 @@ class ScaleBar(pg.ScaleBar):
 
 class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
     """
-    The qt widget that displays a signle ortohogoal view.
-    Has attribute layers: {z_index: Layer}
+    The qt widget that displays a single orthogonal view.
+
+    Attributes
+    ----------
+    layers: Dict
+        {z_index(int): Layer}
+        Holds the different layer objects.
+            1: volume
+            2: volume 2, for checking differences between volumes
+            3: heatmap
+            4: vectors
     """
     mouse_shift = QtCore.pyqtSignal(int, int, int, object,  name='mouse_shift')
     mouse_pressed_signal = QtCore.pyqtSignal(int, int, int, Orientation, str, name='mouse_pressed')
@@ -359,6 +371,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         Wrapper to get volume associated with the first layer
         Returns
         -------
+        Volume
 
         """
         return self.layers[Layer.vol1].vol

@@ -2,6 +2,7 @@ from __future__ import division
 from PyQt4 import QtCore, Qt
 from lookup_tables import Lut
 import numpy as np
+from common import Orientation
 
 
 class LayerBase(Qt.QObject):
@@ -46,8 +47,8 @@ class LayerBase(Qt.QObject):
         """
         reload the current image. For example when the orientation has changed
         """
-        self.image_item.setImage(self.vol.get_data(self.parent.orientation, self.parent.current_slice_idx),
-                                 autoLevels=False)
+        self.set_slice(self.parent.current_slice_idx, self.parent.flipped_x)
+        # self.image_item.setImage()
 
     def set_volume(self, volname, initial=False):
         """
@@ -56,7 +57,7 @@ class LayerBase(Qt.QObject):
         if volname == "None":
             self.volume_label_signal.emit("None")
             self.vol = None
-            self.image_item.setImage(opacity=0.0)
+            self.image_item.setImage(opacity=0.0)  # This clears
             return
         self.volume_label_signal.emit(volname)
 
@@ -75,10 +76,10 @@ class LayerBase(Qt.QObject):
             slice_indx = dim_len / 2
         else:
             slice_indx = self.parent.current_slice_idx
-        slice_ = self.vol.get_data(orientation, int(slice_indx))
+        # slice_ = self.vol.get_data(orientation, int(slice_indx))  # DELETE
         self.parent.set_slice_slider(dim_len, slice_indx)
 
-        self.image_item.setImage(slice_, autoLevels=False, opacity=1.0)
+        #self.image_item.setImage(slice_, autoLevels=False, opacity=1.0)  DELETE
 
         # This fixes problem with linked zooming
         self.parent.viewbox.autoRange()
@@ -86,6 +87,9 @@ class LayerBase(Qt.QObject):
 
     def set_slice(self, index, flip=False):
         if self.vol:
+            # bodge: We do not flip sagittal view in x
+            if self.parent.orientation == Orientation.sagittal:
+                flip = False
             self.image_item.setImage(self.vol.get_data(self.parent.orientation, index - 1, flip=flip), autoLevels=False)
 
     def set_series_slider(self):
