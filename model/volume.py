@@ -40,24 +40,28 @@ class Volume(Qt.QObject):
     def get_axial_slot(self):
         print('get_axial_slot')
 
-    def pixel_axial(self, z, y, x):
+    def pixel_axial(self, z, y, x, flip=False):
         """
         get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the z axis
         """
-        y = self._arr_data.shape[1] - y
-        return self._arr_data[z, y, x], (z, y, x)
+        vox = self.get_data(Orientation.axial, z, flip, (x, y))
+        return vox
+    # y = self._arr_data.shape[1] - y
+        # return self._arr_data[z, y, x], (z, y, x)
 
-    def pixel_sagittal(self, z, y, x):
+    def pixel_sagittal(self, z, y, x, flip=False):
         """
         get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the y axis
         """
-        return self._arr_data[z, y, x], (z, y, x)
+        vox = self.get_data(Orientation.sagittal, x, flip, (y, z))
+        return vox
 
-    def pixel_coronal(self, z, y, x):
+    def pixel_coronal(self, z, y, x, flip=False):
         """
         get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the y axis
         """
-        return self._arr_data[z, y, x], (z, y, x)
+        vox = self.get_data(Orientation.coronal, y, flip, (x, z))
+        return vox
 
     def intensity_range(self):
         return self.min, self.max
@@ -82,7 +86,7 @@ class Volume(Qt.QObject):
         else:
             return vol
 
-    def get_data(self, orientation, index=0, flip=False):
+    def get_data(self, orientation, index=0, flip=False, xy=None):
         """
         Get a 2D slice given the index and orthogonal orientation. Optioanlly return the slice flipped in x
         Parameters
@@ -99,11 +103,11 @@ class Volume(Qt.QObject):
 
         """
         if orientation == Orientation.sagittal:
-            return self._get_sagittal(index, flip)
+            return self._get_sagittal(index, flip, xy)
         if orientation == Orientation.coronal:
-            return self._get_coronal(index, flip)
+            return self._get_coronal(index, flip, xy)
         if orientation == Orientation.axial:
-            return self._get_axial(index, flip)
+            return self._get_axial(index, flip, xy)
 
     def dimension_length(self, orientation):
         """
@@ -126,25 +130,34 @@ class Volume(Qt.QObject):
         """
         self.voxel_size = size
 
-    def _get_coronal(self, index, flip):
+    def _get_coronal(self, index, flip, xy=None):
         index = self._arr_data.shape[1] - index  # Go in reverse so we go from front to back
         slice_ = np.flipud(np.rot90(self._arr_data[:, index, :], 1))
         if flip:
-            return np.flipud(slice_)
+            slice_ = np.flipud(slice_)
+        if xy:
+            y, x = xy
+            slice_ = slice_[y, x]
         return slice_
 
     # Testing. Adding reverse option to try and get same view sequence as IEV. Need to flip now
-    def _get_sagittal(self, index, flip):
+    def _get_sagittal(self, index, flip, xy=None):
         slice_ = np.rot90(self._arr_data[:, :, index], 1)
         if flip:
-            return np.flipud(slice_)
+            slice_ = np.flipud(slice_)
+        if xy:
+            y, x = xy
+            slice_ = slice_[y, x]
         return slice_
 
-    def _get_axial(self, index, flip):
+    def _get_axial(self, index, flip, xy=None):
         index = self._arr_data.shape[0] - index  # Go in reverse so we go from head to tail
         slice_ = np.rot90(self._arr_data[index, :, :], 3)
         if flip:
-            return np.flipud(slice_)
+            slice_ = np.flipud(slice_)
+        if xy:
+            y, x = xy
+            slice_ = slice_[y, x]
         return slice_
 
     def set_lower_level(self, level):

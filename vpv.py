@@ -117,7 +117,7 @@ class Vpv(QtCore.QObject):
 
         # Create the initial 3 orthogonal views. plus 3 hidden for the second row
         inital_views = [
-            [Orientation.sagittal, 'red', 0, 1, False, True],
+            [Orientation.sagittal, 'red', 0, 1, False, False],
             [Orientation.coronal, 'blue', 0, 2, False, True],
             [Orientation.axial, 'green', 0, 3, False, True],
             [Orientation.sagittal, 'orange', 1, 1, True],

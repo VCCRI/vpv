@@ -470,8 +470,8 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
             return
         if self.layers[Layer.vol1].vol:
             try:
-                pix, pos = self.get_pixel(Layer.vol1, self.current_slice_idx, y, x)
-                self.volume_position_signal.emit(int(pos[0]), int(pos[1]), int(pos[2]))
+                pix = self.get_pixel(Layer.vol1, self.current_slice_idx, y, x)
+                self.volume_position_signal.emit(self.current_slice_idx, y, x)
             except IndexError:  # mouse placed outside the image can yield non-existent indices
                 pass
             else:
@@ -479,7 +479,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
 
         if self.layers[Layer.heatmap].vol:
             try:
-                pix, _ = self.get_pixel(Layer.heatmap, self.current_slice_idx, y, x)
+                pix = self.get_pixel(Layer.heatmap, self.current_slice_idx, y, x)
             except IndexError:
                 pass
             else:
@@ -495,15 +495,31 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
             self.mouse_shift.emit(self.current_slice_idx, x, y, self)
 
     def get_pixel(self, layer_index, z, y, x):
-        pos = []
+        """
+        given a layer index and coords, get the corresponding voxel value
+        Parameters
+        ----------
+        layer_index: int
+            the key for the layer in Layers
+        z: int
+            z
+        y: int
+            y
+        x: int
+            y
+
+        Returns
+        -------
+
+        """
         try:
             if self.orientation == Orientation.axial:
-                pix_intensity, pos = self.layers[layer_index].vol.pixel_axial(self.current_slice_idx, y, x)
+                pix_intensity = self.layers[layer_index].vol.pixel_axial(self.current_slice_idx, y, x, self.flipped_x)
             if self.orientation == Orientation.sagittal:
-                pix_intensity, pos = self.layers[layer_index].vol.pixel_sagittal(y, x, self.current_slice_idx)
+                pix_intensity = self.layers[layer_index].vol.pixel_sagittal(y, x, self.current_slice_idx, self.flipped_x)
             if self.orientation == Orientation.coronal:
-                pix_intensity, pos = self.layers[layer_index].vol.pixel_coronal(y, self.current_slice_idx, x)
-            return pix_intensity, pos,
+                pix_intensity = self.layers[layer_index].vol.pixel_coronal(y, self.current_slice_idx, x, self.flipped_x)
+            return pix_intensity
         except AttributeError:
             print(self.layers[layer_index].vol)
 
