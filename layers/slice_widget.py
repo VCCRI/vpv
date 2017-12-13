@@ -267,7 +267,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
     mouse_shift = QtCore.pyqtSignal(int, int, int, object,  name='mouse_shift')
     mouse_pressed_annotation_signal = QtCore.pyqtSignal(int, int, int, object, name='mouse_pressed')
     crosshair_visible_signal = QtCore.pyqtSignal(bool)
-    volume_position_signal = QtCore.pyqtSignal(int, int, int)
+    volume_position_signal = QtCore.pyqtSignal(int, int, int, object)
     volume_pixel_signal = QtCore.pyqtSignal(float)
     data_pixel_signal = QtCore.pyqtSignal(float)
     object_counter = 0
@@ -473,7 +473,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         if self.layers[Layer.vol1].vol:
             try:
                 pix = self.get_pixel(Layer.vol1, self.current_slice_idx, y, x)
-                self.volume_position_signal.emit(self.current_slice_idx, y, x)
+                self.volume_position_signal.emit(self.current_slice_idx, y, x , self)
             except IndexError:  # mouse placed outside the image can yield non-existent indices
                 pass
             else:

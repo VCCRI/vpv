@@ -284,10 +284,26 @@ class Vpv(QtCore.QObject):
         view = SliceWidget(orientation, self.model, color, flipped_x=flipped_x)
         view.volume_pixel_signal.connect(self.mainwindow.set_volume_pix_intensity)
         view.data_pixel_signal.connect(self.mainwindow.set_data_pix_intensity)
-        view.volume_position_signal.connect(self.mainwindow.set_mouse_position)
+        # view.volume_position_signal.connect(self.mainwindow.set_mouse_position)
+        view.volume_position_signal.connect(self.mouse_position_slot)
         view.manage_views_signal.connect(self.update_manager)
         self.views[id_] = view
         return view
+
+    def mouse_position_slot(self, z: int, y: int, x: int, src_view: SliceWidget):
+        """
+        On mouse hover get the coordinates of the cursor and map to normal (axial coordinates)
+        Set the coordinates on the mainwindow
+        Parameters
+        ----------
+        z: int
+        y: int
+        x: int
+        src_view: SliceWidget
+        """
+
+        x1, y1, z1 = self.map_view_to_volume_space(x, y, z, src_view)
+        self.mainwindow.set_mouse_position(z1, y1, x1)
 
     def toggle_dock_widget_visibility(self):
         if self.dock_widget.isVisible():
@@ -540,6 +556,7 @@ class Vpv(QtCore.QObject):
 
         """
         for dest_view in self.views.values():
+            # First map the annotation marker between views
             x1, y1, idx1 = self.map_view_to_view(x, y, slice_idx, src_view, dest_view)
             # Need to call annotations_widget.mouse_pressed_annotate to populate the table
             # Need to get radius and color from annotations_widget
@@ -552,7 +569,44 @@ class Vpv(QtCore.QObject):
             # Add the coordinates to the AnnotationsWidget
             # The coordinates need to be in axial space do map back to them if nessesarry
             if dest_view.orientation == Orientation.axial:
-                self.annotations_manager.mouse_pressed_annotate(idx1, x, y)
+                # Then map it back to real coordinates (eg RAS)
+                xa, ya, idxa = self.map_view_to_volume_space(x, y, slice_idx, dest_view)
+                self.annotations_manager.mouse_pressed_annotate(xa, ya, idxa)
+
+    def map_view_to_volume_space(self, x: int, y: int, idx: int, src_view: SliceWidget):
+        """
+        Given coordinates from a slice view, convert to actual corrdinates in the correct volume space
+        This is required as we do some inversion of the order of slices as they come off the volumes to show
+        a view that the IMPC annotators like.
+
+        Parameters
+        ----------
+        x: int
+        y: int
+        idx: int
+        src_view: SliceWidget
+
+        Returns
+        -------
+        tuple
+            (x, y, z)
+
+        Notes
+        -----
+
+        This maps the view coordinates from any view to the noral axial view. Then adds correction for the inverted
+        slice ordering
+
+        """
+        shape = src_view.main_volume.get_shape_xyz()
+
+        for view in self.views.values():
+            if view.orientation == Orientation.axial:
+                x, y, slice_idx = self.map_view_to_view(x, y, idx, src_view, view)
+                slice_idx = shape[2] - slice_idx
+                y = shape[1] - y
+                x = shape[0] - x
+                return x, y, slice_idx
 
     @staticmethod
     def map_view_to_view(x, y, idx, src_view, dest_view):
