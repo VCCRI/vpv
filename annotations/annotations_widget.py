@@ -299,12 +299,17 @@ class Annotations(QtGui.QWidget):
     def mouse_pressed_annotate(self, view_index, x, y, orientation, vol_id):
         """
         Translate the view coordinates to volume coordinates
-        :param own_index:
-        :param x:
-        :param y:
-        :param orientation:
-        :param vol_id:
-        :return:
+        Parameters
+        ----------
+        view_index
+        x
+        y
+        orientation
+        vol_id
+
+        Returns
+        -------
+
         """
         if self.annotating:
             vol = self.controller.current_view.layers[Layer.vol1].vol

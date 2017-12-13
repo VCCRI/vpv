@@ -230,10 +230,8 @@ class ManageData(QtGui.QWidget):
             self.controller.update_slice_views()
             self.update()
 
-    def mouse_pressed(self, view_index, x, y, orientation, vol_id):
-        # Only do annotations when annotation tab is visible
-        # if self.ui.tabWidget.isTabEnabled(2):
-        self.annotations.mouse_pressed_annotate(view_index, x, y, orientation, vol_id)
+    # def mouse_pressed(self, view_index, x, y, orientation, vol_id):
+    #     self.annotations.mouse_pressed_annotate(view_index, x, y, orientation, vol_id)
 
     def data_controls_visibility(self, checked):
         if checked:

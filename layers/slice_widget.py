@@ -263,7 +263,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
             4: vectors
     """
     mouse_shift = QtCore.pyqtSignal(int, int, int, object,  name='mouse_shift')
-    mouse_pressed_signal = QtCore.pyqtSignal(int, int, int, Orientation, str, name='mouse_pressed')
+    mouse_pressed_annotation_signal = QtCore.pyqtSignal(int, int, int, Orientation, str, name='mouse_pressed')
     crosshair_visible_signal = QtCore.pyqtSignal(bool)
     volume_position_signal = QtCore.pyqtSignal(int, int, int)
     volume_pixel_signal = QtCore.pyqtSignal(float)
@@ -452,7 +452,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         y = self.layers[Layer.vol1].image_item.mapFromScene(pos).y()
         if x < 0 or y < 0:
             return
-        self.mouse_pressed_signal.emit(self.current_slice_idx, x, y, self.orientation, self.layers[Layer.vol1].vol.name)
+        self.mouse_pressed_annotation_signal.emit(self.current_slice_idx, x, y, self.orientation, self.layers[Layer.vol1].vol.name)
 
     def mouse_moved(self, pos):
         """

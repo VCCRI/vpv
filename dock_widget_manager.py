@@ -71,10 +71,10 @@ class ManagerDockWidget(QtGui.QDockWidget):
     def switch_tab(self, idx):
         self.ui.tabWidget.setCurrentIndex(idx)
 
-    def mouse_pressed(self, view_index, x, y, orientation, vol_id):   # delete
-        # Only do annotations when annotation tab is visible
-        # if self.ui.tabWidget.isTabEnabled(2):
-        self.annotations.mouse_pressed_annotate(view_index, x, y, orientation, vol_id)
+    # def mouse_pressed(self, view_index, x, y, orientation, vol_id):   # delete
+    #     # Only do annotations when annotation tab is visible
+    #     # if self.ui.tabWidget.isTabEnabled(2):
+    #     self.annotations.mouse_pressed_annotate(view_index, x, y, orientation, vol_id)
 
     def volume_changed(self, vol_name):
         """

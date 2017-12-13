@@ -101,7 +101,7 @@ class Vpv(QtCore.QObject):
         self.data_manager.gradient_editor_signal.connect(self.gradient_editor)
 
         self.annotations_manager = Annotations(self, self.mainwindow)
-        self.annotations_manager.annotation_highlight_signal.connect(self.highlight_annotation)
+        # self.annotations_manager.annotation_highlight_signal.connect(self.highlight_annotation)
         self.annotations_manager.annotation_radius_signal.connect(self.annotation_radius_changed)
         self.annotations_manager.roi_highlight_off_signal.connect(self.reset_roi)
 
@@ -181,18 +181,18 @@ class Vpv(QtCore.QObject):
         for view in self.views.values():
             view.switch_off_annotation()
 
-    def highlight_annotation(self, x, y, z, color, radius):
-        for view in self.views.values():
-            if view.orientation == Orientation.axial:
-                y = self.current_view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - y
-                view.set_slice(z)
-                view.set_annotation(x, y, color, radius)
-            if view.orientation == Orientation.coronal:
-                view.set_slice(y)
-                view.set_annotation(x, z, color, radius)
-            if view.orientation == Orientation.sagittal:
-                view.set_slice(x)
-                view.set_annotation(y, z, color, radius)
+    # def highlight_annotation(self, x, y, z, color, radius):
+    #     for view in self.views.values():
+    #         if view.orientation == Orientation.axial:
+    #             y = self.current_view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - y
+    #             view.set_slice(z)
+    #             view.set_annotation(x, y, color, radius)
+    #         if view.orientation == Orientation.coronal:
+    #             view.set_slice(y)
+    #             view.set_annotation(x, z, color, radius)
+    #         if view.orientation == Orientation.sagittal:
+    #             view.set_slice(x)
+    #             view.set_annotation(y, z, color, radius)
 
     def current_orientation(self):
         return self.current_view.orientation
@@ -245,7 +245,9 @@ class Vpv(QtCore.QObject):
         """
         view = self.add_view(self.view_id_counter, orientation, color, flipped_x=flipped_x)
         view.mouse_shift.connect(self.mouse_shift)
-        view.mouse_pressed_signal.connect(self.dock_widget.mouse_pressed)
+        # view.mouse_pressed_signal.connect(self.dock_widget.mouse_pressed)
+        view.mouse_pressed_annotation_signal.connect(self.map_annotation_signal_view_to_view)
+        # view.mouse_pressed_annotation_signal.connect(self.annotations_manager.mouse_pressed_annotate)
         view.crosshair_visible_signal.connect(self.crosshair_visible_slot)
         view.scale_changed_signal.connect(self.zoom_changed)
         view.slice_index_changed_signal.connect(self.index_changed)
@@ -519,6 +521,36 @@ class Vpv(QtCore.QObject):
                 h = z[0] - z[1]
                 view.set_roi(y[0], z[1], w, h)
 
+    def map_annotation_signal_view_to_view(self, slice_idx: int, x: int, y: int, orientation: Orientation,
+                                           vol_name: str):
+        """
+        Upon getting a mouse click on a SliceWidget region, it will emit info here including position and the
+        current volume and orientation. Map the coordinates between views so that they are correctly positioned
+        Parameters
+        ----------
+        slice_idx: int
+            the current slice index of the emitting view
+        x: int
+
+        y: int
+            the y position of the view clicked
+        orientation: Orientation
+            The orientation of thr emitting SliceWidget
+        vol_name: str
+            the current Volume.name of the emmiting SliceWidget
+
+        Returns
+        -------
+
+        """
+        for view in self.views.values():
+            color = 'red'
+            radius = 10
+            dest_orientation = view.orientation
+            x1, y1, idx1 = self.map_view_to_view(x, y, slice_idx, orientation, dest_orientation)
+            # Need to call annotations_widget.mouse_pressed_annotate to populate the table
+            # Need to get radius and color from annotations_widget
+            view.set_annotation(x1, y1, color, radius)
 
     @staticmethod
     def map_view_to_view(x, y, idx, src_view, dest_view, forceflip=False):
