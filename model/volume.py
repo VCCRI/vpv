@@ -5,7 +5,7 @@ import tempfile
 from PyQt4 import QtCore, Qt
 from scipy import ndimage
 from scipy.misc import imresize
-from common import Orientation, read_image
+from common import Orientation, read_image, ImageReader
 from read_minc import minc_to_numpy
 
 
@@ -30,6 +30,8 @@ class Volume(Qt.QObject):
         self.int_order = 3
         self.min = float(self._arr_data.min())
         self.max = float(self._arr_data.max())
+        # The coordinate spacing of the input volume
+        self.space = None
 
     def get_shape_zyx(self):
         return self._arr_data.shape
@@ -77,7 +79,9 @@ class Volume(Qt.QObject):
         if ext == '.mnc':
             return minc_to_numpy(path)
 
-        vol = read_image(path)
+        ir = ImageReader(path)
+        vol = ir.vol
+        self.space = ir.space
         if memmap:
             temp = tempfile.TemporaryFile()
             m = np.memmap(temp, dtype=vol.dtype, mode='w+', shape=vol.shape)

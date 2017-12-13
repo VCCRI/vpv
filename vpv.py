@@ -101,7 +101,7 @@ class Vpv(QtCore.QObject):
         self.data_manager.gradient_editor_signal.connect(self.gradient_editor)
 
         self.annotations_manager = Annotations(self, self.mainwindow)
-        # self.annotations_manager.annotation_highlight_signal.connect(self.highlight_annotation)
+        self.annotations_manager.annotation_highlight_signal.connect(self.show_saved_annotations)
         self.annotations_manager.annotation_radius_signal.connect(self.annotation_radius_changed)
         self.annotations_manager.roi_highlight_off_signal.connect(self.reset_roi)
 
@@ -180,19 +180,6 @@ class Vpv(QtCore.QObject):
     def reset_roi(self):
         for view in self.views.values():
             view.switch_off_annotation()
-
-    # def highlight_annotation(self, x, y, z, color, radius):
-    #     for view in self.views.values():
-    #         if view.orientation == Orientation.axial:
-    #             y = self.current_view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal) - y
-    #             view.set_slice(z)
-    #             view.set_annotation(x, y, color, radius)
-    #         if view.orientation == Orientation.coronal:
-    #             view.set_slice(y)
-    #             view.set_annotation(x, z, color, radius)
-    #         if view.orientation == Orientation.sagittal:
-    #             view.set_slice(x)
-    #             view.set_annotation(y, z, color, radius)
 
     def current_orientation(self):
         return self.current_view.orientation
@@ -471,7 +458,6 @@ class Vpv(QtCore.QObject):
                 x1 = dims[1] -r_y[1]
                 dest_view.set_roi(x1, y1, w, h)
 
-
     def map_roi_view_to_view(self, xx, yy, zz, src_orientation, dest_orientation):
         """
         Map a roi from one view to another
@@ -508,7 +494,6 @@ class Vpv(QtCore.QObject):
         # Send a 2D ROI to each view
         for view in self.views.values():
             if view.orientation == Orientation.axial:
-                dim_len = view.layers[Layer.vol1].vol.dimension_length(Orientation.coronal)
                 w = x[1] - x[0]
                 h = y[0] - y[1]
                 view.set_roi(x[0], y[0], w, h)
@@ -521,11 +506,23 @@ class Vpv(QtCore.QObject):
                 h = z[0] - z[1]
                 view.set_roi(y[0], z[1], w, h)
 
-    def map_annotation_signal_view_to_view(self, slice_idx: int, x: int, y: int, orientation: Orientation,
-                                           vol_name: str):
+    def show_saved_annotations(self, x: int, y: int, z: int, color: list, radius: int):
+        """
+        Clicks on the Annotations widget table results in signal with positions in Axial space.
+        Move all views to the corresponding slices and set the annotation marker
+        """
+        # map_annotation_signal_view_to_view needs a src view.
+        # As the coordinates are in axial space, get the axial view
+        for view in self.views.values():
+            if view.orientation == Orientation.axial:
+                self.map_annotation_signal_view_to_view(z, x, y, view, color, radius)
+
+    def map_annotation_signal_view_to_view(self, slice_idx: int, x: int, y: int, src_view: SliceWidget,
+                                           color=(255, 0, 0), radius=10):
         """
         Upon getting a mouse click on a SliceWidget region, it will emit info here including position and the
         current volume and orientation. Map the coordinates between views so that they are correctly positioned
+
         Parameters
         ----------
         slice_idx: int
@@ -534,26 +531,31 @@ class Vpv(QtCore.QObject):
 
         y: int
             the y position of the view clicked
-        orientation: Orientation
-            The orientation of thr emitting SliceWidget
-        vol_name: str
-            the current Volume.name of the emmiting SliceWidget
-
-        Returns
-        -------
+        src_view: SliceWidget
+            the emitting view
+        color: tuple
+            rgb color of the annotation marker
+        radius: int
+            radius of the annotation marker
 
         """
-        for view in self.views.values():
-            color = 'red'
-            radius = 10
-            dest_orientation = view.orientation
-            x1, y1, idx1 = self.map_view_to_view(x, y, slice_idx, orientation, dest_orientation)
+        for dest_view in self.views.values():
+            x1, y1, idx1 = self.map_view_to_view(x, y, slice_idx, src_view, dest_view)
             # Need to call annotations_widget.mouse_pressed_annotate to populate the table
             # Need to get radius and color from annotations_widget
-            view.set_annotation(x1, y1, color, radius)
+
+            # set each view to the correct slice corresponding to the mouse click position
+            dest_view.set_slice(idx1)
+            # Set the annotation marker. Red for pre-annoation, green indicates annotation save
+            dest_view.set_annotation(x1, y1, color, radius)
+
+            # Add the coordinates to the AnnotationsWidget
+            # The coordinates need to be in axial space do map back to them if nessesarry
+            if dest_view.orientation == Orientation.axial:
+                self.annotations_manager.mouse_pressed_annotate(idx1, x, y)
 
     @staticmethod
-    def map_view_to_view(x, y, idx, src_view, dest_view, forceflip=False):
+    def map_view_to_view(x, y, idx, src_view, dest_view):
         """
         Given a coordinate on one view with a given orientation map to another view with a given orientation
         Parameters
@@ -601,11 +603,14 @@ class Vpv(QtCore.QObject):
                 return x, y, idx
             elif dest_orientation == Orientation.coronal:
                 if src_flipped != dest_flipped:
-                    return x, idx, y
+                    return x, rev_idx, y
                 else:
                     return x, rev_idx, y
             elif dest_orientation == Orientation.sagittal:
-                return y, rev_idx, rev_x
+                if src_flipped != dest_flipped:
+                    return y, rev_idx, rev_x
+                else:
+                    return y, idx, x
 
         if src_orientation == Orientation.coronal:
             if dest_orientation == Orientation.axial:

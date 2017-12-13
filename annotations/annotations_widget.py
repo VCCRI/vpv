@@ -178,6 +178,7 @@ class Annotations(QtGui.QWidget):
             annotations_dict = Dict()
             ann = vol.annotations
             vol_id = vol.name
+            space = vol.space
             for i,  a in enumerate(ann.annotations):
                 annotations_dict[i]['annotation_type'] = a.type
                 annotations_dict[i]['emapa_term'] = a.term
@@ -191,6 +192,7 @@ class Annotations(QtGui.QWidget):
                 annotations_dict[i]['z_percent'] = a.z_percent
                 # annotations_dict[vol_id][i]['free_text'] = a.free_text
                 annotations_dict[i]['volume_dimensions_xyz'] = a.dims
+                annotations_dict[i]['space'] = space
                 annotations_dict[i]['stage'] = a.stage.value
 
             # If no annotations available for the volume, do not save
@@ -296,7 +298,7 @@ class Annotations(QtGui.QWidget):
             if all_done:
                 cat.setBackgroundColor(0, QtGui.QColor(0, 255, 0, 100))
 
-    def mouse_pressed_annotate(self, view_index, x, y, orientation, vol_id):
+    def mouse_pressed_annotate(self, z, x, y):
         """
         Translate the view coordinates to volume coordinates
         Parameters
@@ -312,26 +314,9 @@ class Annotations(QtGui.QWidget):
 
         """
         if self.annotating:
-            vol = self.controller.current_view.layers[Layer.vol1].vol
-
-            if orientation == Orientation.sagittal:
-                z = copy.copy(y) # remove the copy
-                y = copy.copy(x)
-                x = view_index
-            elif orientation == Orientation.axial:
-                z = view_index
-                x = x
-                y = vol.dimension_length(Orientation.coronal) - y
-            elif orientation == Orientation.coronal:
-                z = copy.copy(y)
-                y = view_index
-                x = x
-
-            # Populate the location box in the annotations manager
             self.ui.labelXPos.setText(str(x))
             self.ui.labelYPos.setText(str(y))
             self.ui.labelZPos.setText(str(z))
-            self.annotation_highlight_signal.emit(int(x), int(y), int(z), [255, 0, 0], self.annotation_radius)
 
     def resize_table(self):
         self.ui.treeWidgetAvailableTerms.resizeColumnToContents(0)

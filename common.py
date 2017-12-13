@@ -57,6 +57,35 @@ class Layer(Enum):
     vectors = 3
 
 
+class ImageReader(object):
+    def __init__(self, img_path):
+        if img_path.endswith('.gz'):
+            # Get the image file extension
+            ex = splitext(splitext(img_path)[0])[1]
+            tmp = tempfile.NamedTemporaryFile(suffix=ex)
+            with gzip.open(img_path, 'rb') as infile:
+                data = infile.read()
+            with open(tmp.name, 'wb') as outfile:
+                outfile.write(data)
+            img_path = tmp.name
+        self.img = sitk.ReadImage(img_path)
+        self.space = self._convert_direction(self.img.GetDirection())
+        self.vol = sitk.GetArrayFromImage(
+            self.img)
+
+    def _convert_direction(self, directions):
+        """
+        Convert the coordinate system in the sitk object to human readable
+        Returns
+        -------
+
+        """
+        dir_map = {
+            (-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0): 'RAS'}
+        return dir_map.get(directions)
+
+
+
 def read_image(img_path, convert_to_ras=False):
     if img_path.endswith('.gz'):
         # Get the image file extension
@@ -68,7 +97,7 @@ def read_image(img_path, convert_to_ras=False):
             outfile.write(data)
         img_path = tmp.name
     img = sitk.ReadImage(img_path)
-    #direction = img.GetDirection()
+    direction = img.GetDirection()
     arr = sitk.GetArrayFromImage(img)  # Leave this fix out for now until I make optin available to chose orientation
     # if convert_to_ras: # testing to get orientation the same as in IEV by default
     #     #convert to RAS (testing)

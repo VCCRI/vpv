@@ -183,7 +183,9 @@ class AnnotationOverlay(object):
             if index == self.index:
                 self.set(self.x, self.y, self.index, self.color, self.size)
 
-    def set(self, x, y, index, color, size):
+    def set(self, x, y, index, color, size=None):
+        if not size:
+            size = self.size
         self.index = index
         self.color = color
         self.size = size
@@ -263,7 +265,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
             4: vectors
     """
     mouse_shift = QtCore.pyqtSignal(int, int, int, object,  name='mouse_shift')
-    mouse_pressed_annotation_signal = QtCore.pyqtSignal(int, int, int, Orientation, str, name='mouse_pressed')
+    mouse_pressed_annotation_signal = QtCore.pyqtSignal(int, int, int, object, name='mouse_pressed')
     crosshair_visible_signal = QtCore.pyqtSignal(bool)
     volume_position_signal = QtCore.pyqtSignal(int, int, int)
     volume_pixel_signal = QtCore.pyqtSignal(float)
@@ -425,7 +427,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
     def set_roi(self, x, y, w, h):
         self.roi.set(x, y, w, h)
 
-    def set_annotation(self, x, y, color, size):
+    def set_annotation(self, x, y, color, size=None): # Where would this come from normally?
         self.annotation.set(x, y, self.current_slice_idx, color, size)
 
     def switch_off_annotation(self):
@@ -452,7 +454,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         y = self.layers[Layer.vol1].image_item.mapFromScene(pos).y()
         if x < 0 or y < 0:
             return
-        self.mouse_pressed_annotation_signal.emit(self.current_slice_idx, x, y, self.orientation, self.layers[Layer.vol1].vol.name)
+        self.mouse_pressed_annotation_signal.emit(self.current_slice_idx, x, y, self)
 
     def mouse_moved(self, pos):
         """
@@ -710,14 +712,21 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
                 layer.update()
 
         self.ui.sliderSlice.blockSignals(True)
-        self.ui.sliderSlice.setRange(0, new_orientation_len)
-        self.ui.sliderSlice.setValue(self.current_slice_idx)
+        self.set_slice_slider(0,  new_orientation_len)
         self.ui.sliderSlice.blockSignals(False)
         self.viewbox.autoRange()
 
     def set_slice_slider(self, range, index):
+        # Temp fix to reverse the order of the coronal and axial slices so Ann et.al are happy is to reverse the
+        # Numbering of the sliders
+
         self.ui.sliderSlice.setRange(0, range)
         self.ui.sliderSlice.setValue(int(index))
+
+
+
+        # self.ui.sliderSlice.setRange(0, new_orientation_len)
+        # self.ui.sliderSlice.setValue(self.current_slice_idx)
 
     def show_controls(self, show):
         self.ui.controlsWidget.setVisible(show)
