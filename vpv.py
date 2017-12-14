@@ -537,7 +537,7 @@ class Vpv(QtCore.QObject):
                                            color=(255, 0, 0), radius=10):
         """
         Upon getting a mouse click on a SliceWidget region, it will emit info here including position and the
-        current volume and orientation. Map the coordinates between views so that they are correctly positioned
+        emmitting view.  Map the coordinates between views so that they are correctly positioned
 
         Parameters
         ----------
@@ -569,7 +569,7 @@ class Vpv(QtCore.QObject):
             # Add the coordinates to the AnnotationsWidget
             # The coordinates need to be in axial space do map back to them if nessesarry
             if dest_view.orientation == Orientation.axial:
-                # Then map it back to real coordinates (eg RAS)
+                # Now map it back to real coordinates (eg RAS)
                 xa, ya, idxa = self.map_view_to_volume_space(x, y, slice_idx, dest_view)
                 self.annotations_manager.mouse_pressed_annotate(xa, ya, idxa)
 
@@ -605,7 +605,7 @@ class Vpv(QtCore.QObject):
                 x, y, slice_idx = self.map_view_to_view(x, y, idx, src_view, view)
                 slice_idx = shape[2] - slice_idx
                 y = shape[1] - y
-                x = shape[0] - x
+                # x = shape[0] - x
                 return x, y, slice_idx
 
     @staticmethod
