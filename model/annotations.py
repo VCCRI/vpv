@@ -29,11 +29,14 @@ class Annotation(object):
     Records a single manual annotation
     """
     def __init__(self, x, y, z, dims, stage):
-        self.x = x
-        self.y = y
-        self.z = z
+        self.x = None
+        self.y = None
+        self.z = None
+        self.x_percent = None
+        self.y_percent = None
+        self.z_percent = None
         self.dims = dims  # x,y,z
-        self.x_percent, self.y_percent, self.z_percent = self.set_percentages()
+        self.set_xyz(z, y, z)
         self.stage = stage
 
     def __getitem__(self, index):
@@ -42,14 +45,19 @@ class Annotation(object):
         else: # The terms and stages columns
             return self.indexes[index - 1]
 
+    def set_xyz(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.set_percentages()
+
     def set_percentages(self):
         dims = self.dims
         if None in (self.x, self.y, self.z):  # Annotations at startup. No position when not annotated
             return None, None, None
-        xp = 100.0 / dims[0] * self.x
-        yp = 100.0 / dims[1] * self.y
-        zp = 100.0 / dims[2] * self.z
-        return xp, yp, zp
+        self.x_percent = 100.0 / dims[0] * self.x
+        self.y_percent = 100.0 / dims[1] * self.y
+        self.z_percent = 100.0 / dims[2] * self.z
 
 
 class EmapaAnnotation(Annotation):
@@ -78,7 +86,6 @@ class VolumeAnnotations(object):
         self.load_emap_yaml(E155_EMAP_TERMS_FILE)
         self.index = len(self.annotations)
 
-
     def add_emap_annotation(self, x, y, z, emapa, option, stage, category=None):
         """
         Add an emap/pato type annotaiotn from available terms on file, or update if the term is present already
@@ -88,10 +95,8 @@ class VolumeAnnotations(object):
 
         for a in self.annotations:
 
-            if emapa == a.term:
-                a.x = x
-                a.y = y
-                a.z = z
+            if emapa == a.term:  # Update existing term
+                a.set_xyz(x, y, z)
                 a.option = option
                 return
         ann = EmapaAnnotation(x, y, z, emapa, option, self.dims, stage, category)

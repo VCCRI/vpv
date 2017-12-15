@@ -361,7 +361,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         self.setMouseTracking(1)
 
         self.roi = RoiOverlay(self)
-        self.annotation = AnnotationOverlay(self)
+        self.annotation_marker = AnnotationOverlay(self)
 
         self.ui.seriesSlider.hide()
 
@@ -397,7 +397,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         self.scalebar.set_color(qcolor)
 
     def annotation_radius_changed(self, radius):
-        self.annotation.set_size(radius)
+        self.annotation_marker.set_size(radius)
 
     def resizeEvent(self, int_):
         """
@@ -427,11 +427,11 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
     def set_roi(self, x, y, w, h):
         self.roi.set(x, y, w, h)
 
-    def set_annotation(self, x, y, color, size=None): # Where would this come from normally?
-        self.annotation.set(x, y, self.current_slice_idx, color, size)
+    def show_annotation_marker(self, x, y, color, size=None): # Where would this come from normally?
+        self.annotation_marker.set(x, y, self.current_slice_idx, color, size)
 
     def switch_off_annotation(self):
-        self.annotation.clear()
+        self.annotation_marker.clear()
 
     def range_changed(self):
         self.scale_changed_signal.emit(self.orientation, self.id,  self.viewbox.viewRange())
@@ -675,7 +675,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         """
 
         self.roi.clear()
-        self.annotation.clear()
+        self.annotation_marker.clear()
         self.ui.labelSliceNumber.setText(str(index))
 
         if index < 0:
@@ -689,7 +689,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         if crosshair_xy:
             self.vLine.setPos(crosshair_xy[0])
             self.hLine.setPos(crosshair_xy[1])
-        self.annotation.update(self.current_slice_idx)
+        self.annotation_marker.update(self.current_slice_idx)
 
     def move_slice(self, num_slices):
         """

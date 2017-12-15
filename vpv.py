@@ -529,12 +529,32 @@ class Vpv(QtCore.QObject):
         """
         # map_annotation_signal_view_to_view needs a src view.
         # As the coordinates are in axial space, get the axial view
-        for view in self.views.values():
-            if view.orientation == Orientation.axial:
-                self.map_annotation_signal_view_to_view(z, x, y, view, color, radius)
+
+        # Set the volume coords in the annotations widget
+        self.annotations_manager.set_annotation_point(x, y, z)
+
+        # Map the volume coords into the view coords
+        for src in self.views.values():
+            if src.orientation == Orientation.axial:
+                xa, ya, idxa = self.map_view_to_volume_space(x, y, z, src)
+
+        # Set the correct slides and add annotation amrkers
+        for dest_view in self.views.values():
+            # First map the annotation marker between views
+            x1, y1, idx1 = self.map_view_to_view(x, y, idxa, src, dest_view)
+            # Need to call annotations_widget.mouse_pressed_annotate to populate the table
+            # Need to get radius and color from annotations_widget
+
+            # set each view to the correct slice corresponding to the mouse click position
+            dest_view.set_slice(idx1)
+            # Set the annotation marker. Red for pre-annoation, green indicates annotation save
+            dest_view.show_annotation_marker(x1, y1, color, radius)
+
+            # Add the coordinates to the AnnotationsWidget
+            # The coordinates need to be in axial space do map back to them if nessesarry
 
     def map_annotation_signal_view_to_view(self, slice_idx: int, x: int, y: int, src_view: SliceWidget,
-                                           color=(255, 0, 0), radius=10):
+                                           color=(255, 0, 0), radius=10, reverse=False):
         """
         Upon getting a mouse click on a SliceWidget region, it will emit info here including position and the
         emmitting view.  Map the coordinates between views so that they are correctly positioned
@@ -555,6 +575,8 @@ class Vpv(QtCore.QObject):
             radius of the annotation marker
 
         """
+        if not self.annotations_manager.annotating:
+            return
         for dest_view in self.views.values():
             # First map the annotation marker between views
             x1, y1, idx1 = self.map_view_to_view(x, y, slice_idx, src_view, dest_view)
@@ -564,16 +586,16 @@ class Vpv(QtCore.QObject):
             # set each view to the correct slice corresponding to the mouse click position
             dest_view.set_slice(idx1)
             # Set the annotation marker. Red for pre-annoation, green indicates annotation save
-            dest_view.set_annotation(x1, y1, color, radius)
+            dest_view.show_annotation_marker(x1, y1, color, radius)
 
             # Add the coordinates to the AnnotationsWidget
             # The coordinates need to be in axial space do map back to them if nessesarry
             if dest_view.orientation == Orientation.axial:
-                # Now map it back to real coordinates (eg RAS)
-                xa, ya, idxa = self.map_view_to_volume_space(x, y, slice_idx, dest_view)
-                self.annotations_manager.mouse_pressed_annotate(xa, ya, idxa)
+                # Now map it back to image coordinates
+                xa, ya, idxa = self.map_view_to_volume_space(x, y, slice_idx, src_view, reverse)
+                self.annotations_manager.set_annotation_point(xa, ya, idxa)
 
-    def map_view_to_volume_space(self, x: int, y: int, idx: int, src_view: SliceWidget):
+    def map_view_to_volume_space(self, x: int, y: int, idx: int, src_view: SliceWidget, reverse=False):
         """
         Given coordinates from a slice view, convert to actual corrdinates in the correct volume space
         This is required as we do some inversion of the order of slices as they come off the volumes to show
@@ -585,6 +607,9 @@ class Vpv(QtCore.QObject):
         y: int
         idx: int
         src_view: SliceWidget
+        reverse: bool
+            True: map from volume space to image space
+            False: map from image space to volume sapce
 
         Returns
         -------
@@ -603,8 +628,12 @@ class Vpv(QtCore.QObject):
         for view in self.views.values():
             if view.orientation == Orientation.axial:
                 x, y, slice_idx = self.map_view_to_view(x, y, idx, src_view, view)
-                slice_idx = shape[2] - slice_idx
-                y = shape[1] - y
+                if reverse:
+                    slice_idx = slice_idx  # The z slices are inverted so we go through stack head to tail
+                else:
+                    slice_idx = shape[2] - slice_idx
+                    y = shape[1] - y
+
                 # x = shape[0] - x
                 return x, y, slice_idx
 

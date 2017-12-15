@@ -298,10 +298,9 @@ class Annotations(QtGui.QWidget):
             if all_done:
                 cat.setBackgroundColor(0, QtGui.QColor(0, 255, 0, 100))
 
-    def mouse_pressed_annotate(self, x, y, z):
+    def set_annotation_point(self, x, y, z):
         """
-        Translate the view coordinates to volume coordinates
-        Parameters
+        Set the coordnates in the annotations tab. This is before the annotation has been saved
         ----------
         view_index
         x
