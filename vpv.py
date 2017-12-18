@@ -541,7 +541,7 @@ class Vpv(QtCore.QObject):
         # Set the correct slides and add annotation amrkers
         for dest_view in self.views.values():
             # First map the annotation marker between views
-            x1, y1, idx1 = self.map_view_to_view(x, y, idxa, src, dest_view)
+            x1, y1, idx1 = self.map_view_to_view(x, ya, idxa, src, dest_view)
             # Need to call annotations_widget.mouse_pressed_annotate to populate the table
             # Need to get radius and color from annotations_widget
 
