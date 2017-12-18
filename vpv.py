@@ -137,7 +137,7 @@ class Vpv(QtCore.QObject):
         # self.view_manager.data_processing_signal.connect(self.mainwindow.data_processing_slot)
         # self.view_manager.data_processing_finished_signal.connect(self.data_processing_finished_slot)
 
-        self.data_manager.roi_signal.connect(self.set_to_centre_of_roi)
+        self.data_manager.roi_signal.connect(self.map_roi_view_to_view)
 
         self.add_layer(Layer.vol1)
         self.add_layer(Layer.vol2)
@@ -406,12 +406,10 @@ class Vpv(QtCore.QObject):
 
     def set_to_centre_of_roi(self, zz, yy, xx):
         """
-        Recieves coordinates of a coonnected components roi
+        Recieves coordinates of a coonnected components roi from the blob finder table
         Then sends to cooresponding 2D roi to each dest_view dependent on its orientation
         Parameters
         ----------
-        zindices
-        yindices
 
 
         Notes
@@ -435,7 +433,7 @@ class Vpv(QtCore.QObject):
         # Send a 2D ROI to each dest_view
         for dest_view in self.views.values():
             src_dims = self.current_view.layers[Layer.vol1].vol.get_shape_xyz()
-            print('x')
+
             # Get the x y corrdinates of the ROI along with the slice index for each orthogonal dest_view
             # ROI is in normal coordinates so src orientation will always be axial
             if dest_view.orientation == Orientation.axial:
@@ -474,7 +472,7 @@ class Vpv(QtCore.QObject):
                 x1 = dims[1] -r_y[1]
                 dest_view.set_roi(x1, y1, w, h)
 
-    def map_roi_view_to_view(self, xx, yy, zz, src_orientation, dest_orientation):
+    def map_roi_view_to_view(self, xx, yy, zz):
         """
         Map a roi from one view to another
         Parameters
@@ -494,33 +492,34 @@ class Vpv(QtCore.QObject):
         y = [int(x) for x in yy]
         x = [int(x) for x in xx]
 
-        xslice = int(np.mean(x))
-        yslice = int(np.mean(y))
-        zslice = int(np.mean(z))
 
-        # Set the slice views to the centre of the ROI
-        for view in self.views.values():
-            if view.orientation == Orientation.axial:
-                view._set_slice(zslice)
-            if view.orientation == Orientation.coronal:
-                view._set_slice(yslice)
-            if view.orientation == Orientation.sagittal:
-                view._set_slice(xslice)
+        # Map from volume to view space
+        for src in self.views.values():
+            if src.orientation == Orientation.axial:
+                x1, y1, idx1 = self.map_view_to_volume_space(x[0], y[0], z[0], src)
+                x2, y2, idx2 = self.map_view_to_volume_space(x[1], y[1], z[1], src)
 
-        # Send a 2D ROI to each view
-        for view in self.views.values():
-            if view.orientation == Orientation.axial:
-                w = x[1] - x[0]
-                h = y[0] - y[1]
-                view.set_roi(x[0], y[0], w, h)
-            if view.orientation == Orientation.coronal:
-                w = x[1] - x[0]
-                h = z[0] - z[1]
-                view.set_roi(x[0], z[1], w, h)
-            if view.orientation == Orientation.sagittal:
-                w = y[1] - y[0]
-                h = z[0] - z[1]
-                view.set_roi(y[0], z[1], w, h)
+        mid_x = int(np.mean([x1, x2]))
+        mid_y = int(np.mean([y1, y2]))
+        mid_z = int(np.mean([idx1, idx2]))
+
+        for dest_view in self.views.values():
+            # First map the annotation marker between views
+            _, _, idx_centre = self.map_view_to_view(mid_x, mid_y, mid_z, src, dest_view)
+            # Need to call annotations_widget.mouse_pressed_annotate to populate the table
+            # Need to get radius and color from annotations_widget
+
+            # set each view to the correct slice corresponding to the mouse click position
+            dest_view.set_slice(idx_centre)
+            # Send a 2D ROI to each view
+
+            x_1, y_1, idx_1 = self.map_view_to_view(x1, y1, idx1, src, dest_view)
+            x_2, y_2, idx_2 = self.map_view_to_view(x2, y2, idx2, src, dest_view)
+
+            w = x_1 - x_2
+            h = y_2 - y_1
+            dest_view.set_roi(x_1 - w, y_1, w, h)
+
 
     def show_saved_annotations(self, x: int, y: int, z: int, color: list, radius: int):
         """
@@ -634,7 +633,7 @@ class Vpv(QtCore.QObject):
                     slice_idx = shape[2] - slice_idx
                     y = shape[1] - y
 
-                # x = shape[0] - x
+                x = shape[0] - x
                 return x, y, slice_idx
 
     @staticmethod

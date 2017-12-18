@@ -514,6 +514,7 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         -------
 
         """
+        return 0 #TODO This is broken for heatmapss
         try:
             if self.orientation == Orientation.axial:
                 pix_intensity = self.layers[layer_index].vol.pixel_axial(self.current_slice_idx, y, x, self.flipped_x)

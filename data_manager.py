@@ -368,7 +368,7 @@ class ManageData(QtGui.QWidget):
         roi_widget = self.blob_table.item(row, 2)
         roi_str = roi_widget.text()
         roi = [x.strip() for x in roi_str.split(', ')]
-        self.roi_signal.emit(roi[0:2], roi[2:4], roi[4:6])
+        self.roi_signal.emit(roi[4:6], roi[2:4], roi[0:2])
 
     def vector_changed(self, vol_name):
         self.modify_layer(Layer.vectors, 'set_volume', vol_name)
