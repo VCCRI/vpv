@@ -783,8 +783,9 @@ class Vpv(QtCore.QObject):
         try:
             init_vol = self.model.volume_id_list()[0]
             for view in self.views.values():
+                view.update_view()
                 view.layers[Layer.vol1].set_volume(init_vol, initial=True)
-                view.layers[Layer.vol1].update()  # This should make sure 16bit images are scaled correctly at loading?
+                # view.layers[Layer.vol1].update()  # This should make sure 16bit images are scaled correctly at loading?
 
         except IndexError:  # No Volume objects have been loaded
             print('No volumes oaded')
@@ -794,6 +795,7 @@ class Vpv(QtCore.QObject):
                 view.layers[Layer.heatmap].set_volume(init_vol, initial=True)
         except IndexError:  # No Volume objects have been loaded
             pass
+        
 
     def importer_callback(self, volumes, heatmaps, annotations, vector_files, image_series,
                           impc_analysis, last_dir, memory_map=False):
@@ -834,7 +836,7 @@ class Vpv(QtCore.QObject):
             self.data_manager.update()
             self.annotations_manager.update()
 
-    def load_volumes(self, file_list, data_type, memory_map=False, fdr_thresholds=None):
+    def load_volumes(self, file_list, data_type, memory_map=False, fdr_thresholds=False):
         """
         Load some volumes from a list of paths.
         Parameters
@@ -876,7 +878,11 @@ class Vpv(QtCore.QObject):
         impc_zip_file: str
             path tho analysis results zip
         """
-        zf = zipfile.ZipFile(impc_zip_file)
+        try:
+            zf = zipfile.ZipFile(impc_zip_file)
+        except zipfile.BadZipFile as e:
+            common.error_dialog(self.mainwindow, 'Zip file error', 'Cannot read IMPC analysis zip file\nThe zip may be corrupted')
+            return
         names = zf.namelist()
 
         file_names = addict.Dict(
@@ -936,10 +942,10 @@ class Vpv(QtCore.QObject):
 
         else:
             failed = []
-            for f in file_names:
-                if not f:
-                    failed.append(f)
-            common.error_dialog(self, 'The following files could not be found in the zip\n {}'.format('\n'.join(failed)))
+            for key, name in file_names.items():
+                if not name:
+                    failed.append(key)
+            common.error_dialog(self.mainwindow, 'Error loading file', 'The following files could not be found in the zip\n {}'.format('\n'.join(failed)))
             print('IMPC analysis data failed to load. The following files could not be found in the zip')
             print(failed)
 

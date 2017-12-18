@@ -747,10 +747,11 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         """
         Reload each layers' imageItem after properties set. If it has a volume set
         """
+        self.scalebar.updateBar()
         self.set_slice(self.current_slice_idx)
-        for view in list(self.layers.values())[0:3]:
-            if view.vol:
-                view.update()
+        for layer in list(self.layers.values())[0:3]:
+            if layer.vol:
+                layer.update()
 
     ### Key events #####################################################################################################
 
