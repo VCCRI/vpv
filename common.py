@@ -1,10 +1,10 @@
-from PyQt4 import QtGui, QtCore
+from PyQt5.QtWidgets import QMessageBox
 from enum import Enum
 import SimpleITK as sitk
 import tempfile
 import gzip
 from os.path import splitext
-import numpy as np
+
 
 RAS_DIRECTIONS = (-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0)
 LPS_DIRECTIONS = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
@@ -12,11 +12,11 @@ LPS_DIRECTIONS = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
 ZIP_EXTENSIONS = ['']
 
 def error_dialog(parent, title, msg):
-       dialog = QtGui.QMessageBox.warning(parent, title, msg, QtGui.QMessageBox.Cancel)
+       dialog = QMessageBox.warning(parent, title, msg, QMessageBox.Cancel)
 
 
 def info_dialog(parent, title, msg):
-    dialog = QtGui.QMessageBox.information(parent, title, msg, QtGui.QMessageBox.Ok)
+    dialog = QMessageBox.information(parent, title, msg, QMessageBox.Ok)
 
 
 class ImType(Enum):

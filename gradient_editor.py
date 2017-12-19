@@ -1,10 +1,11 @@
 from __future__ import division
-from PyQt4 import QtGui, QtCore, Qt
+from PyQt5 import  QtCore
+from PyQt5.QtWidgets import QDialog
 from ui.ui_gradient_editor import Ui_GradientEditor
 import pyqtgraph as pg
 
-class GradientEditor(QtGui.QDialog):
-    sigFinished = QtCore.pyqtSignal(list) # Emites the two chosen gradients
+class GradientEditor(QDialog):
+    sigFinished = QtCore.pyqtSignal(list)  # Emits the two chosen gradients
 
     def __init__(self, parent):
         super(GradientEditor, self).__init__(parent.mainwindow)

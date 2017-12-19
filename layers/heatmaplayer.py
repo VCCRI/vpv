@@ -1,9 +1,7 @@
-from __future__ import division
-from PyQt4 import QtGui
+from PyQt5 import QtGui
 import pyqtgraph as pg
-from lookup_tables import Lut
 import numpy as np
-from common import Orientation, Layer
+from common import Layer
 from .layer import LayerBase
 
 

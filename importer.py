@@ -15,11 +15,10 @@
 #
 # @author Neil Horner <n.horner@har.mrc.ac.uk>
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
+from PyQt5.QtWidgets import QDialog, QMessageBox, QFileDialog
 import os
 from ui.ui_importer import Ui_Dialog
-from common import ImType
-
 
 VOLUME = 'Volume'
 HEATMAP = 'Heatmap data'
@@ -32,7 +31,7 @@ IMPC_ANALYSIS = "IMPC analysis"
 TYPE_CHOICES = (VOLUME, HEATMAP, ANNOTATIONS, VECTORS, IMAGE_SERIES, IMPC_ANALYSIS)
 
 
-class Import(QtGui.QDialog):
+class Import(QDialog):
     def __init__(self, parent, callback, virtual_stack_callback, last_dir, appdata, dragged_files=None):
         super(Import, self).__init__(parent)
         self.ui = Ui_Dialog()
@@ -74,14 +73,14 @@ class Import(QtGui.QDialog):
                 #                                                   "Load individual 2D slices from folder (yes)\n"
                 #                                                   "Load multiple image volumes (No)",
                 #                                                   'Hello' | QtGui.QMessageBox.No)
-                box = QtGui.QMessageBox()
-                box.setIcon(QtGui.QMessageBox.Question)
+                box = QMessageBox()
+                box.setIcon(QMessageBox.Question)
                 box.setWindowTitle('Choose data type')
                 box.setText('Load individual 2D slices from folder, or load multiple single images volumes?')
-                box.setStandardButtons(QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-                button_y = box.button(QtGui.QMessageBox.Yes)
+                box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+                button_y = box.button(QMessageBox.Yes)
                 button_y.setText('Satack of 2D image slices')
-                button_n = box.button(QtGui.QMessageBox.No)
+                button_n = box.button(QMessageBox.No)
                 button_n.setText('Load multiple 3D image volumes')
                 box.exec_()
                 if box.clickedButton() == button_y:
@@ -143,7 +142,7 @@ class Import(QtGui.QDialog):
 
     def on_choose_files(self):
 
-        qstring_filenames = QtGui.QFileDialog.getOpenFileNames(self, "Choose some data", self.last_dir)
+        qstring_filenames = QFileDialog.getOpenFileNames(self, "Choose some data", self.last_dir)
         self.files_to_open = [x for x in qstring_filenames]
         self.populate_file_list()
 
@@ -151,7 +150,7 @@ class Import(QtGui.QDialog):
         self.last_dir = dir_
 
     def on_load_virtual_stack(self):
-        dir_ = QtGui.QFileDialog.getExistingDirectory(None, "Selet a folder of of images to create virtual stack")
+        dir_ = QFileDialog.getExistingDirectory(None, "Selet a folder of of images to create virtual stack")
         self.load_virtual_stack(dir_)
 
     def load_virtual_stack(self, dir_):

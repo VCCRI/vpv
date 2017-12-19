@@ -61,9 +61,10 @@ __version__ = "0.1.1"
 import os
 import sys
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
-from PyQt4 import uic
+from PyQt5 import QtCore
+from PyQt5 import QtGui
+from PyQt5.QtWidgets import QGroupBox, QApplication
+
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -74,7 +75,7 @@ __all__ = ['QRangeSlider']
 
 DEFAULT_CSS = """
 QRangeSlider * {
-    border: 0px;
+    border: 0px;qt
     padding: 0px;
 }
 QRangeSlider #Head {
@@ -123,13 +124,13 @@ class Ui_Form(object):
         self._splitter.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self._splitter.setOrientation(QtCore.Qt.Horizontal)
         self._splitter.setObjectName(_fromUtf8("splitter"))
-        self._head = QtGui.QGroupBox(self._splitter)
+        self._head = QGroupBox(self._splitter)
         self._head.setTitle(_fromUtf8(""))
         self._head.setObjectName(_fromUtf8("Head"))
-        self._handle = QtGui.QGroupBox(self._splitter)
+        self._handle = QGroupBox(self._splitter)
         self._handle.setTitle(_fromUtf8(""))
         self._handle.setObjectName(_fromUtf8("Span"))
-        self._tail = QtGui.QGroupBox(self._splitter)
+        self._tail = QGroupBox(self._splitter)
         self._tail.setTitle(_fromUtf8(""))
         self._tail.setObjectName(_fromUtf8("Tail"))
         self.gridLayout.addWidget(self._splitter, 0, 0, 1, 1)
@@ -138,10 +139,9 @@ class Ui_Form(object):
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
-        encoding = QtGui.QApplication.UnicodeUTF8
-        Form.setWindowTitle(QtGui.QApplication.translate("QRangeSlider", 
+        Form.setWindowTitle(QApplication.translate("QRangeSlider",
                                                          "QRangeSlider",
-                                                         None, encoding))
+                                                         ))
 
 
 class Element(QtGui.QGroupBox):
@@ -334,16 +334,18 @@ class QRangeSlider(QtGui.QWidget, Ui_Form):
 
         # head layout
         self._head_layout = QtGui.QHBoxLayout()
-        self._head_layout.setSpacing(0)
-        self._head_layout.setMargin(0)
+        self._head_layout.setContentsMargins(0,0,0,0)
+
+        # self._head_layout.setMargin(0)
         self._head.setLayout(self._head_layout)
         self.head = Head(self._head, main=self)
         self._head_layout.addWidget(self.head)
 
         # handle layout
         self._handle_layout = QtGui.QHBoxLayout()
-        self._handle_layout.setSpacing(0)
-        self._handle_layout.setMargin(0)
+        self._handle_layout.setContentsMargins(0,0,0,0);
+
+        # self._handle_layout.setMargin(0)
         self._handle.setLayout(self._handle_layout)
         self.handle = Handle(self._handle, main=self)
         self.handle.setTextColor(self.textColor)
@@ -351,8 +353,9 @@ class QRangeSlider(QtGui.QWidget, Ui_Form):
 
         # tail layout
         self._tail_layout = QtGui.QHBoxLayout()
-        self._tail_layout.setSpacing(0)
-        self._tail_layout.setMargin(0)
+        self._tail_layout.setContentsMargins(0,0,0,0);
+
+        # self._tail_layout.setMargin(0)
         self._tail.setLayout(self._tail_layout)
         self.tail = Tail(self._tail, main=self)
         self._tail_layout.addWidget(self.tail)
@@ -515,7 +518,7 @@ class QRangeSlider(QtGui.QWidget, Ui_Form):
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     rs = QRangeSlider()
     rs.show()
     rs.setRange(15, 35)

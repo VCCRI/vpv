@@ -2,31 +2,25 @@
 
 # Form implementation generated from reading ui file 'ui_layer_widget.ui'
 #
-# Created: Wed Oct  1 13:14:25 2014
-#      by: PyQt4 UI code generator 4.9.3
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
-
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    _fromUtf8 = lambda s: s
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_Layer(object):
     def setupUi(self, Layer):
-        Layer.setObjectName(_fromUtf8("Layer"))
+        Layer.setObjectName("Layer")
         Layer.resize(1030, 51)
-        self.horizontalLayout = QtGui.QHBoxLayout(Layer)
-        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        self.gridLayout = QtGui.QGridLayout()
-        self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.comboBoxVol = QtGui.QComboBox(Layer)
-        self.comboBoxVol.setObjectName(_fromUtf8("comboBoxVol"))
+        self.horizontalLayout = QtWidgets.QHBoxLayout(Layer)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.gridLayout = QtWidgets.QGridLayout()
+        self.gridLayout.setObjectName("gridLayout")
+        self.comboBoxVol = QtWidgets.QComboBox(Layer)
+        self.comboBoxVol.setObjectName("comboBoxVol")
         self.gridLayout.addWidget(self.comboBoxVol, 0, 0, 1, 1)
-        self.comboBoxLut = QtGui.QComboBox(Layer)
-        self.comboBoxLut.setObjectName(_fromUtf8("comboBoxLut"))
+        self.comboBoxLut = QtWidgets.QComboBox(Layer)
+        self.comboBoxLut.setObjectName("comboBoxLut")
         self.gridLayout.addWidget(self.comboBoxLut, 0, 1, 1, 1)
         self.horizontalLayout.addLayout(self.gridLayout)
 
@@ -34,5 +28,6 @@ class Ui_Layer(object):
         QtCore.QMetaObject.connectSlotsByName(Layer)
 
     def retranslateUi(self, Layer):
-        Layer.setWindowTitle(QtGui.QApplication.translate("Layer", "Form", None, QtGui.QApplication.UnicodeUTF8))
+        _translate = QtCore.QCoreApplication.translate
+        Layer.setWindowTitle(_translate("Layer", "Form"))
 

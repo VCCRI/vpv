@@ -1,5 +1,6 @@
 import numpy as np
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
+from PyQt5.QtWidgets import QDialog
 import pyqtgraph as pg
 from lib.qrangeslider import QRangeSlider
 from lookup_tables import Lut
@@ -16,8 +17,7 @@ The Qt widget that controls the currently viewed volumes, heatmaps, and vector v
 DEFAULT_SCALE_BAR_SIZE = 14.0
 
 
-
-class VolNameDialog(QtGui.QDialog):
+class VolNameDialog(QDialog):
     name_changed_signal = QtCore.pyqtSignal(str, str)
 
     def __init__(self, parent, current_name):

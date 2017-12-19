@@ -30,7 +30,9 @@ import sys
 from os.path import join
 p = sys.path
 
-import PyQt4
+from PyQt5 import QtGui, QtCore, QtWidgets
+QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+
 if os.name == 'nt':
     # check where vpv has been installed
     vpv_installation_dir = os.path.dirname(os.path.realpath(__file__))
@@ -49,10 +51,8 @@ import main_window
 import numpy as np
 from dock_widget_manager import ManagerDockWidget
 import importer
-from PyQt4 import QtGui, QtCore
 from model.model import DataModel
 from appdata import AppData
-from stats import StatsWidget
 import common
 from common import Orientation, Layer
 from layers.slice_widget import SliceWidget

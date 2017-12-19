@@ -22,10 +22,10 @@ import numpy as np
 import os
 import tempfile
 from PIL import Image
-from PyQt4 import QtCore, Qt
+from PyQt5 import QtCore
 import json
 from lib.addict import Dict
-from common import Orientation, Stage, AnnotationOption, read_image, timing
+from common import Stage, AnnotationOption, read_image
 
 from .ImageVolume import ImageVolume
 from .HeatmapVolume import HeatmapVolume

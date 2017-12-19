@@ -2,31 +2,26 @@
 
 # Form implementation generated from reading ui file 'ui_dataviewer.ui'
 #
-# Created: Thu Oct  9 13:50:07 2014
-#      by: PyQt4 UI code generator 4.9.3
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
-
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    _fromUtf8 = lambda s: s
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_DataViewer(object):
     def setupUi(self, DataViewer):
-        DataViewer.setObjectName(_fromUtf8("DataViewer"))
+        DataViewer.setObjectName("DataViewer")
         DataViewer.resize(430, 282)
-        self.dockWidgetContents = QtGui.QWidget()
-        self.dockWidgetContents.setObjectName(_fromUtf8("dockWidgetContents"))
-        self.verticalLayout = QtGui.QVBoxLayout(self.dockWidgetContents)
-        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.gridLayoutInfo = QtGui.QGridLayout()
-        self.gridLayoutInfo.setObjectName(_fromUtf8("gridLayoutInfo"))
+        self.dockWidgetContents = QtWidgets.QWidget()
+        self.dockWidgetContents.setObjectName("dockWidgetContents")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.dockWidgetContents)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.gridLayoutInfo = QtWidgets.QGridLayout()
+        self.gridLayoutInfo.setObjectName("gridLayoutInfo")
         self.verticalLayout.addLayout(self.gridLayoutInfo)
         self.plotWidget = PlotWidget(self.dockWidgetContents)
-        self.plotWidget.setObjectName(_fromUtf8("plotWidget"))
+        self.plotWidget.setObjectName("plotWidget")
         self.verticalLayout.addWidget(self.plotWidget)
         DataViewer.setWidget(self.dockWidgetContents)
 
@@ -34,6 +29,7 @@ class Ui_DataViewer(object):
         QtCore.QMetaObject.connectSlotsByName(DataViewer)
 
     def retranslateUi(self, DataViewer):
-        DataViewer.setWindowTitle(QtGui.QApplication.translate("DataViewer", "DockWidget", None, QtGui.QApplication.UnicodeUTF8))
+        _translate = QtCore.QCoreApplication.translate
+        DataViewer.setWindowTitle(_translate("DataViewer", "DockWidget"))
 
 from pyqtgraph import PlotWidget

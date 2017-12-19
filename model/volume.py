@@ -2,10 +2,10 @@
 import numpy as np
 import os
 import tempfile
-from PyQt4 import QtCore, Qt
+from PyQt5 import QtCore, Qt
 from scipy import ndimage
 from scipy.misc import imresize
-from common import Orientation, read_image, ImageReader
+from common import Orientation, ImageReader
 from read_minc import minc_to_numpy
 
 

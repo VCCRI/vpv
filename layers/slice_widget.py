@@ -19,8 +19,9 @@
 This module is involved in the display of a single orthogonal view.
 
 """
-from __future__ import division
-from PyQt4 import QtGui, QtCore
+
+from PyQt5 import QtGui, QtCore
+from PyQt5.QtWidgets import QWidget, QLabel
 import pyqtgraph as pg
 from ui.ui_slice_widget import Ui_SliceWidget
 import os
@@ -87,7 +88,7 @@ class InformationOverlay(QtGui.QWidget):
         self.labels_active['vectors'] = False
 
     def _make_label(self):
-        label = QtGui.QLabel()
+        label = QLabel()
         label.setStyleSheet("font: 10pt; color: white")
         return label
 
@@ -256,7 +257,7 @@ class ScaleBar(pg.ScaleBar):
         self.text.setPos(-w/2., 0)
 
 
-class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
+class SliceWidget(QWidget, Ui_SliceWidget):
     """
     The qt widget that displays a single orthogonal view.
 

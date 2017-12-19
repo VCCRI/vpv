@@ -15,12 +15,12 @@
 #
 # @author Neil Horner <n.horner@har.mrc.ac.uk>
 
-from PyQt4 import QtGui
+from PyQt5.QtWidgets import QDockWidget
 from lookup_tables import Lut
 from ui.ui_manager import Ui_ManageViews
 
 
-class ManagerDockWidget(QtGui.QDockWidget):
+class ManagerDockWidget(QDockWidget):
 
     def __init__(self, model, mainwindow, appdata, data_manager, annotations_manager, console):
         super(ManagerDockWidget, self).__init__(mainwindow)
@@ -38,7 +38,7 @@ class ManagerDockWidget(QtGui.QDockWidget):
         self.ui = Ui_ManageViews()
         self.ui.setupUi(self)
         self.setStyleSheet("font-size: 12px")
-        self.setFeatures(QtGui.QDockWidget.AllDockWidgetFeatures)
+        self.setFeatures(QDockWidget.AllDockWidgetFeatures)
         self.model = model
         self.mainwindow = mainwindow
         self.volume_ids = None

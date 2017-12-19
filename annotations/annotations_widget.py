@@ -8,11 +8,12 @@ Works something like this:
 """
 import os
 import copy
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QComboBox, QFileDialog
 from ui.ui_annotations import Ui_Annotations
 import json
 import common
-from common import Orientation, Stage, Layer, AnnotationOption
+from common import Stage, Layer, AnnotationOption
 from lib.addict import Dict
 from collections import defaultdict
 
@@ -24,7 +25,7 @@ OPTION_COLOR_MAP = {
     AnnotationOption.abnormal: (255, 0, 0, 100)}
 
 
-class Annotations(QtGui.QWidget):
+class Annotations(QWidget):
     annotation_highlight_signal = QtCore.pyqtSignal(int, int, int, list, int)
     annotation_radius_signal = QtCore.pyqtSignal(int)
     annotation_recent_dir_signal = QtCore.pyqtSignal(str)
@@ -119,7 +120,7 @@ class Annotations(QtGui.QWidget):
             """
             box.activated.connect(lambda: self.update_annotation(child_, box_))
 
-        header = QtGui.QTreeWidgetItem(['category', 'term', 'option'])
+        header = QTreeWidgetItem(['category', 'term', 'option'])
         self.ui.treeWidgetAvailableTerms.setHeaderItem(header)
         ann_by_cat = defaultdict(list)  # sort the annotations into categories
 
@@ -131,16 +132,16 @@ class Annotations(QtGui.QWidget):
         for ann in vol.annotations:
             ann_by_cat[ann.category].append(ann)
         for category, annotations in ann_by_cat.items():
-            parent = QtGui.QTreeWidgetItem(self.ui.treeWidgetAvailableTerms)
+            parent = QTreeWidgetItem(self.ui.treeWidgetAvailableTerms)
             parent.setText(0, category)
             parent.setFlags(parent.flags())
             for i, annotation in enumerate(annotations):
-                child = QtGui.QTreeWidgetItem(parent)
+                child = QTreeWidgetItem(parent)
                 child.setText(1, annotation.term)
                 option = annotation.option
                 color = OPTION_COLOR_MAP[option]
                 parent.addChild(child)
-                box = QtGui.QComboBox()
+                box = QComboBox()
                 box.addItem(AnnotationOption.normal.value, AnnotationOption.normal)
                 box.addItem(AnnotationOption.abnormal.value, AnnotationOption.abnormal)
                 box.addItem(AnnotationOption.unobserved.value, AnnotationOption.unobserved)
@@ -168,11 +169,11 @@ class Annotations(QtGui.QWidget):
         if not os.path.isdir(default_dir):
             default_dir = os.path.expanduser("~")
 
-        out_dir = str(QtGui.QFileDialog.getExistingDirectory(
+        out_dir = str(QFileDialog.getExistingDirectory(
             self,
             'Select directory to save annotations',
             default_dir,
-            QtGui.QFileDialog.ShowDirsOnly))
+            QFileDialog.ShowDirsOnly))
 
         for vol in self.controller.model.all_volumes():
             annotations_dict = Dict()

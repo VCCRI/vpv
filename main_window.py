@@ -18,12 +18,12 @@
 
 import os
 import _version
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 
 from ui.ui_main import Ui_MainWindow
 
 
-class Main(QtGui.QMainWindow, Ui_MainWindow):
+class Main(QtWidgets.QMainWindow, Ui_MainWindow):
     hide_view_signal = QtCore.pyqtSignal(int)
 
     def __init__(self, controller, appdata):

@@ -1,6 +1,6 @@
 
 from ui.ui_consoletab import Ui_console
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui
 # from pyqtgraph import console
 
 
@@ -10,14 +10,15 @@ os.environ['QT_API'] = 'pyqt'
 import sip
 sip.setapi("QString", 2)
 sip.setapi("QVariant", 2)
-from PyQt4.QtGui  import *
+from PyQt5.QtGui  import *
+from PyQt5.QtWidgets import QWidget
 # Import the console machinery from ipython
 
 from qtconsole.rich_jupyter_widget import RichJupyterWidget
 from qtconsole.inprocess import QtInProcessKernelManager
 from IPython.lib import guisupport
 
-class Console(QtGui.QWidget):
+class Console(QWidget):
     console_command_executed = QtCore.pyqtSignal()
 
     def __init__(self, mainwindow, vpv):

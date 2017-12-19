@@ -1,4 +1,4 @@
-from PyQt4 import QtGui
+from PyQt5 import QtGui
 import pyqtgraph as pg
 from .layer import LayerBase
 

@@ -2,41 +2,27 @@
 
 # Form implementation generated from reading ui file 'ui_consoletab.ui'
 #
-# Created: Sun Sep 25 11:57:58 2016
-#      by: PyQt4 UI code generator 4.11.3
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
-
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    def _fromUtf8(s):
-        return s
-
-try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
-except AttributeError:
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_console(object):
     def setupUi(self, console):
-        console.setObjectName(_fromUtf8("console"))
+        console.setObjectName("console")
         console.resize(761, 737)
-        self.verticalLayout = QtGui.QVBoxLayout(console)
-        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.mainLayout = QtGui.QVBoxLayout()
-        self.mainLayout.setObjectName(_fromUtf8("mainLayout"))
+        self.verticalLayout = QtWidgets.QVBoxLayout(console)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.mainLayout = QtWidgets.QVBoxLayout()
+        self.mainLayout.setObjectName("mainLayout")
         self.verticalLayout.addLayout(self.mainLayout)
 
         self.retranslateUi(console)
         QtCore.QMetaObject.connectSlotsByName(console)
 
     def retranslateUi(self, console):
-        console.setWindowTitle(_translate("console", "Form", None))
+        _translate = QtCore.QCoreApplication.translate
+        console.setWindowTitle(_translate("console", "Form"))
 
 import resources_rc

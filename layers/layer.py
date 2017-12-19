@@ -1,5 +1,4 @@
-from __future__ import division
-from PyQt4 import QtCore, Qt
+from PyQt5 import QtCore, Qt
 from lookup_tables import Lut
 import numpy as np
 from common import Orientation
