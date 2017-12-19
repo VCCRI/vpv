@@ -58,6 +58,9 @@ class ViewBox(pg.ViewBox):
 
 
 class InformationOverlay(QtGui.QWidget):
+    """
+    Widget for displaying volume information in the top-right corner
+    """
     def __init__(self, parent=None):
         super(InformationOverlay, self).__init__(parent)
 
@@ -205,6 +208,9 @@ class AnnotationOverlay(object):
 
 
 class ScaleBar(pg.ScaleBar):
+    """
+    Pyqtgraph scalebar displayed at bottom of the orthogonal view
+    """
     def __init__(self):
         color = QtGui.QColor(255, 255, 255)
         self.scale_bar_label_visible = False
@@ -259,10 +265,11 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
     layers: Dict
         {z_index(int): Layer}
         Holds the different layer objects.
-            1: volume
-            2: volume 2, for checking differences between volumes
-            3: heatmap
-            4: vectors
+            1: volume (volumelayer.Volumelayer)
+            2: volume 2 (volumelayer.Volumelayer)
+                for checking differences between volumes
+            3: heatmap (heatmaplayer.Hetmaplyer)
+            4: vectors (vectorlayer.Vectorlayer)
     """
     mouse_shift = QtCore.pyqtSignal(int, int, int, object,  name='mouse_shift')
     mouse_pressed_annotation_signal = QtCore.pyqtSignal(int, int, int, object, name='mouse_pressed')
@@ -435,14 +442,14 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
 
     def range_changed(self):
         self.scale_changed_signal.emit(self.orientation, self.id,  self.viewbox.viewRange())
-        QtCore.QTimer.singleShot(1000, lambda: self.scalebar.updateBar())
+        QtCore.QTimer.singleShot(500, lambda: self.scalebar.updateBar())
 
     def set_zoom(self, range_x=None, range_y=None):
         if range_x:
             self.viewbox.setXRange(range_x[0], range_x[1], padding=False)
         if range_y:
             self.viewbox.setYRange(range_y[0], range_y[1], padding=False)
-        QtCore.QTimer.singleShot(1000, lambda: self.scalebar.updateBar())
+        QtCore.QTimer.singleShot(500, lambda: self.scalebar.updateBar())
 
     def set_data_label_visibility(self, visible):
         self.overlay.setVisible(visible)
@@ -747,12 +754,14 @@ class SliceWidget(QtGui.QWidget, Ui_SliceWidget):
         """
         Reload each layers' imageItem after properties set. If it has a volume set
         """
-        self.scalebar.updateBar()
+
         self.set_slice(self.current_slice_idx)
         for layer in list(self.layers.values())[0:3]:
             if layer.vol:
                 layer.update()
-
+        self.scalebar.updateBar()
+        x, y = self.viewbox.viewRange()
+        self.set_zoom(x, y)  # This is the only way I can see to update the scalebar on initial volume being added
     ### Key events #####################################################################################################
 
     def left_key_pressed(self):

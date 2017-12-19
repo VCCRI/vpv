@@ -776,26 +776,25 @@ class Vpv(QtCore.QObject):
                     self.add_initial_volume()
                     self.any_data_loaded = True
 
-    def add_initial_volume(self):  # move to vpv.py
+    def add_initial_volume(self):
         """
         Called when loading in volumes for the first time, to get a volume displayed without havong to manually set it
         """
         try:
             init_vol = self.model.volume_id_list()[0]
             for view in self.views.values():
-                view.update_view()
                 view.layers[Layer.vol1].set_volume(init_vol, initial=True)
                 # view.layers[Layer.vol1].update()  # This should make sure 16bit images are scaled correctly at loading?
-
+                view.update_view()
         except IndexError:  # No Volume objects have been loaded
-            print('No volumes oaded')
+            print('No volumes loaded')
+
         try:  # See if we have any Data objects loaded
             init_vol = self.model.data_id_list()[0]
             for view in self.views.values():
                 view.layers[Layer.heatmap].set_volume(init_vol, initial=True)
         except IndexError:  # No Volume objects have been loaded
             pass
-        
 
     def importer_callback(self, volumes, heatmaps, annotations, vector_files, image_series,
                           impc_analysis, last_dir, memory_map=False):

@@ -9,7 +9,12 @@ import copy
 from common import Orientation, Layer
 from functools import partial
 
+"""
+The Qt widget that controls the currently viewed volumes, heatmaps, and vector volumes
+"""
+
 DEFAULT_SCALE_BAR_SIZE = 14.0
+
 
 
 class VolNameDialog(QtGui.QDialog):
