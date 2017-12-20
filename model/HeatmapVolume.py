@@ -132,14 +132,31 @@ class HeatmapVolume(Volume):
     def get_lut(self):
         return self.negative_lut, self.positive_lut
 
-    def get_data(self, orientation, index=1, flip=None):
+    def get_data(self, orientation, index=1, flip=None, xy=None):
         """
-        overide the base method. return two arrays instead of one. One with negative values and the other with positives
-        :param orientation:
-        :param index:
-        :return:
+        Override the base method. return two arrays instead of one. One with negative values and the other with positives
+        The Heatmap layer takes negative and positive slices and applies individual LUTs to each
+
+        If xy given, just return a single pixel value at that position
+
+        Parameters
+        ----------
+        orientation: Orientation
+        index: slice to take
+        flip:
+        xy
+
+        Returns
+        -------
+        tuple: (ndarray, ndarray)
+            orthogonal slices at given slice index and orientation if xy is None
+        float:
+            single voxel value if xy is tuple (xy)
+
         """
-        array = super(HeatmapVolume, self).get_data(orientation, index, flip)
+        array = super(HeatmapVolume, self).get_data(orientation, index, flip, xy)
+        if xy:
+            return array
 
         neg_array = np.copy(array)
         neg_array[neg_array > 0] = 0

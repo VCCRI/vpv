@@ -11,7 +11,8 @@ from common import Orientation, Layer
 from functools import partial
 
 """
-The Qt widget that controls the currently viewed volumes, heatmaps, and vector volumes
+The Qt widget that controls the currently viewed volumes, heatmaps, and vector volumes. Accessed from the main 
+dock widget
 """
 
 DEFAULT_SCALE_BAR_SIZE = 14.0

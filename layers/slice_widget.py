@@ -60,7 +60,14 @@ class ViewBox(pg.ViewBox):
 
 class InformationOverlay(QtGui.QWidget):
     """
-    Widget for displaying volume information in the top-right corner
+    Widget for displaying volume id information
+
+    for example the top of the view might look like:
+
+    vol1: mutant_1
+    vol2: population_avg
+    hm: heatmap
+
     """
     def __init__(self, parent=None):
         super(InformationOverlay, self).__init__(parent)
@@ -89,7 +96,7 @@ class InformationOverlay(QtGui.QWidget):
 
     def _make_label(self):
         label = QLabel()
-        label.setStyleSheet("font: 10pt; color: white")
+        label.setStyleSheet("color: white")
         return label
 
     def set_volume_label(self, text):
@@ -522,7 +529,6 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         -------
 
         """
-        return 0 #TODO This is broken for heatmapss
         try:
             if self.orientation == Orientation.axial:
                 pix_intensity = self.layers[layer_index].vol.pixel_axial(self.current_slice_idx, y, x, self.flipped_x)

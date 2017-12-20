@@ -32,6 +32,7 @@ p = sys.path
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
 
 if os.name == 'nt':
     # check where vpv has been installed
@@ -377,7 +378,7 @@ class Vpv(QtCore.QObject):
 
     def mouse_shift(self, src_index, x, y, src_view):
         """
-        Gets mouse moved signal
+        Gets mouse moved signal. Sets corresponding slices in other views if views are linked
 
         Parameters
         ----------
@@ -392,6 +393,8 @@ class Vpv(QtCore.QObject):
         src_vol: ImageVolume
             The volume belonging to the source view
         """
+
+        #TODO: AttributeError: 'SliceWidget' object has no attribute 'Layers'
         for dest_view in self.views.values():
 
             if not self.data_manager.link_views:

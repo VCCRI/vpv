@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_data(object):
     def setupUi(self, data):
         data.setObjectName("data")
-        data.resize(761, 839)
+        data.resize(761, 857)
         self.verticalLayout = QtWidgets.QVBoxLayout(data)
         self.verticalLayout.setObjectName("verticalLayout")
         self.layoutVolume = QtWidgets.QVBoxLayout()
@@ -88,6 +88,7 @@ class Ui_data(object):
         self.verticalLayout_7 = QtWidgets.QVBoxLayout()
         self.verticalLayout_7.setObjectName("verticalLayout_7")
         self.checkBoxInterpolate = QtWidgets.QCheckBox(data)
+        self.checkBoxInterpolate.setIconSize(QtCore.QSize(32, 32))
         self.checkBoxInterpolate.setObjectName("checkBoxInterpolate")
         self.verticalLayout_7.addWidget(self.checkBoxInterpolate)
         self.checkBoxLinkViews = QtWidgets.QCheckBox(data)

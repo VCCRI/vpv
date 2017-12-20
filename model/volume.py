@@ -55,7 +55,8 @@ class Volume(Qt.QObject):
         """
         get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the y axis
         """
-        vox = self.get_data(Orientation.sagittal, x, flip, (y, z))
+        a = self.get_data.__code__
+        vox = self.get_data(Orientation.sagittal, x, flip=flip, xy=(y, z))
         return vox
 
     def pixel_coronal(self, z, y, x, flip=False):
