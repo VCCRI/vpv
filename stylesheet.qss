@@ -98,7 +98,7 @@ QCheckBox::indicator {
 }
 
 QCheckBox::indicator:unchecked {
-    image: url(images/checkbox_unchecked.png);
+    image: url(:/images/checkbox_unchecked);
 }
 
 
@@ -107,7 +107,7 @@ QCheckBox::indicator:unchecked:pressed {
 }
 
 QCheckBox::indicator:checked {
-    image: url(images/checkbox_checked.png);
+    image: url(:/images/checkbox_checked);
 }
 
 
