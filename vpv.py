@@ -725,7 +725,7 @@ class Vpv(QtCore.QObject):
             elif dest_orientation == Orientation.sagittal:
                 return x, y, idx
 
-    def stats(self):
+    def stats(self): # delete!
         """
         Show the stats dialog
         """
