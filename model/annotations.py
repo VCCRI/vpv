@@ -72,7 +72,7 @@ class EmapaAnnotation(Annotation):
 
 class VolumeAnnotations(object):
     """
-    Associated with a volume class
+    Associated with a single Volume instance
     Holds coordinates, ontological term, and option associated with manual annotations
     
     For testing we re just doing the E15.5 stage. We will have to have multiple stages later and there will need

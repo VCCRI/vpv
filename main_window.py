@@ -23,12 +23,12 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 from ui.ui_main import Ui_MainWindow
 
 
-class Main(QtWidgets.QMainWindow, Ui_MainWindow):
+class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
     hide_view_signal = QtCore.pyqtSignal(int)
 
     def __init__(self, controller, appdata):
 
-        super(Main, self).__init__()
+        super(Mainwindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.setWindowTitle("VPV")

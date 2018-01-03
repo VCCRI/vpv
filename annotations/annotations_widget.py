@@ -7,9 +7,8 @@ Works something like this:
 
 """
 import os
-import copy
 from PyQt5 import QtGui, QtCore
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QComboBox, QFileDialog
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QComboBox, QFileDialog, QComboBox
 from ui.ui_annotations import Ui_Annotations
 import json
 import common
@@ -32,14 +31,21 @@ class Annotations(QWidget):
     roi_highlight_off_signal = QtCore.pyqtSignal()
     #reset_roi_signal = QtCore.pyqtSignal()  # Set the roi to None so can annotate without giving coords
 
-    def __init__(self, controller,  manager):
-        super(Annotations, self).__init__(manager)
+    def __init__(self, controller, main_window):
+        """
+        Parameters
+        ----------
+        controller: vpv.Vpv
+            The entry point of the app
+        main_window: QtWidgets.QmainWindow
+            The mainwindow. Used as a parent for other widgets
+        """
+        super(Annotations, self).__init__(main_window)
         self.controller = controller
 
         self.ui = Ui_Annotations()
 
         self.ui.setupUi(self)
-        # self.ui.comboBoxAnnotationsVolumes.setStyleSheet("QTreeWidget::selection-background-color: yellow;selection-background-color: red;")
 
         self.appdata = self.controller.appdata
 
@@ -70,13 +76,20 @@ class Annotations(QWidget):
 
         self.reset_roi()
 
-    def on_tree_clicked(self, item):
+    def on_tree_clicked(self, item: QTreeWidgetItem):
         """
-        Get the annotation for that term and display it on the annotation info box
-        
+        Responds to clicks on the QtreeWidget containing the annoations
+
         Parameters
         ----------
-        item: QTreeWidgetItem that has been clicked
+        item: the item that has been clicked
+
+        Notes
+        -----
+        - Gets the current volume
+        - Retrieves the annotation information and fills the annotation info box at the bottom of the tab widget
+        - Emits a signal with the corresponding coordinates so that the annotation marker can be set
+
         """
         term = item.text(1)
         vol = self.controller.current_annotation_volume()
@@ -115,7 +128,7 @@ class Annotations(QWidget):
         """
         self.ui.treeWidgetAvailableTerms.clear()
 
-        def setup_signal(box_, child_):
+        def setup_signal(box_: QComboBox, child_: QTreeWidgetItem):
             """
             Created this inner function otherwise the last cbox made was always giving the signal?
             """
@@ -157,7 +170,7 @@ class Annotations(QWidget):
         # Set the roi coords to None
         self.roi_highlight_off_signal.emit()
 
-    def annotation_radius_changed(self, radius):
+    def annotation_radius_changed(self, radius: int):
         self.annotation_radius = radius
         self.annotation_radius_signal.emit(radius)
 
@@ -212,20 +225,21 @@ class Annotations(QWidget):
         if not success:
             common.error_dialog(self, 'Error', 'The was an error writing the annotation files')
         else:
-            msg = '\n'.join(saved_files)
-            common.info_dialog(self, 'Success', 'Annotation files saved')
+            sf_str = '\n'.join(saved_files)
+            common.info_dialog(self, 'Success', 'Annotation files saved:{}'.fomrat(sf_str))
 
         self.annotation_recent_dir_signal.emit(out_dir)
         self.resize_table()
 
-    def volume_changed(self, vol_id):
+    def volume_changed(self, vol_id: str):
         self.controller.volume_changed(vol_id)
         self.update()
         self.populate_available_terms()
 
-    def update_annotation(self, child, cbox):
+    def update_annotation(self, child: QTreeWidgetItem, cbox: QComboBox):
         """
         On getting a change signal from the parameter option combobox, set options on the vol.annotations object
+
         Parameters
         ----------
         child: is the node in the QTreeWidget that corresponds to our paramter option selection
@@ -300,7 +314,7 @@ class Annotations(QWidget):
             if all_done:
                 cat.setBackground(0, QtGui.QBrush(QtGui.QColor(0, 255, 0, 100)))
 
-    def set_annotation_point(self, x, y, z):
+    def set_annotation_point(self, x: int, y: int, z: int):
         """
         Set the coordnates in the annotations tab. This is before the annotation has been saved
         ----------

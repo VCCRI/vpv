@@ -90,7 +90,7 @@ class Vpv(QtCore.QObject):
         self.view_scale_basrs = False
         self.view_id_counter = 0
         self.appdata = AppData()
-        self.mainwindow = main_window.Main(self, self.appdata)
+        self.mainwindow = main_window.Mainwindow(self, self.appdata)
         # self.mainwindow.showFullScreen()
         self.model = DataModel()
         self.model.updating_started_signal.connect(self.updating_started)
@@ -523,24 +523,24 @@ class Vpv(QtCore.QObject):
             h = y_2 - y_1
             dest_view.set_roi(x_1 - w, y_1, w, h)
 
-
     def show_saved_annotations(self, x: int, y: int, z: int, color: list, radius: int):
         """
-        Clicks on the Annotations widget table results in signal with positions in Axial space.
+        Receives clicks from the annotations widget table.
+        Gets positions of annotation in Axial space (normal volume sapce).
         Move all views to the corresponding slices and set the annotation marker
         """
-        # map_annotation_signal_view_to_view needs a src view.
-        # As the coordinates are in axial space, get the axial view
 
         # Set the volume coords in the annotations widget
         self.annotations_manager.set_annotation_point(x, y, z)
 
         # Map the volume coords into the view coords
+        #  map_annotation_signal_view_to_view needs a src view.
+        #  As the coordinates are in axial space, get the axial view
         for src in self.views.values():
             if src.orientation == Orientation.axial:
                 xa, ya, idxa = self.map_view_to_volume_space(x, y, z, src)
 
-        # Set the correct slides and add annotation amrkers
+        # Set the correct slides and add annotation markers
         for dest_view in self.views.values():
             # First map the annotation marker between views
             x1, y1, idx1 = self.map_view_to_view(x, ya, idxa, src, dest_view)
