@@ -538,12 +538,13 @@ class Vpv(QtCore.QObject):
         #  As the coordinates are in axial space, get the axial view
         for src in self.views.values():
             if src.orientation == Orientation.axial:
-                xa, ya, idxa = self.map_view_to_volume_space(x, y, z, src, test=True)
+                xa, ya, idxa = self.map_view_to_volume_space(x, y, z, src)
+                break
 
         # Set the correct slides and add annotation markers
         for dest_view in self.views.values():
             # First map the annotation marker between views
-            x1, y1, idx1 = self.map_view_to_view(x, ya, idxa, src, dest_view)
+            x1, y1, idx1 = self.map_view_to_view(xa, ya, idxa, src, dest_view)
             # Need to call annotations_widget.mouse_pressed_annotate to populate the table
             # Need to get radius and color from annotations_widget
 
@@ -592,7 +593,7 @@ class Vpv(QtCore.QObject):
                 xa, ya, idxa = self.map_view_to_volume_space(x, y, slice_idx, src_view, reverse)
                 self.annotations_manager.set_annotation_point(xa, ya, idxa)
 
-    def map_view_to_volume_space(self, x: int, y: int, idx: int, src_view: SliceWidget, reverse=False, test=False) -> tuple:
+    def map_view_to_volume_space(self, x: int, y: int, idx: int, src_view: SliceWidget, reverse=False) -> tuple:
         """
         Given coordinates from a slice view, convert to actual coordinates in the correct volume space
         This is required as we do some inversion of the order of slices as they come off the volumes to show
@@ -630,8 +631,7 @@ class Vpv(QtCore.QObject):
                     slice_idx = shape[2] - slice_idx
                     y = shape[1] - y
 
-                if not test:
-                    x = shape[0] - x
+                x = shape[0] - x
                 return x, y, slice_idx
 
     @staticmethod
