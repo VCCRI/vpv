@@ -39,6 +39,7 @@ class Annotations(QWidget):
         self.ui = Ui_Annotations()
 
         self.ui.setupUi(self)
+        # self.ui.comboBoxAnnotationsVolumes.setStyleSheet("QTreeWidget::selection-background-color: yellow;selection-background-color: red;")
 
         self.appdata = self.controller.appdata
 
@@ -150,7 +151,7 @@ class Annotations(QWidget):
                 # Setup combobox selection signal
                 setup_signal(box, child)
                 self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)
-                child.setBackgroundColor(1, QtGui.QColor(*color))  # Unpack the tuple of colors and opacity
+                child.setBackground(1, QtGui.QBrush(QtGui.QColor(*color)))  # Unpack the tuple of colors and opacity
         self.mark_complete_categories()
 
         # Set the roi coords to None
@@ -269,7 +270,7 @@ class Annotations(QWidget):
             return
 
         color = OPTION_COLOR_MAP[option]
-        base_node.setBackgroundColor(1, QtGui.QColor(*color))
+        base_node.setBackground(1, QtGui.QBrush(QtGui.QColor(*color)))
 
         vol.annotations.add_emap_annotation(x, y, z, term, option, stage)
         self.mark_complete_categories()
@@ -297,7 +298,7 @@ class Annotations(QWidget):
                     all_done = False
                     break  # still some to be annotated
             if all_done:
-                cat.setBackgroundColor(0, QtGui.QColor(0, 255, 0, 100))
+                cat.setBackground(0, QtGui.QBrush(QtGui.QColor(0, 255, 0, 100)))
 
     def set_annotation_point(self, x, y, z):
         """

@@ -1,0 +1,11 @@
+#There are two types of file in here. 
+
+1. The qt ui xml files, which can be edited in qtdesigner
+2. The compiled python qt code files
+
+
+After editing the .ui files, the corresponding .py file can be generated like so:
+
+	`pyuic5 ui_uifile.ui > ui_uifile.py`
+
+pyuic4 can be installed by `apt install pyqt5-dev-tools`
