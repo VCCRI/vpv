@@ -538,7 +538,7 @@ class Vpv(QtCore.QObject):
         #  As the coordinates are in axial space, get the axial view
         for src in self.views.values():
             if src.orientation == Orientation.axial:
-                xa, ya, idxa = self.map_view_to_volume_space(x, y, z, src)
+                xa, ya, idxa = self.map_view_to_volume_space(x, y, z, src, test=True)
 
         # Set the correct slides and add annotation markers
         for dest_view in self.views.values():
@@ -553,28 +553,23 @@ class Vpv(QtCore.QObject):
             dest_view.show_annotation_marker(x1, y1, color, radius)
 
             # Add the coordinates to the AnnotationsWidget
-            # The coordinates need to be in axial space do map back to them if nessesarry
+            # The coordinates need to be in axial space do map back to them if necessary
 
     def map_annotation_signal_view_to_view(self, slice_idx: int, x: int, y: int, src_view: SliceWidget,
-                                           color=(255, 0, 0), radius=10, reverse=False):
+                                           color: tuple=(255, 0, 0), radius: int=10, reverse: bool=False):
         """
         Upon getting a mouse click on a SliceWidget region, it will emit info here including position and the
-        emmitting view.  Map the coordinates between views so that they are correctly positioned
+        emitting view.  Map the coordinates between views so that they are correctly positioned
 
         Parameters
         ----------
-        slice_idx: int
-            the current slice index of the emitting view
-        x: int
-
-        y: int
-            the y position of the view clicked
-        src_view: SliceWidget
-            the emitting view
-        color: tuple
-            rgb color of the annotation marker
-        radius: int
-            radius of the annotation marker
+        slice_idx: the current slice index of the emitting view
+        x: the y position of the view clicked
+        y: the y position of the view clicked
+        src_view: the emitting view
+        color: rgb color of the annotation marker
+        radius: radius of the annotation marker
+        reverse:
 
         """
         if not self.annotations_manager.annotating:
@@ -591,15 +586,15 @@ class Vpv(QtCore.QObject):
             dest_view.show_annotation_marker(x1, y1, color, radius)
 
             # Add the coordinates to the AnnotationsWidget
-            # The coordinates need to be in axial space do map back to them if nessesarry
+            # The coordinates need to be in axial space do map back to them if necessary
             if dest_view.orientation == Orientation.axial:
                 # Now map it back to image coordinates
                 xa, ya, idxa = self.map_view_to_volume_space(x, y, slice_idx, src_view, reverse)
                 self.annotations_manager.set_annotation_point(xa, ya, idxa)
 
-    def map_view_to_volume_space(self, x: int, y: int, idx: int, src_view: SliceWidget, reverse=False):
+    def map_view_to_volume_space(self, x: int, y: int, idx: int, src_view: SliceWidget, reverse=False, test=False) -> tuple:
         """
-        Given coordinates from a slice view, convert to actual corrdinates in the correct volume space
+        Given coordinates from a slice view, convert to actual coordinates in the correct volume space
         This is required as we do some inversion of the order of slices as they come off the volumes to show
         a view that the IMPC annotators like.
 
@@ -615,8 +610,7 @@ class Vpv(QtCore.QObject):
 
         Returns
         -------
-        tuple
-            (x, y, z)
+        (x, y, z)
 
         Notes
         -----
@@ -636,7 +630,8 @@ class Vpv(QtCore.QObject):
                     slice_idx = shape[2] - slice_idx
                     y = shape[1] - y
 
-                x = shape[0] - x
+                if not test:
+                    x = shape[0] - x
                 return x, y, slice_idx
 
     @staticmethod
