@@ -28,16 +28,21 @@ class ImType(Enum):
     IMAGE_SERIES = "Image series"
     IMPC_ANALYSIS = "IMPC analysis"
 
+
 class AnnotationOption(Enum):
-    unobserved = "unobserved"
-    normal = 'normal'
+    present = 'present'
+    absent = 'absent'
     abnormal = 'abnormal'
+    unobservable = "unobservable"
+    ambiguous = 'ambiguous'
     image_only = 'imageOnly'
+
 
 class Orientation(Enum):
     sagittal = 1
     coronal = 2
     axial = 3
+
 
 class Stage(Enum):
     e9_5 = 'E9.5'

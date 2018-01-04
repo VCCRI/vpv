@@ -18,10 +18,13 @@ from collections import defaultdict
 
 
 OPTION_COLOR_MAP = {
-    AnnotationOption.unobserved: (0, 255, 255, 100),
-    AnnotationOption.image_only: (30, 30, 30, 100),
-    AnnotationOption.normal: (0, 255, 0, 100),
-    AnnotationOption.abnormal: (255, 0, 0, 100)}
+    AnnotationOption.present: (0, 255, 0, 100),
+    AnnotationOption.absent: (255, 0, 0, 200),
+    AnnotationOption.abnormal: (255, 0, 0, 100),
+    AnnotationOption.unobservable: (0, 255, 255, 100),
+    AnnotationOption.ambiguous: (100, 100, 0, 100),
+    AnnotationOption.image_only: (30, 30, 30, 100)
+}
 
 
 class Annotations(QWidget):
@@ -155,11 +158,14 @@ class Annotations(QWidget):
                 option = annotation.option
                 color = OPTION_COLOR_MAP[option]
                 parent.addChild(child)
+
+                # Set up the combobox and highlight the currently selected one
                 box = QComboBox()
-                box.addItem(AnnotationOption.normal.value, AnnotationOption.normal)
-                box.addItem(AnnotationOption.abnormal.value, AnnotationOption.abnormal)
-                box.addItem(AnnotationOption.unobserved.value, AnnotationOption.unobserved)
-                box.addItem(AnnotationOption.image_only.value, AnnotationOption.image_only)
+                for opt in AnnotationOption:
+                    box.addItem(opt.value, opt)
+                # box.addItem(AnnotationOption.abnormal.value, AnnotationOption.abnormal)
+                # box.addItem(AnnotationOption.unobserved.value, AnnotationOption.unobserved)
+                # box.addItem(AnnotationOption.image_only.value, AnnotationOption.image_only)
                 box.setCurrentIndex(box.findText(option.value))
                 # Setup combobox selection signal
                 setup_signal(box, child)
@@ -275,7 +281,7 @@ class Annotations(QWidget):
             if None in (x, y, z):
                 common.info_dialog(self, 'Select a region!',
                                    "For option '{}' a coordinate must be specified".format(AnnotationOption.abnormal.name))
-                # this will rest the option backt o what it is on the volume.annotation object
+                # this will rest the option back to what it is on the volume.annotation object
                 cbox.setCurrentIndex(cbox.findText(vol.annotations.get_by_term(term).option.value))
                 return
 

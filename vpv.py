@@ -22,8 +22,8 @@
 # In at least one case, the paths are not correctly set. So the following hack attempts to set correct paths
 
 
-WINPYTHON_DIR = 'WinPython-64bit-3.4.4.2Zero'
-PYTHON_DIR = 'python-3.4.4.amd64'
+WINPYTHON_DIR = 'WinPython-64bit-3.6.3.0Zero'
+PYTHON_DIR = 'python-3.6.3.amd64'
 
 import os
 import sys
