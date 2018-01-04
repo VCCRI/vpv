@@ -186,9 +186,9 @@ class DataModel(QtCore.QObject):
                     if a['option'] == 'imageOnly':
                         continue  # just leave the defult in there
                     # check that diemsions stored in annotation file are same os the loaded volume
-                    xyz_in_file = a.volume_dimensions_xyz
+                    xyz_in_file = tuple(a.volume_dimensions_xyz)
                     # reverese as numpy works in zyx
-                    vol_dims = list(reversed(vol.get_shape()))
+                    vol_dims = vol.get_shape_xyz()
                     if vol_dims != xyz_in_file:
                         return """Error loading annotations\nAnnotations dimensions are {}.
                         Loaded volume dimensions are {}""".format(

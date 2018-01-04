@@ -226,7 +226,7 @@ class Annotations(QWidget):
             common.error_dialog(self, 'Error', 'The was an error writing the annotation files')
         else:
             sf_str = '\n'.join(saved_files)
-            common.info_dialog(self, 'Success', 'Annotation files saved:{}'.fomrat(sf_str))
+            common.info_dialog(self, 'Success', 'Annotation files saved:{}'.format(sf_str))
 
         self.annotation_recent_dir_signal.emit(out_dir)
         self.resize_table()
