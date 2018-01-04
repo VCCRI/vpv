@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, Qt
 from lookup_tables import Lut
 import numpy as np
+import pyqtgraph as pg
 from common import Orientation
 
 
@@ -22,11 +23,10 @@ class LayerBase(Qt.QObject):
         self.lt = Lut()
 
     def clear(self):
-        return
-        self.vol = None
-        #clear the image item with an empty array
+        slice_ = np.copy(self.image_item.image)
+        slice_[:] = 0
+        self.image_item.setImage(slice_)
 
-        self.image_item.setImage(np.zeros((2,2)))
 
     def get_imageItem(self): # Delete?
         return self.image_item
@@ -54,10 +54,11 @@ class LayerBase(Qt.QObject):
         """
         :param vol, Volume object from model.py
         """
+
         if volname == "None":
             self.volume_label_signal.emit("None")
+            self.clear()  # This clears the image
             self.vol = None
-            self.image_item.setImage()  # This clears the image
             return
         self.volume_label_signal.emit(volname)
 
