@@ -573,6 +573,10 @@ class Vpv(QtCore.QObject):
         reverse:
 
         """
+        if not self.current_annotation_volume():
+            self.annotations_manager.reset_roi()
+            return
+
         if not self.annotations_manager.annotating:
             return
         for dest_view in self.views.values():

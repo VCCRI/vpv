@@ -105,6 +105,7 @@ class Annotations(QWidget):
         )
         self.ui.textEditAnnotationInfo.setText(info_str)
         if None in (ann.x, ann.y, ann.z):
+            self.reset_roi()
             return
         self.annotation_highlight_signal.emit(ann.x, ann.y, ann.z, [0, 255, 0], self.annotation_radius)
 
@@ -163,9 +164,7 @@ class Annotations(QWidget):
                 box = QComboBox()
                 for opt in AnnotationOption:
                     box.addItem(opt.value, opt)
-                # box.addItem(AnnotationOption.abnormal.value, AnnotationOption.abnormal)
-                # box.addItem(AnnotationOption.unobserved.value, AnnotationOption.unobserved)
-                # box.addItem(AnnotationOption.image_only.value, AnnotationOption.image_only)
+
                 box.setCurrentIndex(box.findText(option.value))
                 # Setup combobox selection signal
                 setup_signal(box, child)
@@ -244,7 +243,7 @@ class Annotations(QWidget):
 
     def update_annotation(self, child: QTreeWidgetItem, cbox: QComboBox):
         """
-        On getting a change signal from the parameter option combobox, set options on the vol.annotations object
+        On getting a change signal from the parameter option combobox, set options on the volume.annotations object
 
         Parameters
         ----------
@@ -277,10 +276,15 @@ class Annotations(QWidget):
 
         option = cbox.itemData(cbox.currentIndex(), QtCore.Qt.UserRole)
 
-        if option == AnnotationOption.abnormal:
+        # If we are updating the annotation to ImageOnly, we should wipe any coordinates that may have been added to
+        # a previous annotation option.
+        if option == AnnotationOption.image_only:
+            x = y = z = None
+
+        elif option in (AnnotationOption.abnormal, AnnotationOption.ambiguous):
             if None in (x, y, z):
                 common.info_dialog(self, 'Select a region!',
-                                   "For option '{}' a coordinate must be specified".format(AnnotationOption.abnormal.name))
+                                   "For option '{}' coordinates must be specified".format(option.name))
                 # this will rest the option back to what it is on the volume.annotation object
                 cbox.setCurrentIndex(cbox.findText(vol.annotations.get_by_term(term).option.value))
                 return

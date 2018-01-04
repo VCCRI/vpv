@@ -542,8 +542,8 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
     def clear_layers(self):
         for layer in self.layers.items():
-            layer[1].clear()  # Why is layer a tuple?
             layer[1].clear()
+            #layer[1].clear()
 
     def register_layer(self, layer_enum, viewmanager):
         """

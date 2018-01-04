@@ -22,6 +22,7 @@ class LayerBase(Qt.QObject):
         self.lt = Lut()
 
     def clear(self):
+        return
         self.vol = None
         #clear the image item with an empty array
 
@@ -56,7 +57,7 @@ class LayerBase(Qt.QObject):
         if volname == "None":
             self.volume_label_signal.emit("None")
             self.vol = None
-            self.image_item.setImage(opacity=0.0)  # This clears
+            self.image_item.setImage()  # This clears the image
             return
         self.volume_label_signal.emit(volname)
 
