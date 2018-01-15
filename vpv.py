@@ -30,9 +30,13 @@ import sys
 from os.path import join
 p = sys.path
 
-from PyQt5 import QtGui, QtCore, QtWidgets
-QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
-QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
+from PyQt5 import QtGui, QtCore, QtWidgets, Qt
+
+try:
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
+except AttributeError:
+    print("High DPI scling not available. QT >=5.6 is needed for this ")
 
 if os.name == 'nt':
     # check where vpv has been installed
