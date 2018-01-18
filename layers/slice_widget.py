@@ -727,7 +727,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
                 layer.update()
 
         self.ui.sliderSlice.blockSignals(True)
-        self.set_slice_slider(0,  new_orientation_len)
+        self.set_slice_slider(new_orientation_len, self.current_slice_idx)
         self.ui.sliderSlice.blockSignals(False)
         self.viewbox.autoRange()
 
