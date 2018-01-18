@@ -697,7 +697,11 @@ class SliceWidget(QWidget, Ui_SliceWidget):
             return
         for layer in self.all_layers():
             if layer.vol:
-                layer.set_slice(index, flip=self.flipped_x)
+                if self.orientation == Orientation.sagittal: # No flipping on sagittal just yet
+                    flip = False
+                else:
+                    flip = self.flipped_x
+                layer.set_slice(index, flip=flip)
 
         self.current_slice_idx = index
 

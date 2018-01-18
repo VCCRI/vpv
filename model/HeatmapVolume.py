@@ -156,7 +156,7 @@ class HeatmapVolume(Volume):
         """
         array = super(HeatmapVolume, self).get_data(orientation, index, flip, xy)
         if xy:
-            return array
+           return array
 
         neg_array = np.copy(array)
         neg_array[neg_array > 0] = 0

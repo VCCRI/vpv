@@ -88,9 +88,9 @@ class LayerBase(Qt.QObject):
 
     def set_slice(self, index, flip=False):
         if self.vol:
-            # bodge: We do not flip sagittal view in x
-            if self.parent.orientation == Orientation.sagittal:
+            if self.parent.orientation == Orientation.sagittal:  # No flipping on sagittal just yet
                 flip = False
+            # bodge: We do not flip sagittal view in x
             self.image_item.setImage(self.vol.get_data(self.parent.orientation, index - 1, flip=flip), autoLevels=False)
 
     def set_series_slider(self):

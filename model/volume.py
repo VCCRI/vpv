@@ -107,6 +107,8 @@ class Volume(Qt.QObject):
         np.ndarry 2D
 
         """
+        if xy:
+            pass # for debug
         if orientation == Orientation.sagittal:
             return self._get_sagittal(index, flip, xy)
         if orientation == Orientation.coronal:
