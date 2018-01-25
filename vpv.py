@@ -307,8 +307,12 @@ class Vpv(QtCore.QObject):
         src_view: SliceWidget
         """
 
-        x1, y1, z1 = self.map_view_to_volume_space(x, y, z, src_view)
-        self.mainwindow.set_mouse_position(z1, y1, x1)
+        try:
+            x1, y1, z1 = self.map_view_to_volume_space(x, y, z, src_view)
+        except TypeError:
+            pass #Todo: Another bodge. If there are no views that are axial we have a problem
+        else:
+            self.mainwindow.set_mouse_position(z1, y1, x1)
 
     def toggle_dock_widget_visibility(self):
         if self.dock_widget.isVisible():
@@ -606,6 +610,8 @@ class Vpv(QtCore.QObject):
         Given coordinates from a slice view, convert to actual coordinates in the correct volume space
         This is required as we do some inversion of the order of slices as they come off the volumes to show
         a view that the IMPC annotators like.
+
+        Currently not working if there are no Slice views that are in axial view
 
         Parameters
         ----------
