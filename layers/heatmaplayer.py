@@ -3,6 +3,7 @@ import pyqtgraph as pg
 import numpy as np
 from common import Layer
 from .layer import LayerBase
+from common import Orientation
 
 
 class HeatmapLayer(LayerBase):
@@ -36,6 +37,7 @@ class HeatmapLayer(LayerBase):
         what?
         :return:
         """
+        return  # need to work out if this is needed. It currently puts heatmap data in wrong flip at first view
         if self.vol:
             slices = self.vol.get_data(self.parent.orientation, self.parent.current_slice_idx)
             for i, ii in enumerate(self.image_items):
@@ -86,9 +88,12 @@ class HeatmapLayer(LayerBase):
         #         image_item.setZValue(z)
         #         image_item.setImage(slice_[i], autoLevels=True, opacity=1.0)
         #         z += 1
-        self.update()
+        #self.update()
 
     def set_slice(self, index, flip=None):
+        flip=self.parent.flipped_x
+        if self.parent.orientation == Orientation.coronal:
+            h = 0
         flip = self.parent.flipped_x
         if self.vol and self.vol != "None":
             slices = self.vol.get_data(self.parent.orientation, index - 1, flip=flip)
