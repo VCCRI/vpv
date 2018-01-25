@@ -721,6 +721,14 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
     def set_orientation(self, orientation):
 
+        # Somewhere in here we have to switch off the flipping
+        # total bodge. 25/01/18. Should have this removed soon
+        if orientation in (Orientation.coronal, Orientation.axial):
+            self.flipped_x = True
+        else:
+            self.flipped_x = False
+        print(orientation, self.flipped_x)
+
         self.orientation = orientation  # Covert str from combobox to enum member
         # Get the range and midslice of the new orientation
         new_orientation_len = self.layers[Layer.vol1].vol.dimension_length(self.orientation)

@@ -75,19 +75,21 @@ class HeatmapLayer(LayerBase):
 
         self.neg_image_item.setLookupTable(self.vol.negative_lut)
         self.pos_image_item.setLookupTable(self.vol.positive_lut)
+        self.set_slice(self.parent.current_slice_idx)
 
-        for i, image_item in enumerate(self.image_items):
-            if self.vol == "None":
-                # self.vol = None
-                # The only way I found to hide removed image was to set transparent
-                image_item.setImage(opacity=0.0)
-            else:
-                image_item.setZValue(z)
-                image_item.setImage(slice_[i], autoLevels=True, opacity=1.0)
-                z += 1
+        # for i, image_item in enumerate(self.image_items):
+        #     if self.vol == "None":
+        #         # self.vol = None
+        #         # The only way I found to hide removed image was to set transparent
+        #         image_item.setImage(opacity=0.0)
+        #     else:
+        #         image_item.setZValue(z)
+        #         image_item.setImage(slice_[i], autoLevels=True, opacity=1.0)
+        #         z += 1
         self.update()
 
     def set_slice(self, index, flip=None):
+        flip = self.parent.flipped_x
         if self.vol and self.vol != "None":
             slices = self.vol.get_data(self.parent.orientation, index - 1, flip=flip)
             for i, ii in enumerate(self.image_items):

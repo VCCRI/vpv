@@ -402,7 +402,7 @@ class Vpv(QtCore.QObject):
         for dest_view in self.views.values():
 
             if not self.data_manager.link_views:
-                if dest_view.layers[Layer.vol1].vol != src_view.Layers:
+                if dest_view.layers[Layer.vol1].vol != src_view.layers[Layer.vol1].vol:
                     dest_view.hide_crosshair()
                     continue
 
