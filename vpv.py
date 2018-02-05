@@ -929,9 +929,7 @@ class Vpv(QtCore.QObject):
             # get the trhesholds from the csv files
             qval_int_csv = join(td.name, file_names.qvals_intensity_file)
             intensity_fdr_thresh = self.extract_fdr_thresholds(qval_int_csv)
-            if not intensity_fdr_thresh:
-                common.info_dialog(self.mainwindow, "No hits",
-                                   "There are no hits in the intensity heatmap. The threshold is set to max")
+
             inten_tstat = join(td.name, file_names.intensity_tstats_file)
 
             self.load_volumes([inten_tstat], 'heatmap', memory_map=False,
@@ -939,9 +937,7 @@ class Vpv(QtCore.QObject):
 
             qval_jac_csv = join(td.name, file_names.qvals_jacobians_file)
             jacobian_fdr_thresh = self.extract_fdr_thresholds(qval_jac_csv)
-            if not jacobian_fdr_thresh:
-                common.info_dialog(self.mainwindow, "No hits",
-                                   "There are no hits in the jacobian heatmap. The threshold is set to max")
+
             jac_tstat = join(td.name, file_names.jacobians_tstats_file)
 
             self.load_volumes([jac_tstat], 'heatmap', memory_map=False,
@@ -950,7 +946,12 @@ class Vpv(QtCore.QObject):
             # Load any other volumes in the zip. Probably will be mutants
             mutants = [join(td.name, x) for x in files_remaining if x.endswith('nrrd')]
             self.load_volumes(mutants, 'vol', memory_map=False)
-
+            if not intensity_fdr_thresh:
+                common.info_dialog(self.mainwindow, "No hits",
+                                   "There are no hits in the intensity heatmap. The threshold is set to max")
+            if not jacobian_fdr_thresh:
+                common.info_dialog(self.mainwindow, "No hits",
+                                   "There are no hits in the jacobian heatmap. The threshold is set to max")
         else:
             failed = []
             for key, name in file_names.items():
