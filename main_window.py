@@ -166,8 +166,8 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def on_action_show_scale_bars(self, checked):
         self.controller.show_scale_bars(checked)
 
-    def set_mouse_position(self, z, y, x):
-        self.mouse_position_label.setText("z:{} y:{} x:{}".format(z,y,x))
+    def set_mouse_position(self, x, y, z):
+        self.mouse_position_label.setText("x:{} y:{} z:{}".format(x, y, z))
 
     def set_volume_pix_intensity(self, value):
         self.volume_pix_val_label.setText('vol:{}  '.format(value))

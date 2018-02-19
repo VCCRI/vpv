@@ -27,12 +27,11 @@ from ui.ui_slice_widget import Ui_SliceWidget
 import os
 from collections import OrderedDict
 
-from common import Orientation, Layer
+from common import Orientation, Layers
 from .heatmaplayer import HeatmapLayer
 from .vectorlayer import VectorLayer
 from .volumelayer import VolumeLayer
 from model import ImageVolume
-
 DEFAULT_SCALE_BAR_SIZE = 1000.00
 DEFAULT_VOXEL_SIZE = 14.0
 
@@ -270,19 +269,22 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
     Attributes
     ----------
-    layers: Dict
+    layers: OrderedDict
         {z_index(int): Layer}
-        Holds the different layer objects.
+        Holds references to the different layer objects.
             1: volume (volumelayer.Volumelayer)
             2: volume 2 (volumelayer.Volumelayer)
                 for checking differences between volumes
-            3: heatmap (heatmaplayer.Hetmaplyer)
+            3: heatmap (heatmaplayer.Heatmaplayer)
             4: vectors (vectorlayer.Vectorlayer)
     """
-    mouse_shift = QtCore.pyqtSignal(int, int, int, object,  name='mouse_shift')
+    # mouse_shift = QtCore.pyqtSignal(int, int, int, object,  name='mouse_shift')
     mouse_pressed_annotation_signal = QtCore.pyqtSignal(int, int, int, object, name='mouse_pressed')
     crosshair_visible_signal = QtCore.pyqtSignal(bool)
     volume_position_signal = QtCore.pyqtSignal(int, int, int, object)
+
+    mouse_moved_signal = QtCore.pyqtSignal(int, int, int, object, name='mouse_move')
+
     volume_pixel_signal = QtCore.pyqtSignal(float)
     data_pixel_signal = QtCore.pyqtSignal(float)
     object_counter = 0
@@ -294,7 +296,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
     slice_index_changed_signal = QtCore.pyqtSignal(Orientation, int, int)
     move_to_next_vol_signal = QtCore.pyqtSignal(int, bool)  # Slice id, reverse order
 
-    def __init__(self, orientation, model, border_color, flipped_x=False):
+    def __init__(self, orientation, model, border_color):
         super(SliceWidget, self).__init__()
         self.ui = Ui_SliceWidget()
         # Bug in Windows - https://groups.google.com/forum/#!msg/pyqtgraph/O7E2sWaEWDg/7KPVeiO6qooJ
@@ -303,7 +305,12 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         else:
             pg.functions.USE_WEAVE = True
 
-        self.flipped_x = flipped_x  # We have the default view at init
+        # Whether the view should be flipped in slice view coordinates relative to the model data
+        self.flipped_x = False
+
+        self.flipped_z = False
+
+        self.flipped_y = False
 
         self.scalebar = None
         self.ui.setupUi(self)
@@ -341,7 +348,6 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         self.setStyleSheet('QWidget#controlsWidget{{ background-color: {} }}'.format(border_color))
 
         self.current_slice_idx = 0
-        self.layers = OrderedDict()
 
         self.viewbox.setAspectLocked(True)
 
@@ -380,10 +386,12 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
         self.ui.seriesSlider.hide()
 
+        self.layers = self.register_layers()
+
         self.show()
 
     @property
-    def main_volume(self):
+    def main_volume(self) -> ImageVolume:
         """
         Wrapper to get volume associated with the first layer
         Returns
@@ -391,8 +399,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         Volume
 
         """
-        return self.layers[Layer.vol1].vol
-
+        return self.layers[Layers.vol1].vol
 
     @property
     def scale_bar_visible(self):
@@ -403,9 +410,16 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         self.scalebar.scale_bar_label_visible = is_visible
         self.scalebar.updateBar()
 
-    def flipx(self, flip, override_sagitall=False):
-
+    def flipx(self, flip):
         self.flipped_x = flip
+        self.update_view()
+
+    def flipz(self, flip):
+        self.flipped_z = flip
+        self.update_view()
+
+    def flipy(self, flip):
+        self.flipped_y = flip
         self.update_view()
 
     def set_scalebar_color(self, qcolor):
@@ -463,10 +477,21 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         self.overlay.setVisible(visible)
 
     def mouse_pressed(self, event):
+        """
+
+        ----------
+        event
+
+        Returns
+        -------
+
+        """
+
         self.setFocus()
         pos = event._scenePos
-        x = self.layers[Layer.vol1].image_item.mapFromScene(pos).x()
-        y = self.layers[Layer.vol1].image_item.mapFromScene(pos).y()
+
+        x = self.layers[Layers.vol1].image_item.mapFromScene(pos).x()
+        y = self.layers[Layers.vol1].image_item.mapFromScene(pos).y()
         if x < 0 or y < 0:
             return
         self.mouse_pressed_annotation_signal.emit(self.current_slice_idx, x, y, self)
@@ -479,37 +504,50 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         pos: QtCOre.QPointF
             (x,y)
         """
- 
+
         self.setFocus()
-        x = int(self.layers[Layer.vol1].image_item.mapFromScene(pos).x())
-        y = int(self.layers[Layer.vol1].image_item.mapFromScene(pos).y())
-        if x < 0 or y < 0:
-            return
-        if self.layers[Layer.vol1].vol:
-            try:
-                pix = self.get_pixel(Layer.vol1, self.current_slice_idx, y, x)
-                self.volume_position_signal.emit(self.current_slice_idx, y, x , self)
-            except IndexError:  # mouse placed outside the image can yield non-existent indices
-                pass
-            else:
-                self.volume_pixel_signal.emit(round(float(pix), 2))
+        x = int(self.layers[Layers.vol1].image_item.mapFromScene(pos).x())
+        y = int(self.layers[Layers.vol1].image_item.mapFromScene(pos).y())
 
-        if self.layers[Layer.heatmap].vol:
-            try:
-                pix = self.get_pixel(Layer.heatmap, self.current_slice_idx, y, x)
-            except IndexError:
-                pass
-            else:
-                self.data_pixel_signal.emit(round(float(pix), 6))
+        self.mouse_moved_signal.emit(x, y, self.current_slice_idx, self)
 
-        modifiers = QtGui.QApplication.keyboardModifiers()
 
-        # If shift is pressed emit signal to get other views to get to the same or interscting slice
-        if modifiers == QtCore.Qt.ShiftModifier:
-
-            # With mouse move signal, also send currebt vol.
-            # If veiews are not synchronised, syncyed sliceing only occurs within volumes
-            self.mouse_shift.emit(self.current_slice_idx, x, y, self)
+        #
+        # # Pyqtgraph indexes the x dimension in the opposite direction to Slicer, so flip it
+        # dims = self.main_volume.shape_xyz()
+        # if self.orientation in (Orientation.axial, Orientation.coronal):
+        #     x = dims[0] - x
+        # elif self.orientation == Orientation.sagittal:
+        #     x = dims[1] - x
+        #
+        # if x < 0 or y < 0:
+        #     return
+        # if self.layers[Layers.vol1].vol:
+        #     try:
+        #         pix = self.get_pixel(Layers.vol1, self.current_slice_idx, y, x)
+        #         self.volume_position_signal.emit(self.current_slice_idx, y, x , self)
+        #     except IndexError:  # mouse placed outside the image can yield non-existent indices
+        #         pass
+        #     else:
+        #         self.volume_pixel_signal.emit(round(float(pix), 2))
+        #
+        # if self.layers[Layers.heatmap].vol:
+        #     try:
+        #         pix = self.get_pixel(Layers.heatmap, self.current_slice_idx, y, x)
+        #     except IndexError:
+        #         pass
+        #     else:
+        #         self.data_pixel_signal.emit(round(float(pix), 6))
+        #         self.data_pixel_signal.emit(round(float(pix), 6))
+        #
+        # modifiers = QtGui.QApplication.keyboardModifiers()
+        #
+        # # If shift is pressed emit signal to get other views to get to the same or interscting slice
+        # if modifiers == QtCore.Qt.ShiftModifier:
+        #
+        #     # With mouse move signal, also send currebt vol.
+        #     # If veiews are not synchronised, syncyed sliceing only occurs within volumes
+        #     self.mouse_shift.emit(self.current_slice_idx, x, y, self)
 
     def get_pixel(self, layer_index, z, y, x):
         """
@@ -531,11 +569,14 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         """
         try:
             if self.orientation == Orientation.axial:
-                pix_intensity = self.layers[layer_index].vol.pixel_axial(self.current_slice_idx, y, x, self.flipped_x)
+                pix_intensity = self.layers[layer_index].vol.pixel_axial(self.current_slice_idx, y, x,
+                                                                         self.flipped_x, self.flipped_z)
             if self.orientation == Orientation.sagittal:
-                pix_intensity = self.layers[layer_index].vol.pixel_sagittal(y, x, self.current_slice_idx, self.flipped_x)
+                pix_intensity = self.layers[layer_index].vol.pixel_sagittal(y, x, self.current_slice_idx,
+                                                                            self.flipped_x, self.flipped_z)
             if self.orientation == Orientation.coronal:
-                pix_intensity = self.layers[layer_index].vol.pixel_coronal(y, self.current_slice_idx, x, self.flipped_x)
+                pix_intensity = self.layers[layer_index].vol.pixel_coronal(y, self.current_slice_idx, x,
+                                                                           self.flipped_x, self.flipped_z)
             return pix_intensity
         except AttributeError:
             print(self.layers[layer_index].vol)
@@ -545,37 +586,37 @@ class SliceWidget(QWidget, Ui_SliceWidget):
             layer[1].clear()
             #layer[1].clear()
 
-    def register_layer(self, layer_enum, viewmanager):
+    def register_layers(self):
         """
-        Create a new Layer object and add to layers
+        Create a new Layer object and add to display
         """
-        if layer_enum == Layer.vol1:  # the bottom layer is always an image volume
-            layer = VolumeLayer(self, layer_enum, self.model, viewmanager)
-            self.viewbox.addItem(layer.image_item)
-            self.scalebar = ScaleBar()
-            self.scalebar.setParentItem(self.viewbox)
-            self.scalebar.anchor((1, 1), (1, 1), offset=(-60, -60))
-            self.scalebar.updateBar()
-            layer.volume_label_signal.connect(self.overlay.set_volume_label)
-            # if self.orientation == Orientation.sagittal:
-            #     # A temp bodge: 17th Nov 17. Do the xy flip on sagittal sections to match that of IEV
-            #     self.flipx(True, override_sagitall=True)
+        layers = OrderedDict()
+        # the bottom layer is always an image volume
+        v1_layer = VolumeLayer(self, Layers.vol1, self.model)
+        self.viewbox.addItem(v1_layer.image_item)
+        self.scalebar = ScaleBar()
+        self.scalebar.setParentItem(self.viewbox)
+        self.scalebar.anchor((1, 1), (1, 1), offset=(-60, -60))
+        self.scalebar.updateBar()
+        v1_layer.volume_label_signal.connect(self.overlay.set_volume_label)
 
-        elif layer_enum == Layer.vol2:
-            layer = VolumeLayer(self, layer_enum, self.model, viewmanager)
-            self.viewbox.addItem(layer.image_item)
-            layer.volume_label_signal.connect(self.overlay.set_volume2_label)
+        v2_layer = VolumeLayer(self, Layers.vol2, self.model)
+        self.viewbox.addItem(v2_layer.image_item)
+        v2_layer.volume_label_signal.connect(self.overlay.set_volume2_label)
 
-        elif layer_enum == Layer.heatmap:
-            layer = HeatmapLayer(self, layer_enum, self.model, viewmanager)
-            layer.volume_label_signal.connect(self.overlay.set_data_label)
-            for image_item in layer.image_items:
-                self.viewbox.addItem(image_item)
+        hm_layer = HeatmapLayer(self, Layers.heatmap, self.model)
+        hm_layer.volume_label_signal.connect(self.overlay.set_data_label)
+        for image_item in hm_layer.image_items:
+            self.viewbox.addItem(image_item)
 
-        elif layer_enum == Layer.vectors:
-            layer = VectorLayer(self.viewbox, self, self.model)
+        v_layer = VectorLayer(self.viewbox, self, self.model)
 
-        self.layers[layer_enum] = layer
+        layers[Layers.vol1] = v1_layer
+        layers[Layers.vol2] = v2_layer
+        layers[Layers.heatmap] = hm_layer
+        layers[Layers.vectors] = v_layer
+
+        return layers
 
     def all_layers(self):
         return [layer for layer in self.layers.values()]
@@ -593,7 +634,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
         # Reset the interpolated slice as sliding through the faster non-interpolated slices
         pass
-        #self.refresh_layers()
+
 
     def slice_slider_pressed(self):
         """
@@ -619,12 +660,8 @@ class SliceWidget(QWidget, Ui_SliceWidget):
             # speed up after a few slices
             self.left_scroll_timer.setInterval(40)
         self.set_slice(self.current_slice_idx - 1)
-        self.emit_index_changed(self.current_slice_idx - 1)
         if not self.button_scrolling:
             self.left_scroll_timer.stop()
-            # Switch interpolation back on for the static image and refresh
-            #self.model.interpolate = True
-            self.refresh_layers()
 
     def scroll_button_released(self):
         self.button_scrolling = False
@@ -644,23 +681,14 @@ class SliceWidget(QWidget, Ui_SliceWidget):
             # speed up after a few slices
             self.right_scroll_timer.setInterval(40)
         self.set_slice(self.current_slice_idx + 1)
-        self.emit_index_changed(self.current_slice_idx + 1)
         if not self.button_scrolling:
             self.right_scroll_timer.stop()
-            # Switch interpolation back on for the static image and refresh
-            #self.model.interpolate = True
-            self.refresh_layers()
-
-    def emit_index_changed(self, idx): # Is this used?
-        self.slice_index_changed_signal.emit(self.orientation, self.id, idx)
 
     def wheel_scroll(self, forward):
         if forward:
             self.set_slice(self.current_slice_idx + 1)
-            self.emit_index_changed(self.current_slice_idx + 1)
         else:
             self.set_slice(self.current_slice_idx - 1)
-            self.emit_index_changed(self.current_slice_idx - 1)
 
     def on_manage_views(self):
         self.manage_views_signal.emit(self.id)
@@ -678,30 +706,35 @@ class SliceWidget(QWidget, Ui_SliceWidget):
             xy coordinates of the cross hair
         """
         # if reverse:
-        #     index = self.layers[Layer.vol1].vol.dimension_length(self.orientation) - index
+        #     index = self.display[Layer.vol1].vol.dimension_length(self.orientation) - index
 
         self.ui.sliderSlice.setValue(index)
         self._set_slice(index, crosshair_xy)
 
     def _set_slice(self, index, crosshair_xy=None):
         """
-        :param index: int, slice to view
-        :param reverse: bool, count from reverse
-        """
+        Set the slice view to index of the current volume. If xy is given show a cross hair at this position
+        Parameters
+        ----------
+        index: int
+            slice index to show
+        crosshair_xy: tuple
+            X Y pisition (in slice view coordiates) to show cross hair
 
+        Returns
+        -------
+
+        """
         self.roi.clear()
         self.annotation_marker.clear()
         self.ui.labelSliceNumber.setText(str(index))
 
         if index < 0:
             return
+
         for layer in self.all_layers():
             if layer.vol:
-                if self.orientation == Orientation.sagittal: # No flipping on sagittal just yet
-                    flip = False
-                else:
-                    flip = self.flipped_x
-                layer.set_slice(index, flip=flip)
+                layer.set_slice(index)
 
         self.current_slice_idx = index
 
@@ -721,17 +754,9 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
     def set_orientation(self, orientation):
 
-        # Somewhere in here we have to switch off the flipping
-        # total bodge. 25/01/18. Should have this removed soon
-        if orientation in (Orientation.coronal, Orientation.axial):
-            self.flipped_x = True
-        else:
-            self.flipped_x = False
-        print(orientation, self.flipped_x)
-
         self.orientation = orientation  # Covert str from combobox to enum member
         # Get the range and midslice of the new orientation
-        new_orientation_len = self.layers[Layer.vol1].vol.dimension_length(self.orientation)
+        new_orientation_len = self.layers[Layers.vol1].vol.dimension_length(self.orientation)
         self.current_slice_idx = int(new_orientation_len/2)
 
         for layer in self.all_layers():
@@ -771,9 +796,8 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
     def update_view(self):
         """
-        Reload each layers' imageItem after properties set. If it has a volume set
+        Reload each display' imageItem after properties set. If it has a volume set
         """
-
         self.set_slice(self.current_slice_idx)
         for layer in list(self.layers.values())[0:3]:
             if layer.vol:
@@ -781,7 +805,9 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         self.scalebar.updateBar()
         x, y = self.viewbox.viewRange()
         self.set_zoom(x, y)  # This is the only way I can see to update the scalebar on initial volume being added
-    ### Key events #####################################################################################################
+
+
+        ### Key events ################################################################################################
 
     def left_key_pressed(self):
         if not self.button_scrolling:
@@ -837,8 +863,8 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         vol_ids = self.model.volume_id_list()
         if len(vol_ids) < 2:
             return
-        current_vol_idx = vol_ids.index(self.layers[Layer.vol1].vol.name)
-        if not self.layers[Layer.vol1].vol.name or self.layers[Layer.vol1].vol.name == 'None':
+        current_vol_idx = vol_ids.index(self.layers[Layers.vol1].vol.name)
+        if not self.layers[Layers.vol1].vol.name or self.layers[Layers.vol1].vol.name == 'None':
             return
         if reverse:
             if current_vol_idx - 1 < 0:
@@ -851,16 +877,16 @@ class SliceWidget(QWidget, Ui_SliceWidget):
             else:
                 new_index = current_vol_idx + 1
         new_vol_name = vol_ids[new_index]
-        self.layers[Layer.vol1].set_volume(new_vol_name)
+        self.layers[Layers.vol1].set_volume(new_vol_name)
 
-    def mousePressEvent(self, e):
-        """
-        Find the position that was clicked and emit them along with any stats data volumes in the layers
-        """
-        xy = self.viewbox.mapFromItemToView(self.viewbox, QtCore.QPointF(e.pos().x(), e.pos().y()))
-        clickpos = (xy.x(), xy.y(), self.current_slice_idx)
-        datavols = tuple(l.vol for l in self.layers.values() if l.vol and l.vol.data_type == 'stats')
-        self.voxel_clicked_signal.emit(datavols, self.orientation, clickpos)
+    # def mousePressEvent(self, e):
+    #     """
+    #     Find the position that was clicked and emit them along with any stats data volumes in the display
+    #     """
+    #     xy = self.viewbox.mapFromItemToView(self.viewbox, QtCore.QPointF(e.pos().x(), e.pos().y()))
+    #     clickpos = (xy.x(), xy.y(), self.current_slice_idx)
+    #     datavols = tuple(l.vol for l in self.layers.values() if l.vol and l.vol.data_type == 'stats')
+    #     self.voxel_clicked_signal.emit(datavols, self.orientation, clickpos)
 
 
 

@@ -7,7 +7,7 @@ from lookup_tables import Lut
 from ui.ui_datatab import Ui_data
 from ui.ui_change_vol_name import Ui_VolNameDialog
 import copy
-from common import Orientation, Layer
+from common import Orientation, Layers
 from functools import partial
 
 """
@@ -47,14 +47,14 @@ class ManageData(QtGui.QWidget):
     ui_changed_signal = QtCore.pyqtSignal()
     scale_bar_color_signal = QtCore.pyqtSignal(QtGui.QColor)
     gradient_editor_signal = QtCore.pyqtSignal()
-    flipxy_signal = QtCore.pyqtSignal(bool)
 
-    def __init__(self, controller, model, mainwindow):
+    def __init__(self, controller, model, mainwindow, appdata):
         super(ManageData, self).__init__(mainwindow)
         self.ui = Ui_data()
         self.ui.setupUi(self)
         self.views = controller.views
         self.mainwindow = mainwindow
+        self.appdata = appdata
         lut = Lut()
         self.controller = controller  # vpv.py
         self.ui.pushButtonRecalcConnectComponents.clicked.connect(self.controller.recalc_connected_components)
@@ -71,15 +71,6 @@ class ManageData(QtGui.QWidget):
         self._link_views = True
         self.ui.checkBoxLinkViews.setChecked(True)
         self.ui.checkBoxLinkViews.clicked.connect(self.on_link_views)
-
-        # Flip the x and y diemnions so the stomach is on opposite sides in the axial and
-        # coranal sections
-        self._flipxy = False
-        self.ui.checkBoxFlipXY.setChecked(False)
-        self.ui.checkBoxFlipXY.clicked.connect(self.on_flipxy)
-
-        # deactivate the flipbox for now
-        self.ui.checkBoxFlipXY.hide()
 
         self.ui.comboBoxOrientation.activated['QString'].connect(self.on_orientation)
 
@@ -161,7 +152,7 @@ class ManageData(QtGui.QWidget):
         self.six_views_visible = False
 
         self.ui.checkBox6Views.setChecked(False)
-        self.ui.checkBox6Views.clicked.connect(self.showThreeOverThreeViews)
+        self.ui.checkBox6Views.clicked.connect(self.show2Rows)
 
         self.blob_table = QtGui.QTableWidget(self)
         self.ui.verticalLayoutConnectedComponents.addWidget(self.blob_table, 0)
@@ -222,14 +213,14 @@ class ManageData(QtGui.QWidget):
         self.scale_bar_color_signal.emit(color)
 
     def on_change_vol_name(self):
-        vol = self.controller.current_view.layers[Layer.vol1].vol
+        vol = self.controller.current_view.layers[Layers.vol1].vol
         if vol:
             dlg = VolNameDialog(self, vol.name)
             dlg.name_changed_signal.connect(self.change_vol_name)
             dlg.show()
 
     def change_vol_name(self, current_name, new_name):
-        vol = self.controller.current_view.layers[Layer.vol1].vol
+        vol = self.controller.current_view.layers[Layers.vol1].vol
 
         if vol and new_name:
             self.controller.model.change_vol_name(current_name, new_name)
@@ -261,7 +252,7 @@ class ManageData(QtGui.QWidget):
         """
         Make color scale bar figure. A bit of a mess at the moment. Will tody up
         """
-        if not self.controller.current_view.layers[Layer.heatmap].vol:
+        if not self.controller.current_view.layers[Layers.heatmap].vol:
             return
         if not isvisible:
             self.colour_bar.hide()
@@ -280,31 +271,31 @@ class ManageData(QtGui.QWidget):
     def lower_magnitude_changed(self):
         value = self.vector_mag_slider.getRange()[0]
         if not self.link_views:
-            self.current_slice_view.layers[Layer.vectors].set_magnitude_cutoff(value, 10.0)
+            self.current_slice_view.layers[Layers.vectors].set_magnitude_cutoff(value, 10.0)
         else:
             for view in self.views.values():
-                view.layers[Layer.heatmap].set_magnitude_cutoff(value, 10.0)
+                view.layers[Layers.heatmap].set_magnitude_cutoff(value, 10.0)
         #self.update_slice_views()
 
     def vector_subsampling_changed(self, value):
         if self.link_views:
             for view in self.views.values():
-                view.layers[Layer.vectors].set_subsampling(value)
+                view.layers[Layers.vectors].set_subsampling(value)
         else:
-            self.controller.current_view.layers[Layer.vectors].set_subsampling(value)
+            self.controller.current_view.layers[Layers.vectors].set_subsampling(value)
 
     def vector_scale_changed(self, value):
         if self.link_views:
             for view in self.views.values():
-                view.layers[Layer.vectors].set_scale(value)
+                view.layers[Layers.vectors].set_scale(value)
         else:
-            self.controller.current_view.layers[Layer.vectors].set_scale(value)
+            self.controller.current_view.layers[Layers.vectors].set_scale(value)
 
     def vector_change_color(self):
         col = QtGui.QColorDialog.getColor()
 
         if col.isValid():
-            self.modify_layer(Layer.vectors, 'set_arrow_color', col)
+            self.modify_layer(Layers.vectors, 'set_arrow_color', col)
 
     def showRedViewManagerSlot(self):
         self.switch_selected_view(0)
@@ -334,24 +325,24 @@ class ManageData(QtGui.QWidget):
         t: float
             the t-statistic
         """
-        self.modify_layer(Layer.heatmap, 'set_t_threshold', t)
+        self.modify_layer(Layers.heatmap, 'set_t_threshold', t)
 
     def volume_changed(self, vol_name):
         """
         When volume is changed from the combobox
         """
-        self.modify_layer(Layer.vol1, 'set_volume', vol_name)
+        self.modify_layer(Layers.vol1, 'set_volume', vol_name)
 
     def volume2_changed(self, vol_name):
         """
         When volume is changed from the combobox
         """
-        self.modify_layer(Layer.vol2, 'set_volume', vol_name)
+        self.modify_layer(Layers.vol2, 'set_volume', vol_name)
 
     def data_changed(self, vol_name):
         """
         """
-        self.modify_layer(Layer.heatmap, 'set_volume', vol_name)
+        self.modify_layer(Layers.heatmap, 'set_volume', vol_name)
         self.update_connected_components(vol_name)
 
     def update_connected_components(self, vol_name):
@@ -377,7 +368,7 @@ class ManageData(QtGui.QWidget):
         self.roi_signal.emit(roi[4:6], roi[2:4], roi[0:2])
 
     def vector_changed(self, vol_name):
-        self.modify_layer(Layer.vectors, 'set_volume', vol_name)
+        self.modify_layer(Layers.vectors, 'set_volume', vol_name)
 
     def switch_selected_view(self, slice_id):
         """
@@ -450,7 +441,7 @@ class ManageData(QtGui.QWidget):
 
         """
         slice_layers = self.controller.current_view.layers
-        heatmap_vol = slice_layers[Layer.heatmap].vol
+        heatmap_vol = slice_layers[Layers.heatmap].vol
         if not heatmap_vol:
             return
 
@@ -508,7 +499,7 @@ class ManageData(QtGui.QWidget):
         self.update_vector_controls()
 
     def update_vector_controls(self):
-        vol = self.controller.current_view.layers[Layer.vectors].vol
+        vol = self.controller.current_view.layers[Layers.vectors].vol
         if vol:
             self.ui.spinBoxVectorSubsampling.setValue(vol.subsampling)
             self.ui.spinBoxVectorScale.setValue(vol.scale)
@@ -518,7 +509,7 @@ class ManageData(QtGui.QWidget):
 
     def update_volume_controls(self):
         slice_layers = self.controller.current_view.layers
-        vol1 = slice_layers[Layer.vol1].vol
+        vol1 = slice_layers[Layers.vol1].vol
 
         if vol1:
             min_, max_ = [round(x, 2) for x in vol1.intensity_range()]
@@ -531,11 +522,11 @@ class ManageData(QtGui.QWidget):
             self.ui.comboBoxVolume.setCurrentIndex(
                 self.ui.comboBoxVolume.findText(vol1.name))
             self.ui.comboBoxVolumeLut.setCurrentIndex(
-                self.ui.comboBoxVolumeLut.findText(slice_layers[Layer.vol1].lut[1]))
+                self.ui.comboBoxVolumeLut.findText(slice_layers[Layers.vol1].lut[1]))
         else:  # No volume
             self.ui.comboBoxVolume.setCurrentIndex(self.ui.comboBoxVolume.findText('None'))
 
-        vol2 = slice_layers[Layer.vol2].vol
+        vol2 = slice_layers[Layers.vol2].vol
         if vol2:
             min_, max_ = [round(x, 2) for x in vol2.intensity_range()]
             lower, upper = [round(x, 2) for x in vol2.levels]
@@ -546,19 +537,19 @@ class ManageData(QtGui.QWidget):
             self.volume_levels_slider2.update()
             self.ui.comboBoxVolume2.setCurrentIndex(self.ui.comboBoxVolume2.findText(vol2.name))
             self.ui.comboBoxVolumeLut2.setCurrentIndex(
-                self.ui.comboBoxVolumeLut2.findText(slice_layers[Layer.vol2].lut[1]))
+                self.ui.comboBoxVolumeLut2.findText(slice_layers[Layers.vol2].lut[1]))
         else:  # No second volume overlay
             self.ui.comboBoxVolume2.setCurrentIndex(self.ui.comboBoxVolume2.findText('None'))
 
     def update_color_scale_bar(self):
-        vol = self.controller.current_view.layers[Layer.heatmap].vol
+        vol = self.controller.current_view.layers[Layers.heatmap].vol
         if vol:
             neg_lower, neg_upper = [round(x, 2) for x in vol.neg_levels]
             pos_lower, pos_upper = [round(x, 2) for x in vol.pos_levels]
             self.colour_bar.update(pos_upper,  pos_lower, neg_upper,neg_lower)
 
     def update_data_controls(self):
-        vol = self.controller.current_view.layers[Layer.heatmap].vol
+        vol = self.controller.current_view.layers[Layers.heatmap].vol
         self.update_fdr_buttons()
         if vol:
             min_, max_ = [round(x, 2) for x in vol.intensity_range()]
@@ -617,24 +608,24 @@ class ManageData(QtGui.QWidget):
         self.update_vector_controls()
 
     def lower_level_volume_changed(self, value):
-        self.controller.current_view.layers[Layer.vol1].vol.set_lower_level(value)
+        self.controller.current_view.layers[Layers.vol1].vol.set_lower_level(value)
         self.update_slice_views()
 
     def upper_level_volume_changed(self, value):
-        self.controller.current_view.layers[Layer.vol1].vol.set_upper_level(value)
+        self.controller.current_view.layers[Layers.vol1].vol.set_upper_level(value)
         self.update_slice_views()
 
     def lower_level_volume2_changed(self, value):
-        self.controller.current_view.layers[Layer.vol2].vol.set_lower_level(value)
+        self.controller.current_view.layers[Layers.vol2].vol.set_lower_level(value)
         self.update_slice_views()
 
     def upper_level_volume2_changed(self, value):
-        if self.controller.current_view.layers[Layer.vol2].vol:
-            self.controller.current_view.layers[Layer.vol2].vol.set_upper_level(value)
+        if self.controller.current_view.layers[Layers.vol2].vol:
+            self.controller.current_view.layers[Layers.vol2].vol.set_upper_level(value)
             self.update_slice_views()
 
     def update_data_lut(self, which, value):
-        vol = self.controller.current_view.layers[Layer.heatmap].vol
+        vol = self.controller.current_view.layers[Layers.heatmap].vol
         if vol:
             if which == 'neg_lower':
                 vol.set_lower_negative_lut(value)
@@ -664,10 +655,10 @@ class ManageData(QtGui.QWidget):
     #     self.update_slice_views()
 
     def on_vol_lut_changed(self, lut_name):
-        self.modify_layer(Layer.vol1, 'set_lut', lut_name)
+        self.modify_layer(Layers.vol1, 'set_lut', lut_name)
 
     def on_vol2_lut_changed(self, lut_name):
-        self.modify_layer(Layer.vol2, 'set_lut', lut_name)
+        self.modify_layer(Layers.vol2, 'set_lut', lut_name)
 
     def on_heatmap_lut_changed(self, lut_name):
         """
@@ -677,7 +668,7 @@ class ManageData(QtGui.QWidget):
         lut_name str:
             the name of the LUT
         """
-        vol = self.controller.current_view.layers[Layer.heatmap].vol
+        vol = self.controller.current_view.layers[Layers.heatmap].vol
         vol.set_lut(lut_name)
         self.update_slice_views()
 
@@ -703,20 +694,6 @@ class ManageData(QtGui.QWidget):
     def link_views(self, checked):
         self._link_views = checked
         self.ui.checkBoxLinkViews.setChecked(checked)
-
-    def on_flipxy(self, checked):
-        self.flipxy = checked
-
-    @property
-    def flipxy(self):
-        return self._flipxy
-
-    @flipxy.setter
-    def flipxy(self, checked):
-        print('flip', checked)
-        self._flipxy = checked
-        self.ui.checkBoxFlipXY.setChecked(self._flipxy)
-        self.flipxy_signal.emit(self._flipxy)
 
     def left_view_visibility(self, checked):
         if checked:
@@ -748,7 +725,7 @@ class ManageData(QtGui.QWidget):
             if self.six_views_visible:
                 self.views[5].hide()
 
-    def showThreeOverThreeViews(self, checked):
+    def show2Rows(self, checked):
         if checked:
             self.six_views_visible = True
             self.views[3].show()
@@ -765,6 +742,7 @@ class ManageData(QtGui.QWidget):
             self.ui.pushButtonManagerOrange.hide()
             self.ui.pushButtonManagerGrey.hide()
             self.ui.pushButtonManagerCyan.hide()
+        self.controller.update_slice_views()
 
     def on_interpolate(self, checked):
         self.model.set_interpolation(checked)
@@ -777,13 +755,23 @@ class ManageData(QtGui.QWidget):
         """
         # convert the str to an enum member
         orientation = Orientation[orientation]
+
+        def get_flip(orientation):
+            fx = self.appdata.get_flips()[orientation.name]['x']
+            fz = self.appdata.get_flips()[orientation.name]['z']
+            return fx, fz
+
         if self.link_views:
-            for view in self.views.values():
-                view.set_orientation(orientation)
-                #view.update_view()
+            for v in self.views.values():
+                v.set_orientation(orientation)
+                fx, fz = get_flip(v.orientation)
+                v.flipx(fx)
         else:
-            self.controller.current_view.set_orientation(orientation)
-            #self.controller.current_view.update_view()
+            v =self.controller.current_view
+            v.set_orientation(orientation)
+            fx, fz = get_flip(v.orientation)
+            v.flipx(fx)
+
 
 
 class ColorScaleBar(object):

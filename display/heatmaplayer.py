@@ -1,12 +1,11 @@
 from PyQt5 import QtGui
 import pyqtgraph as pg
 import numpy as np
-from common import Layer
-from .layer import LayerBase
-from common import Orientation
+from common import Layers
+from .layer import Layer
 
 
-class HeatmapLayer(LayerBase):
+class HeatmapLayer(Layer):
     def __init__(self, *args):
         super(HeatmapLayer, self).__init__(*args)
         self.neg_image_item = pg.ImageItem(autoLevels=False)
@@ -34,10 +33,10 @@ class HeatmapLayer(LayerBase):
 
     def reload(self):
         """
-        what?
-        :return:
+        TODO: Find out is this is needed and delete if not
         """
-        return  # need to work out if this is needed. It currently puts heatmap data in wrong flip at first view
+        return
+        # need to work out if this is needed. It currently puts heatmap data in wrong flip at first view
         if self.vol:
             slices = self.vol.get_data(self.parent.orientation, self.parent.current_slice_idx)
             for i, ii in enumerate(self.image_items):
@@ -60,43 +59,36 @@ class HeatmapLayer(LayerBase):
 
         orientation = self.parent.orientation
 
-
         self.parent.overlay.set_data_label(volname)
         dim_len = self.vol.dimension_length(orientation)
 
         # If there is a volume image, use the same slice index
-        if not self.parent.layers[Layer.vol1].vol:
-            # A slice for 'data' is a list of negative and positive values. Get the midslice
-            slice_ = self.vol.get_data(orientation, dim_len / 2)
-            #self.parent.set_slice_slider(self.dim_len, self.dim_len / 2)
-        else:
-            # Get the parent current index slice
-            slice_ = self.vol.get_data(orientation, self.parent.current_slice_idx)
-        #self.vol.levels = self.image_item.getLevels()
-        z = self.layer_type.value
+        # if not self.parent.layers[Layers.vol1].vol:
+        #     # A slice for 'data' is a list of negative and positive values. Get the midslice
+        #     slice_ = self.vol.get_data(orientation, dim_len / 2)
+        #     #self.parent.set_slice_slider(self.dim_len, self.dim_len / 2)
+        # else:
+        #     # Get the parent current index slice
+        #     slice_ = self.vol.get_data(orientation, self.parent.current_slice_idx)
+        # #self.vol.levels = self.image_item.getLevels()
+        # z = self.layer_type.value
 
         self.neg_image_item.setLookupTable(self.vol.negative_lut)
         self.pos_image_item.setLookupTable(self.vol.positive_lut)
         self.set_slice(self.parent.current_slice_idx)
 
-        # for i, image_item in enumerate(self.image_items):
-        #     if self.vol == "None":
-        #         # self.vol = None
-        #         # The only way I found to hide removed image was to set transparent
-        #         image_item.setImage(opacity=0.0)
-        #     else:
-        #         image_item.setZValue(z)
-        #         image_item.setImage(slice_[i], autoLevels=True, opacity=1.0)
-        #         z += 1
-        #self.update()
+    def set_slice(self, index):
+        """Set the heatmap layer to the specified index
 
-    def set_slice(self, index, flip=None):
-        flip=self.parent.flipped_x
-        if self.parent.orientation == Orientation.coronal:
-            h = 0
-        flip = self.parent.flipped_x
+        Parameters
+        ----------
+        index: int
+            the index to set
+
+        """
         if self.vol and self.vol != "None":
-            slices = self.vol.get_data(self.parent.orientation, index - 1, flip=flip)
+            slices = self.vol.get_data(self.parent.orientation, index - 1,
+                                       self.parent.flipped_x, self.parent.flipped_z, self.parent.flipped_y)
             for i, ii in enumerate(self.image_items):
                 ii.setImage(slices[i], autoLevels=False)
 

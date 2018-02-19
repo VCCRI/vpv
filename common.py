@@ -4,6 +4,7 @@ import SimpleITK as sitk
 import tempfile
 import gzip
 from os.path import splitext
+from lib import nrrd
 
 
 RAS_DIRECTIONS = (-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0)
@@ -52,7 +53,7 @@ class Stage(Enum):
     e18_5 = 'E18.5'
 
 
-class Layer(Enum):
+class Layers(Enum):
     """
     Map layer names to z-index
     """
@@ -64,6 +65,7 @@ class Layer(Enum):
 
 class ImageReader(object):
     def __init__(self, img_path):
+
         if img_path.endswith('.gz'):
             # Get the image file extension
             ex = splitext(splitext(img_path)[0])[1]
@@ -73,23 +75,13 @@ class ImageReader(object):
             with open(tmp.name, 'wb') as outfile:
                 outfile.write(data)
             img_path = tmp.name
+        # if img_path.endswith('nrrd'):
+        #     self.vol = nrrd.read(img_path)[0]
+        #     self.space = None
+        # else:
         self.img = sitk.ReadImage(img_path)
-        self.space = self._convert_direction(self.img.GetDirection())
-        self.vol = sitk.GetArrayFromImage(
-            self.img)
-
-    def _convert_direction(self, directions):
-        """
-        Convert the coordinate system in the sitk object to human readable
-        Returns
-        -------
-
-        """
-        dir_map = {
-            (-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0): 'RAS'}
-        return dir_map.get(directions)
-
-
+        self.space = self.img.GetDirection()
+        self.vol = sitk.GetArrayFromImage(self.img)
 
 def read_image(img_path, convert_to_ras=False):
     if img_path.endswith('.gz'):

@@ -1,9 +1,9 @@
 from PyQt5 import QtGui
 import pyqtgraph as pg
-from .layer import LayerBase
+from .layer import Layer
 
 
-class VolumeLayer(LayerBase):
+class VolumeLayer(Layer):
 
     def __init__(self, *args):
         super(VolumeLayer, self).__init__(*args)

@@ -4,10 +4,11 @@ import os
 import tempfile
 from collections import OrderedDict
 import SimpleITK as sitk
-from common import read_image, timing
+from common import read_image, timing, ImageReader
 
 from lookup_tables import Lut
 from read_minc import mincstats_to_numpy
+from coordinate_mapper import convert_volume
 
 
 class HeatmapVolume(Volume):
@@ -86,11 +87,13 @@ class HeatmapVolume(Volume):
         """
         if os.path.splitext(path)[1].lower() == '.mnc':
 
-            arr = mincstats_to_numpy(path)
+            arr = mincstats_to_numpy(path)  # Need to fix headers for mncs
             return arr
         else:
-            arr = read_image(path).astype(np.float16)
-            return arr
+            ir = ImageReader(path)
+            arr = ir.vol.astype(np.float16)
+            arr = convert_volume(arr, ir.space)
+        return arr
 
     @timing
     def find_largest_connected_components(self):
@@ -132,7 +135,7 @@ class HeatmapVolume(Volume):
     def get_lut(self):
         return self.negative_lut, self.positive_lut
 
-    def get_data(self, orientation, index=1, flip=None, xy=None):
+    def get_data(self, orientation, index=1, flipx=False, flipz=False, flipy=False, xy=None):
         """
         Override the base method. return two arrays instead of one. One with negative values and the other with positives
         The Heatmap layer takes negative and positive slices and applies individual LUTs to each
@@ -143,7 +146,7 @@ class HeatmapVolume(Volume):
         ----------
         orientation: Orientation
         index: slice to take
-        flip:
+        flipx:
         xy
 
         Returns
@@ -154,7 +157,7 @@ class HeatmapVolume(Volume):
             single voxel value if xy is tuple (xy)
 
         """
-        array = super(HeatmapVolume, self).get_data(orientation, index, flip, xy)
+        array = super(HeatmapVolume, self).get_data(orientation, index, flipx, flipz, flipy, xy)
         if xy:
            return array
 

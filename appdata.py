@@ -20,6 +20,9 @@ import yaml
 from os.path import expanduser
 import os
 import collections
+from common import Orientation
+
+VPV_APPDATA_VERSION = 2
 
 
 class AppData(object):
@@ -44,12 +47,36 @@ class AppData(object):
                 with open(self.app_data_file, 'r') as fh:
                     self.app_data = yaml.load(fh)
             except Exception as e:
-               print('Warning: could not load app data file')
-               self.app_data = {}
+                print('Warning: could not load app data file')
+                self.app_data = {}
         else:
             self.app_data = {}
+
+        # Appdata versioning was not always in place. If a we find some appdata without a version, reset the data
+        # Also reset the data if we find a previous version
+        if self.app_data.get('version') is None or self.app_data['version'] < VPV_APPDATA_VERSION:
+            print("resetting appdata")
+            self.app_data = {}
+
+        if self.app_data == {}:
+            self.app_data['version'] = VPV_APPDATA_VERSION
+
         if 'recent_files' not in self.app_data:
             self.app_data['recent_files'] = collections.deque(maxlen=10)
+
+    def set_flips(self, flip_options: dict):
+        self.app_data['flips'] = flip_options
+
+    def get_flips(self):
+        flips = self.app_data.get('flips')
+
+        if not flips:
+            self.app_data['flips'] = {'axial':    {'x': False, 'z': False},
+                                      'coronal':  {'x': False, 'z': False},
+                                      'sagittal': {'x': False, 'z': False},
+                                      'impc_view': False}
+
+        return self.app_data['flips']
 
     def write_app_data(self):
         with open(self.app_data_file, 'w') as fh:

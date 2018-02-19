@@ -59,10 +59,12 @@ import importer
 from model.model import DataModel
 from appdata import AppData
 import common
-from common import Orientation, Layer
-from layers.slice_widget import SliceWidget
+from common import Orientation, Layers
+from display.slice_view_widget import SliceWidget
 from data_manager import ManageData
+from options_tab import OptionsTab
 from annotations.annotations_widget import Annotations
+from coordinate_mapper import Coordinate_mapper
 
 try:
     from console import Console
@@ -84,9 +86,14 @@ import csv
 
 
 class Vpv(QtCore.QObject):
+    """The entry point to VPV. Acts a bit like a controller taking signals from the different views and propogating
+    them to other views.
+    """
     data_processing_finished_signal = QtCore.pyqtSignal()
     crosshair_visible_signal = QtCore.pyqtSignal()
     crosshair_invisible_signal = QtCore.pyqtSignal()
+    volume_pixel_signal = QtCore.pyqtSignal(int)
+    volume_position_signal = QtCore.pyqtSignal(int, int, int)
 
     def __init__(self):
         super(Vpv, self).__init__()
@@ -101,14 +108,20 @@ class Vpv(QtCore.QObject):
         self.model.updating_finished_signal.connect(self.updating_finished)
         self.model.updating_msg_signal.connect(self.display_update_msg)
         self.views = {}
-        # layers and views now created in manage_views
-        self.data_manager = ManageData(self, self.model, self.mainwindow)
+        # display and views now created in manage_views
+        self.data_manager = ManageData(self, self.model, self.mainwindow, self.appdata)
         self.data_manager.gradient_editor_signal.connect(self.gradient_editor)
 
         self.annotations_manager = Annotations(self, self.mainwindow)
         self.annotations_manager.annotation_highlight_signal.connect(self.show_saved_annotations)
         self.annotations_manager.annotation_radius_signal.connect(self.annotation_radius_changed)
         self.annotations_manager.roi_highlight_off_signal.connect(self.reset_roi)
+
+        self.volume_pixel_signal.connect(self.mainwindow.set_volume_pix_intensity)
+
+        self.options_tab = OptionsTab(self.mainwindow, self.appdata)
+        self.options_tab.flip_signal.connect(self.on_options_flip)
+        self.options_tab.impc_view_signal.connect(self.on_impc_view)
 
         # Sometimes QT console is a pain to install. If not availale do not make console tab
         if console_imported:
@@ -117,20 +130,17 @@ class Vpv(QtCore.QObject):
             self.console = None
 
         self.dock_widget = ManagerDockWidget(self.model, self.mainwindow, self.appdata, self.data_manager,
-                                             self.annotations_manager, self.console)
+                                             self.annotations_manager, self.options_tab, self.console)
         self.dock_widget.setAllowedAreas(QtCore.Qt.LeftDockWidgetArea)
 
         # Create the initial 3 orthogonal views. plus 3 hidden for the second row
         inital_views = [
-            [Orientation.sagittal, 'red', 0, 1, False, False],
-            [Orientation.coronal, 'blue', 0, 2, False, True],
-            [Orientation.axial, 'green', 0, 3, False, True],
+            [Orientation.sagittal, 'red', 0, 1, False],
+            [Orientation.coronal, 'blue', 0, 2, False],
+            [Orientation.axial, 'green', 0, 3, False],
             [Orientation.sagittal, 'orange', 1, 1, True],
-            [Orientation.coronal, 'grey', 1, 2, True, True],
-            [Orientation.axial, 'cyan', 1, 3, True, True]
-            # ['sagittal', 'yellow', 1, 1, True],
-            # ['axial', 'pink', 1, 3, True],
-            # ['coronal', 'cyan', 1, 2, True]
+            [Orientation.coronal, 'grey', 1, 2, True],
+            [Orientation.axial, 'cyan', 1, 3, True]
         ]
 
         for v in inital_views:
@@ -139,19 +149,150 @@ class Vpv(QtCore.QObject):
 
         self.crosshair_visible = False
 
-        # self.view_manager.data_processing_signal.connect(self.mainwindow.data_processing_slot)
-        # self.view_manager.data_processing_finished_signal.connect(self.data_processing_finished_slot)
-
-        self.data_manager.roi_signal.connect(self.map_roi_view_to_view)
-
-        self.add_layer(Layer.vol1)
-        self.add_layer(Layer.vol2)
-        self.add_layer(Layer.heatmap)
-        self.add_layer(Layer.vectors)
+        self.mapper = Coordinate_mapper(self.views)
+        self.data_manager.roi_signal.connect(self.mapper.roi_to_view)
 
         self.any_data_loaded = False
         self.crosshair_permanent = False
         self.gradient_editor_widget = None
+
+        self.options_tab.set_orientations()
+        self.options_tab.set_orientations()
+
+    def on_slice_view_mouse_move(self, x: int, y: int, z: int, src_view: SliceWidget):
+
+        # Get the pixel value of the main volume at the given coordinates
+        vol = src_view.main_volume
+        if not vol:
+            return
+        if any(i < 0 for i in (x, y, z)):
+            return
+
+        # map to the volume space
+        vol_points = self.mapper.view_to_volume(x, y, z, src_view)
+        try:
+            pix = vol.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]] )
+        except IndexError:
+            pass
+        else:
+            if x > 0 and x > 0:
+                self.volume_pixel_signal.emit(round(float(pix), 2))
+                self.mainwindow.set_mouse_position(*vol_points)
+
+        # # If shift is pressed emit signal to get other views to get to the same or interscting slice
+        modifiers = QtGui.QApplication.keyboardModifiers()
+
+        if modifiers == QtCore.Qt.ShiftModifier:
+
+            # With mouse move signal, also send currebt vol.
+            # If veiews are not synchronised, syncyed sliceing only occurs within volumes
+            self.mouse_shift(x, y, z, src_view)
+
+    def map_annotation_signal_view_to_view(self, slice_idx: int, x: int, y: int, src_view: SliceWidget,
+                                           color: tuple=(255, 0, 0), radius: int=10, reverse: bool=False):
+        """
+        Upon getting a mouse click on a SliceWidget region, it will emit info here including position and the
+        emitting view.  Map the coordinates between views so that they are correctly positioned
+
+        Parameters
+        ----------
+        slice_idx: the current slice index of the emitting view
+        x: the y position of the view clicked
+        y: the y position of the view clicked
+        src_view: the emitting view
+        color: rgb color of the annotation marker
+        radius: radius of the annotation marker
+        reverse:
+
+        """
+        if not self.current_annotation_volume():
+            self.annotations_manager.reset_roi()
+            return
+
+        if not self.annotations_manager.annotating:
+            return
+        for dest_view in self.views.values():
+            # First map the annotation marker between views
+            dest_x, dest_y, dest_index = self.mapper.view_to_view(x, y, slice_idx, src_view, dest_view)
+
+            dest_view.set_slice(dest_index)
+            # Set the annotation marker. Red for pre-annoation, green indicates annotation save
+            dest_view.show_annotation_marker(dest_x, dest_y, color, radius)
+
+            # Add the coordinates to the AnnotationsWidget
+            # The coordinates need to be in axial space do map back to them if necessary
+            if dest_view.orientation == Orientation.axial:
+                # Now map it back to image coordinates
+                xa, ya, idxa = self.mapper.view_to_volume(x, y, slice_idx, src_view)
+                self.annotations_manager.set_annotation_position_label(xa, ya, idxa)
+
+
+    def mouse_shift(self, x, y, z, src_view):
+        """
+        Gets mouse moved signal. Sets corresponding slices in other views if views are linked
+
+        Parameters
+        ----------
+        src_index: int
+            the current slice of the calling view
+        x: int
+            the x position of the mouse
+        y: int
+            the y position of the mouse
+        src_orientation: str
+            the orientation of the calling view
+        src_vol: ImageVolume
+            The volume belonging to the source view
+        """
+
+        #TODO: AttributeError: 'SliceWidget' object has no attribute 'Layers'
+        for dest_view in self.views.values():
+
+            # if not self.data_manager.link_views:
+            #     # if dest_view.main_volume != src_view.layers[Layers.vol1].vol:
+            #     #     dest_view.hide_crosshair()
+            #     #     continue
+
+            # _, dest_y, dest_index = self.mapper.view_to_view(x, y, src_index, None, dest_view)
+            dest_x, dest_y, dest_z = self.mapper.view_to_view(x, y, z, src_view, dest_view) # document!
+            try:
+                dest_view.set_slice(dest_z, crosshair_xy=(dest_x, dest_y))
+            except IndexError:
+                print('dfksj')
+
+    def on_impc_view(self, do_impc: bool):
+
+        # For RAS, we need to vertically flip the axial view. Need to add other views as well
+        for view in self.views.values():
+            view.roi.clear()
+            if view.orientation == Orientation.axial:
+                view.flipy(do_impc)
+                view.flipz(do_impc)
+                self.mapper.impc_view = do_impc
+            if view.orientation == Orientation.coronal:
+                view.flipz(do_impc)
+
+
+    def on_options_flip(self, orientation: Orientation, flip_dim: str, flip: bool):
+        """
+        Recieves signals that instruct a flip on the data
+        The flip can be in x or z (in slice view coordinates) and will apply to all views in a given orientation
+        Parameters
+        ----------
+        orientation: Orientation enum
+            the orientation to take effect on
+        flip_dim: str
+            'x' or 'z'
+        flip: bool
+            whether to flip (True) or to display in original orientation
+
+        """
+        for view in self.views.values():
+            if view.orientation == orientation:
+                if flip_dim == 'x':
+                    view.flipx(flip)
+                if flip_dim == 'z':
+                    view.flipz(flip)
 
     def current_annotation_volume(self):
         """
@@ -162,7 +303,7 @@ class Vpv(QtCore.QObject):
         model.ImageVolume instance
         """
 
-        return self.current_view.layers[Layer.vol1].vol
+        return self.current_view.layers[Layers.vol1].vol
 
     def on_console_enter_pressesd(self):
         print('command update')
@@ -200,10 +341,6 @@ class Vpv(QtCore.QObject):
         self.data_manager.link_views = True
         self.annotations_manager.tab_changed(indx)
 
-    def add_layer(self, z_position: int):  # move
-        for view in self.views.values():
-            view.register_layer(z_position, self)
-
     def updating_started(self):
         self.updating_dlg = QtGui.QMessageBox()
 
@@ -231,12 +368,12 @@ class Vpv(QtCore.QObject):
         for view in self.views.values():
             view.update_view()
 
-    def setup_views(self, orientation, color, row, column, hidden=False, flipped_x=False):
+    def setup_views(self, orientation: Orientation, color: tuple, row: int, column: int, hidden: bool=False):
         """
         Create all the orthogonal views and setup the signals and slots
         """
-        view = self.add_view(self.view_id_counter, orientation, color, flipped_x=flipped_x)
-        view.mouse_shift.connect(self.mouse_shift)
+        view = self.add_view(self.view_id_counter, orientation, color)
+        # view.mouse_shift.connect(self.mouse_shift)
         # view.mouse_pressed_signal.connect(self.dock_widget.mouse_pressed)
         view.mouse_pressed_annotation_signal.connect(self.map_annotation_signal_view_to_view)
         # view.mouse_pressed_annotation_signal.connect(self.annotations_manager.mouse_pressed_annotate)
@@ -245,12 +382,21 @@ class Vpv(QtCore.QObject):
         view.slice_index_changed_signal.connect(self.index_changed)
         view.move_to_next_vol_signal.connect(self.move_to_next_vol)
         self.data_manager.scale_bar_color_signal.connect(view.set_scalebar_color)
-        self.data_manager.flipxy_signal.connect(view.flipx)
         self.crosshair_visible_signal.connect(view.show_crosshair)
         self.crosshair_invisible_signal.connect(view.hide_crosshair)
         self.view_id_counter += 1
         self.mainwindow.add_slice_view(view, row, column)
         view.setHidden(hidden)
+
+        view.mouse_moved_signal.connect(self.on_slice_view_mouse_move)
+
+        # Get the oriettion flip info from the appdata config and set the vies accordingly
+        flips = self.appdata.get_flips()
+        flipx = flips[orientation.name]['x']
+        flipz = flips[orientation.name]['z']
+
+        view.flipped_x = flipx
+        view.flipped_z = flipz
 
     def gradient_editor(self):
         # Activeated 6 times on one click so bogdge for now
@@ -261,10 +407,10 @@ class Vpv(QtCore.QObject):
 
     def set_heatmap_luts(self, luts):
         for view in self.views.values():
-            if view.layers[Layer.heatmap].vol:
-                view.layers[Layer.heatmap].vol.pos_lut = luts[0]
-                #view.layers[Layer.heatmap].vol.neg_lut = luts[1]
-                view.layers[Layer.heatmap].update()
+            if view.layers[Layers.heatmap].vol:
+                view.layers[Layers.heatmap].vol.pos_lut = luts[0]
+                #view.display[Layer.heatmap].vol.neg_lut = luts[1]
+                view.layers[Layers.heatmap].update()
 
     def move_to_next_vol(self, view_id, reverse=False):
         if self.data_manager.link_views:
@@ -275,10 +421,10 @@ class Vpv(QtCore.QObject):
         self.data_manager.switch_selected_view(view_id)
 
     def recalc_connected_components(self):
-        self.current_view.layers[Layer.heatmap].vol.find_largest_connected_components()
-        self.data_manager.update_connected_components(self.current_view.layers[Layer.heatmap].vol.name)
+        self.current_view.layers[Layers.heatmap].vol.find_largest_connected_components()
+        self.data_manager.update_connected_components(self.current_view.layers[Layers.heatmap].vol.name)
 
-    def add_view(self, id_, orientation, color, flipped_x=False):
+    def add_view(self, id_, orientation, color):
         """
         Setup the controls for each layer)
         :param id, int
@@ -286,11 +432,9 @@ class Vpv(QtCore.QObject):
         :param color: str, jsut a color word at the moment eg: red
         :return SliceWidget
         """
-        view = SliceWidget(orientation, self.model, color, flipped_x=flipped_x)
-        view.volume_pixel_signal.connect(self.mainwindow.set_volume_pix_intensity)
+        view = SliceWidget(orientation, self.model, color)
         view.data_pixel_signal.connect(self.mainwindow.set_data_pix_intensity)
-        # view.volume_position_signal.connect(self.mainwindow.set_mouse_position)
-        view.volume_position_signal.connect(self.mouse_position_slot)
+        # view.volume_position_signal.connect(self.mouse_position_slot)
         view.manage_views_signal.connect(self.update_manager)
         self.views[id_] = view
         return view
@@ -308,7 +452,7 @@ class Vpv(QtCore.QObject):
         """
 
         try:
-            x1, y1, z1 = self.map_view_to_volume_space(x, y, z, src_view)
+            x1, y1, z1 = self.mapper.view_to_volume(x, y, z, src_view)
         except TypeError:
             pass #Todo: Another bodge. If there are no views that are axial we have a problem
         else:
@@ -384,363 +528,56 @@ class Vpv(QtCore.QObject):
     def data_processing_finished_slot(self):
         self.data_processing_finished_signal.emit()
 
-    def mouse_shift(self, src_index, x, y, src_view):
-        """
-        Gets mouse moved signal. Sets corresponding slices in other views if views are linked
-
-        Parameters
-        ----------
-        src_index: int
-            the current slice of the calling view
-        x: int
-            the x position of the mouse
-        y: int
-            the y position of the mouse
-        src_orientation: str
-            the orientation of the calling view
-        src_vol: ImageVolume
-            The volume belonging to the source view
-        """
-
-        #TODO: AttributeError: 'SliceWidget' object has no attribute 'Layers'
-        for dest_view in self.views.values():
-
-            if not self.data_manager.link_views:
-                if dest_view.layers[Layer.vol1].vol != src_view.layers[Layer.vol1].vol:
-                    dest_view.hide_crosshair()
-                    continue
-
-            dest_x, dest_y, dest_index = self.map_view_to_view(
-                x, y, src_index, src_view, dest_view)
-
-            dest_view.set_slice(dest_index, crosshair_xy=(dest_x, dest_y))
-
-    def set_to_centre_of_roi(self, zz, yy, xx):
-        """
-        Recieves coordinates of a coonnected components roi from the blob finder table
-        Then sends to cooresponding 2D roi to each dest_view dependent on its orientation
-        Parameters
-        ----------
-
-
-        Notes
-        -----
-        I wan to integrate this with map_view_to_view but that function will need some reworking to do that
-
-        Returns
-        -------
-
-        """
-
-        zz = [int(x) for x in zz]
-        yy = [int(x) for x in yy]
-        xx = [int(x) for x in xx]
-
-        xslice = int(np.mean(xx))
-        yslice = int(np.mean(yy))
-        zslice = int(np.mean(zz))
-
-
-        # Send a 2D ROI to each dest_view
-        for dest_view in self.views.values():
-            src_dims = self.current_view.layers[Layer.vol1].vol.get_shape_xyz()
-
-            # Get the x y corrdinates of the ROI along with the slice index for each orthogonal dest_view
-            # ROI is in normal coordinates so src orientation will always be axial
-            if dest_view.orientation == Orientation.axial:
-                zslice = src_dims[2] - zslice
-                dest_view._set_slice(zslice)
-                r_x, r_y, r_z = xx, yy, zz
-
-                w = r_x[1] - r_x[0]
-                h = r_y[1] - r_y[0]
-                dims = dest_view.main_volume.get_shape_xyz()
-                y1 = dims[1] - r_y[0] - h
-                x1 = dims[0] - r_x[0] - w
-                dest_view.set_roi(x1, y1, w, h)
-
-            elif dest_view.orientation == Orientation.coronal:
-                yslice = src_dims[1] - yslice
-                dest_view._set_slice(yslice)
-                r_x, r_y, r_z = xx, yy, zz
-
-                w = r_x[1] - r_x[0]
-                h = r_z[1] - r_z[0]
-                dims = dest_view.main_volume.get_shape_xyz()
-                y1 = r_z[0]
-                x1 = dims[0] - r_x[0] - w
-                dest_view.set_roi(x1, y1, w, h)
-
-            if dest_view.orientation == Orientation.sagittal:
-                xslice = xslice
-                dest_view._set_slice(xslice)
-                r_x, r_y, r_z = xx, yy, zz
-
-                w = r_y[1] - r_y[0]
-                h = r_z[1] - r_z[0]
-                dims = dest_view.main_volume.get_shape_xyz()
-                y1 = r_z[0]
-                x1 = dims[1] -r_y[1]
-                dest_view.set_roi(x1, y1, w, h)
-
-    def map_roi_view_to_view(self, xx, yy, zz):
-        """
-        Map a roi from one view to another
-        Parameters
-        ----------
-        xx: tuple
-        yy: tuple
-        zz: tuple
-        src_ori: Orientation
-        dest_ori: Orientation
-
-        Returns
-        -------
-        tuple
-            ((x,x), (y,y), (z,z)
-        """
-        z = [int(x) for x in zz]
-        y = [int(x) for x in yy]
-        x = [int(x) for x in xx]
-
-
-        # Map from volume to view space
-        for src in self.views.values():
-            if src.orientation == Orientation.axial:
-                x1, y1, idx1 = self.map_view_to_volume_space(x[0], y[0], z[0], src)
-                x2, y2, idx2 = self.map_view_to_volume_space(x[1], y[1], z[1], src)
-
-        mid_x = int(np.mean([x1, x2]))
-        mid_y = int(np.mean([y1, y2]))
-        mid_z = int(np.mean([idx1, idx2]))
-
-        for dest_view in self.views.values():
-            # First map the annotation marker between views
-            _, _, idx_centre = self.map_view_to_view(mid_x, mid_y, mid_z, src, dest_view)
-            # Need to call annotations_widget.mouse_pressed_annotate to populate the table
-            # Need to get radius and color from annotations_widget
-
-            # set each view to the correct slice corresponding to the mouse click position
-            dest_view.set_slice(idx_centre)
-            # Send a 2D ROI to each view
-
-            x_1, y_1, idx_1 = self.map_view_to_view(x1, y1, idx1, src, dest_view)
-            x_2, y_2, idx_2 = self.map_view_to_view(x2, y2, idx2, src, dest_view)
-
-            w = x_1 - x_2
-            h = y_2 - y_1
-            dest_view.set_roi(x_1 - w, y_1, w, h)
-
     def show_saved_annotations(self, x: int, y: int, z: int, color: list, radius: int):
         """
-        Receives clicks from the annotations widget table.
-        Gets positions of annotation in Axial space (normal volume sapce).
-        Move all views to the corresponding slices and set the annotation marker
-        """
+        When clicking on a saved annotation  from the table, highlight in 'color' the location
+        Bit of a bodge this. Need to move some of it to coordinate mapper
 
-        # Set the volume coords in the annotations widget
-        self.annotations_manager.set_annotation_point(x, y, z)
-
-        # Map the volume coords into the view coords
-        #  map_annotation_signal_view_to_view needs a src view.
-        #  As the coordinates are in axial space, get the axial view
-        for src in self.views.values():
-            if src.orientation == Orientation.axial:
-                xa, ya, idxa = self.map_view_to_volume_space(x, y, z, src)
-                break
-
-        # Set the correct slides and add annotation markers
-        for dest_view in self.views.values():
-            # First map the annotation marker between views
-            x1, y1, idx1 = self.map_view_to_view(xa, ya, idxa, src, dest_view)
-            # Need to call annotations_widget.mouse_pressed_annotate to populate the table
-            # Need to get radius and color from annotations_widget
-
-            # set each view to the correct slice corresponding to the mouse click position
-            dest_view.set_slice(idx1)
-            # Set the annotation marker. Red for pre-annoation, green indicates annotation save
-            dest_view.show_annotation_marker(x1, y1, color, radius)
-
-            # Add the coordinates to the AnnotationsWidget
-            # The coordinates need to be in axial space do map back to them if necessary
-
-    def map_annotation_signal_view_to_view(self, slice_idx: int, x: int, y: int, src_view: SliceWidget,
-                                           color: tuple=(255, 0, 0), radius: int=10, reverse: bool=False):
-        """
-        Upon getting a mouse click on a SliceWidget region, it will emit info here including position and the
-        emitting view.  Map the coordinates between views so that they are correctly positioned
 
         Parameters
         ----------
-        slice_idx: the current slice index of the emitting view
-        x: the y position of the view clicked
-        y: the y position of the view clicked
-        src_view: the emitting view
-        color: rgb color of the annotation marker
-        radius: radius of the annotation marker
-        reverse:
-
-        """
-        if not self.current_annotation_volume():
-            self.annotations_manager.reset_roi()
-            return
-
-        if not self.annotations_manager.annotating:
-            return
-        for dest_view in self.views.values():
-            # First map the annotation marker between views
-            x1, y1, idx1 = self.map_view_to_view(x, y, slice_idx, src_view, dest_view)
-            # Need to call annotations_widget.mouse_pressed_annotate to populate the table
-            # Need to get radius and color from annotations_widget
-
-            # set each view to the correct slice corresponding to the mouse click position
-            dest_view.set_slice(idx1)
-            # Set the annotation marker. Red for pre-annoation, green indicates annotation save
-            dest_view.show_annotation_marker(x1, y1, color, radius)
-
-            # Add the coordinates to the AnnotationsWidget
-            # The coordinates need to be in axial space do map back to them if necessary
-            if dest_view.orientation == Orientation.axial:
-                # Now map it back to image coordinates
-                xa, ya, idxa = self.map_view_to_volume_space(x, y, slice_idx, src_view, reverse)
-                self.annotations_manager.set_annotation_point(xa, ya, idxa)
-
-    def map_view_to_volume_space(self, x: int, y: int, idx: int, src_view: SliceWidget, reverse=False) -> tuple:
-        """
-        Given coordinates from a slice view, convert to actual coordinates in the correct volume space
-        This is required as we do some inversion of the order of slices as they come off the volumes to show
-        a view that the IMPC annotators like.
-
-        Currently not working if there are no Slice views that are in axial view
-
-        Parameters
-        ----------
-        x: int
-        y: int
-        idx: int
-        src_view: SliceWidget
-        reverse: bool
-            True: map from volume space to image space
-            False: map from image space to volume sapce
+        x
+        y
+        z
+        color
+        radius
 
         Returns
         -------
-        (x, y, z)
-
-        Notes
-        -----
-
-        This maps the view coordinates from any view to the noral axial view. Then adds correction for the inverted
-        slice ordering
 
         """
-        shape = src_view.main_volume.get_shape_xyz()
+        src_index = z
+        impc = self.appdata.get_flips()['impc_view']
 
-        for view in self.views.values():
-            if view.orientation == Orientation.axial:
-                x, y, slice_idx = self.map_view_to_view(x, y, idx, src_view, view)
-                if reverse:
-                    slice_idx = slice_idx  # The z slices are inverted so we go through stack head to tail
+        for dest_view in self.views.values():
+
+            dest_x, dest_y, dest_z = self.mapper.view_to_view(x, y, src_index, None, dest_view)
+            dest_x_rev, dest_y_rev, dest_z_rev = self.mapper.view_to_view(x, y, src_index, None, dest_view, rev=True) # document!
+
+            if dest_view.orientation == Orientation.sagittal:
+                dest_view.set_slice(dest_z_rev)
+
+                if impc:
+                    dest_view.show_annotation_marker(dest_x_rev, dest_y_rev, color, radius)
                 else:
-                    slice_idx = shape[2] - slice_idx
-                    y = shape[1] - y
+                    dest_view.show_annotation_marker(dest_x, dest_y, color, radius)
 
-                x = shape[0] - x
-                return x, y, slice_idx
-
-    @staticmethod
-    def map_view_to_view(x, y, idx, src_view, dest_view):
-        """
-        Given a coordinate on one view with a given orientation map to another view with a given orientation
-        Parameters
-        ----------
-        x: int
-            the x position in the view
-        y: int
-            the y position in the view
-        idx: int
-            the slice index
-        src_orientation: Orientation
-        dest_orientation: Orientation
-        src_dims: tuple
-            xyz: dimensions of the volume currently in view in the source view
-
-        Returns
-        -------
-        tuple
-            (x,y,idx)
-
-        """
-        # the Data is flipped to make it compatibile with the IEV view. So we have to account for this when mapping
-        # between views by using the pint counting from the opposite side
-
-        dest_orientation = dest_view.orientation
-        dest_flipped = dest_view.flipped_x
-
-        src_orientation = src_view.orientation
-        src_dims = src_view.main_volume.get_shape_xyz()
-        src_flipped = src_view.flipped_x
-
-        if src_orientation == Orientation.axial:
-            xyz = src_dims
-        elif src_orientation == Orientation.coronal:
-            xyz = (src_dims[0], src_dims[2], src_dims[1])
-        elif src_orientation == Orientation.sagittal:
-            xyz = (src_dims[1], src_dims[2], src_dims[0])
-
-        rev_x = xyz[0] - x
-        rev_y = xyz[1] - y
-        rev_idx = xyz[2] - idx
-
-        if src_orientation == Orientation.axial:
-            if dest_orientation == Orientation.axial:
-                return x, y, idx
-            elif dest_orientation == Orientation.coronal:
-                if src_flipped != dest_flipped:
-                    return x, rev_idx, y
+            elif dest_view.orientation == Orientation.coronal:
+                if impc:
+                    dest_view.set_slice(dest_z_rev)
+                    dest_view.show_annotation_marker(dest_x_rev, dest_y_rev, color, radius)
                 else:
-                    return x, rev_idx, y
-            elif dest_orientation == Orientation.sagittal:
-                if src_flipped != dest_flipped:
-                    return y, rev_idx, rev_x
-                else:
-                    return y, idx, x
+                    dest_view.set_slice(dest_z)
+                    dest_view.show_annotation_marker(dest_x_rev, dest_y, color, radius)
 
-        if src_orientation == Orientation.coronal:
-            if dest_orientation == Orientation.axial:
-                if src_flipped != dest_flipped:
-                    return x, idx, y
+            elif dest_view.orientation == Orientation.axial:
+                if impc:
+                    dest_view.set_slice(dest_z_rev)
+                    dest_view.show_annotation_marker(dest_x_rev, dest_y_rev, color, radius)
                 else:
-                    return x, idx, rev_y
-            elif dest_orientation == Orientation.coronal:
-                return x, y, idx
-            elif dest_orientation == Orientation.sagittal:
-                if dest_flipped != src_flipped:
-                    return idx, y, rev_x
-                else:
-                    return idx, y, x
+                    dest_view.set_slice(dest_z)
+                    dest_view.show_annotation_marker(dest_x_rev, dest_y, color, radius)
 
-        if src_orientation == Orientation.sagittal:
-            if dest_orientation == Orientation.axial:
-                if src_flipped != dest_flipped:
-                    return rev_idx, x, rev_y
-                else:
-                    return idx, x, rev_y
-            elif dest_orientation == Orientation.coronal:
-                if src_flipped != dest_flipped:
-                    return rev_idx, y, x
-                else:
-                    return idx, y, x
-            elif dest_orientation == Orientation.sagittal:
-                return x, y, idx
-
-    def stats(self): # delete!
-        """
-        Show the stats dialog
-        """
-        sw = StatsWidget(self.mainwindow, self.model)
-        #sw.set_available_data(self.model.data_id_list())
-        sw.show()
 
     def control_visiblity(self, visible):
         for slice_ in self.slice_widgets.values():
@@ -795,8 +632,8 @@ class Vpv(QtCore.QObject):
         try:
             init_vol = self.model.volume_id_list()[0]
             for view in self.views.values():
-                view.layers[Layer.vol1].set_volume(init_vol, initial=True)
-                # view.layers[Layer.vol1].update()  # This should make sure 16bit images are scaled correctly at loading?
+                view.layers[Layers.vol1].set_volume(init_vol, initial=True)
+                # view.display[Layer.vol1].update()  # This should make sure 16bit images are scaled correctly at loading?
                 view.update_view()
         except IndexError:  # No Volume objects have been loaded
             print('No volumes loaded')
@@ -804,7 +641,7 @@ class Vpv(QtCore.QObject):
         try:  # See if we have any Data objects loaded
             init_vol = self.model.data_id_list()[0]
             for view in self.views.values():
-                view.layers[Layer.heatmap].set_volume(init_vol, initial=True)
+                view.layers[Layers.heatmap].set_volume(init_vol, initial=True)
         except IndexError:  # No Volume objects have been loaded
             pass
 
@@ -837,9 +674,11 @@ class Vpv(QtCore.QObject):
                 error = self.model.load_annotation(ann)
                 if error:
                     common.error_dialog(self.mainwindow, 'Annotations not loaded', error)
+                else:
+                    common.info_dialog(self.mainwindow, 'Load success', 'Annotations loaded')
             # Switch to annotations tab
-            #self.dock_widget.switch_tab(1)
-            #self.dock_widget.tab_changed(1)
+            self.dock_widget.switch_tab(1)
+            self.dock_widget.tab_changed(1)
 
         self.appdata.set_last_dir_browsed(last_dir)
 
@@ -929,9 +768,7 @@ class Vpv(QtCore.QObject):
             # get the trhesholds from the csv files
             qval_int_csv = join(td.name, file_names.qvals_intensity_file)
             intensity_fdr_thresh = self.extract_fdr_thresholds(qval_int_csv)
-            if not intensity_fdr_thresh:
-                common.info_dialog(self.mainwindow, "No hits",
-                                   "There are no hits in the intensity heatmap. The threshold is set to max")
+
             inten_tstat = join(td.name, file_names.intensity_tstats_file)
 
             self.load_volumes([inten_tstat], 'heatmap', memory_map=False,
@@ -939,9 +776,7 @@ class Vpv(QtCore.QObject):
 
             qval_jac_csv = join(td.name, file_names.qvals_jacobians_file)
             jacobian_fdr_thresh = self.extract_fdr_thresholds(qval_jac_csv)
-            if not jacobian_fdr_thresh:
-                common.info_dialog(self.mainwindow, "No hits",
-                                   "There are no hits in the jacobian heatmap. The threshold is set to max")
+
             jac_tstat = join(td.name, file_names.jacobians_tstats_file)
 
             self.load_volumes([jac_tstat], 'heatmap', memory_map=False,
@@ -950,7 +785,12 @@ class Vpv(QtCore.QObject):
             # Load any other volumes in the zip. Probably will be mutants
             mutants = [join(td.name, x) for x in files_remaining if x.endswith('nrrd')]
             self.load_volumes(mutants, 'vol', memory_map=False)
-
+            if not intensity_fdr_thresh:
+                common.info_dialog(self.mainwindow, "No hits",
+                                   "There are no hits in the intensity heatmap. The threshold is set to max")
+            if not jacobian_fdr_thresh:
+                common.info_dialog(self.mainwindow, "No hits",
+                                   "There are no hits in the jacobian heatmap. The threshold is set to max")
         else:
             failed = []
             for key, name in file_names.items():
@@ -1011,8 +851,9 @@ class Vpv(QtCore.QObject):
         self.dock_widget.show(view_widget_id)
 
     def close(self):
-        print('Bye')
+        print('saving settings to {}'.format(self.appdata.app_data_file))
         self.appdata.write_app_data()
+        print('exiting')
 
     def on_view_new_screen(self):
 

@@ -18,21 +18,24 @@
 from PyQt5.QtWidgets import QDockWidget
 from lookup_tables import Lut
 from ui.ui_manager import Ui_ManageViews
+from common import Orientation
 
 
 class ManagerDockWidget(QDockWidget):
 
-    def __init__(self, model, mainwindow, appdata, data_manager, annotations_manager, console):
+    def __init__(self, model, mainwindow, appdata, data_manager, annotations_manager, options, console):
         super(ManagerDockWidget, self).__init__(mainwindow)
         lut = Lut()
         self.appdata = appdata
         self.data_manager = data_manager
         self.annotations = annotations_manager
+        self.options_tab = options
         self.console = console
         self.tab_map = {0: self.data_manager,
                         1: self.annotations}
         if self.console:
             self.tab_map[2] = self.console
+        self.tab_map[3] = self.options_tab
         self.hotred = lut._hot_red_blue()[0]
         self.hotblue = lut._hot_red_blue()[1]
         self.ui = Ui_ManageViews()
@@ -54,6 +57,9 @@ class ManagerDockWidget(QDockWidget):
         self.annotations.annotation_recent_dir_signal.connect(self.appdata.set_last_dir_browsed)
         self.ui.tabWidget.addTab(self.annotations, 'Annotations')
         self.ui.tabWidget.currentChanged.connect(self.tab_changed)
+
+        self.ui.tabWidget.addTab(self.options_tab, 'Options')
+
         if self.console:
             self.ui.tabWidget.addTab(self.console, 'Console')
 
@@ -61,10 +67,13 @@ class ManagerDockWidget(QDockWidget):
         """
         When changing tab, execute code required for that tab
         """
-        self.tab_map[indx].tab_is_active()
-        if indx == 1:  # Need to link views for the annotations tab
-            self.data_manager.link_views = True
-            self.annotations.annotating = True
+        if indx == 1:
+            self.tab_map.get(indx).tab_is_active()
+            if indx == 1:  # Need to link views for the annotations tab
+                self.data_manager.link_views = True
+                self.annotations.annotating = True
+            else:
+                self.annotations.annotating = False
         else:
             self.annotations.annotating = False
 

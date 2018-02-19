@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QComboBox, QFileDialog, QC
 from ui.ui_annotations import Ui_Annotations
 import json
 import common
-from common import Stage, Layer, AnnotationOption
+from common import Stage, Layers, AnnotationOption
 from lib.addict import Dict
 from collections import defaultdict
 
@@ -118,7 +118,7 @@ class Annotations(QWidget):
 
         #  Ensure all the view ports contain the same image
         for view in self.controller.views.values():
-            view.layers[Layer.vol1].set_volume(vol.name)
+            view.layers[Layers.vol1].set_volume(vol.name)
 
         self.populate_available_terms()
         self.update()
@@ -324,7 +324,7 @@ class Annotations(QWidget):
             if all_done:
                 cat.setBackground(0, QtGui.QBrush(QtGui.QColor(0, 255, 0, 100)))
 
-    def set_annotation_point(self, x: int, y: int, z: int):
+    def set_annotation_position_label(self, x: int, y: int, z: int):
         """
         Set the coordnates in the annotations tab. This is before the annotation has been saved
         ----------
@@ -349,7 +349,7 @@ class Annotations(QWidget):
 
     def update(self):
 
-        vol = self.controller.current_view.layers[Layer.vol1].vol
+        vol = self.controller.current_view.layers[Layers.vol1].vol
         if vol:
             self.ui.comboBoxAnnotationsVolumes.clear()
             self.ui.comboBoxAnnotationsVolumes.addItems(self.controller.model.volume_id_list())
