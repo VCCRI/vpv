@@ -131,11 +131,11 @@ class Volume(Qt.QObject):
         :return:
         """
         if orientation == Orientation.sagittal:
-            return self._arr_data[0, 0, :].size
+            return self._arr_data.shape[0]
         if orientation == Orientation.coronal:
-            return self._arr_data[0, :, 0].size
+            return self._arr_data.shape[1]
         if orientation == Orientation.axial:
-            return self._arr_data[:, 0, 0].size
+            return self._arr_data.shape[2]
 
     def set_voxel_size(self, size):
         """
@@ -148,7 +148,8 @@ class Volume(Qt.QObject):
     def _get_coronal(self, index, flipx, flipz, flipy, xy=None):
         if flipz:
             index = self._arr_data.shape[1] - index
-        slice_ = np.rot90(self._arr_data[:, index, :], 1)
+        # slice_ = np.rot90(self._arr_data[:, index, :], 1)
+        slice_ = self._arr_data[:, index, :]
         if flipx:
             slice_ = np.flipud(slice_)
         if xy:
@@ -160,7 +161,8 @@ class Volume(Qt.QObject):
     def _get_sagittal(self, index, flipx, flipz, flipy, xy=None):
         if flipz:
             index = self._arr_data.shape[2] - index
-        slice_ = np.rot90(self._arr_data[:, :, index], 1)
+        # slice_ = np.rot90(self._arr_data[:, :, index], 1)
+        slice_ = self._arr_data[index, :, :]
         if flipx:
             slice_ = np.flipud(slice_)
         if xy:
@@ -171,7 +173,8 @@ class Volume(Qt.QObject):
     def _get_axial(self, index, flipx, flipz, flipy, xy=None):
         if flipz:
             index = self._arr_data.shape[0] - index
-        slice_ = np.rot90(self._arr_data[index, :, :], 1)
+        # slice_ = np.rot90(self._arr_data[index, :, :], 1)
+        slice_ = self._arr_data[:, :, index]
         if flipy:
             slice_ = np.fliplr(slice_)
         if flipx:

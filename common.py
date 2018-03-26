@@ -82,6 +82,10 @@ class ImageReader(object):
         self.img = sitk.ReadImage(img_path)
         self.space = self.img.GetDirection()
         self.vol = sitk.GetArrayFromImage(self.img)
+        import numpy as np
+        # Testing
+        self.vol = np.rot90(self.vol, axes=(0, 2), k=1)
+        # self.vol = np.rot90(self.vol, axes=(2, 1), k=1)
 
 def read_image(img_path, convert_to_ras=False):
     if img_path.endswith('.gz'):

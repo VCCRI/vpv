@@ -143,13 +143,14 @@ class Vpv(QtCore.QObject):
             [Orientation.axial, 'cyan', 1, 3, True]
         ]
 
+        self.mapper = Coordinate_mapper(self.views, self.appdata.get_flips())
+
         for v in inital_views:
             self.setup_views(*v)
         self.current_view = self.views[0]
 
         self.crosshair_visible = False
 
-        self.mapper = Coordinate_mapper(self.views)
         self.data_manager.roi_signal.connect(self.mapper.roi_to_view)
 
         self.any_data_loaded = False
@@ -261,6 +262,7 @@ class Vpv(QtCore.QObject):
                 print('dfksj')
 
     def on_impc_view(self, do_impc: bool):
+        return
 
         # For RAS, we need to vertically flip the axial view. Need to add other views as well
         for view in self.views.values():
@@ -372,7 +374,7 @@ class Vpv(QtCore.QObject):
         """
         Create all the orthogonal views and setup the signals and slots
         """
-        view = self.add_view(self.view_id_counter, orientation, color)
+        view = self.add_view(self.view_id_counter, orientation, color, self.mapper)
         # view.mouse_shift.connect(self.mouse_shift)
         # view.mouse_pressed_signal.connect(self.dock_widget.mouse_pressed)
         view.mouse_pressed_annotation_signal.connect(self.map_annotation_signal_view_to_view)
@@ -389,14 +391,6 @@ class Vpv(QtCore.QObject):
         view.setHidden(hidden)
 
         view.mouse_moved_signal.connect(self.on_slice_view_mouse_move)
-
-        # Get the oriettion flip info from the appdata config and set the vies accordingly
-        flips = self.appdata.get_flips()
-        flipx = flips[orientation.name]['x']
-        flipz = flips[orientation.name]['z']
-
-        view.flipped_x = flipx
-        view.flipped_z = flipz
 
     def gradient_editor(self):
         # Activeated 6 times on one click so bogdge for now
@@ -424,15 +418,26 @@ class Vpv(QtCore.QObject):
         self.current_view.layers[Layers.heatmap].vol.find_largest_connected_components()
         self.data_manager.update_connected_components(self.current_view.layers[Layers.heatmap].vol.name)
 
-    def add_view(self, id_, orientation, color):
+    def add_view(self, id_, orientation, color, mapper):
         """
-        Setup the controls for each layer)
-        :param id, int
-        :param orientation: str,
-        :param color: str, jsut a color word at the moment eg: red
-        :return SliceWidget
+        Setup each orthogonal viewer
+
+        Parameters
+        ----------
+        id_: int
+        orientation: Orientation
+        Initial orientation
+        color: str
+            just a color word at the moment eg: red
+        mapper coordinate_mapper.Coordinate_mapper
+            Hold info such as whether the current orientation should have flips applied
+
+        Returns
+        -------
+        SliceWidget
+
         """
-        view = SliceWidget(orientation, self.model, color)
+        view = SliceWidget(orientation, self.model, color, mapper)
         view.data_pixel_signal.connect(self.mainwindow.set_data_pix_intensity)
         # view.volume_position_signal.connect(self.mouse_position_slot)
         view.manage_views_signal.connect(self.update_manager)

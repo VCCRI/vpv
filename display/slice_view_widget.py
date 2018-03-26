@@ -296,7 +296,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
     slice_index_changed_signal = QtCore.pyqtSignal(Orientation, int, int)
     move_to_next_vol_signal = QtCore.pyqtSignal(int, bool)  # Slice id, reverse order
 
-    def __init__(self, orientation, model, border_color):
+    def __init__(self, orientation, model, border_color, mapper):
         super(SliceWidget, self).__init__()
         self.ui = Ui_SliceWidget()
         # Bug in Windows - https://groups.google.com/forum/#!msg/pyqtgraph/O7E2sWaEWDg/7KPVeiO6qooJ
@@ -305,12 +305,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         else:
             pg.functions.USE_WEAVE = True
 
-        # Whether the view should be flipped in slice view coordinates relative to the model data
-        self.flipped_x = False
-
-        self.flipped_z = False
-
-        self.flipped_y = False
+        self.mapper = mapper # Contains info on whether views should be flipped or not
 
         self.scalebar = None
         self.ui.setupUi(self)
@@ -409,18 +404,6 @@ class SliceWidget(QWidget, Ui_SliceWidget):
     def scale_bar_visible(self, is_visible):
         self.scalebar.scale_bar_label_visible = is_visible
         self.scalebar.updateBar()
-
-    def flipx(self, flip):
-        self.flipped_x = flip
-        self.update_view()
-
-    def flipz(self, flip):
-        self.flipped_z = flip
-        self.update_view()
-
-    def flipy(self, flip):
-        self.flipped_y = flip
-        self.update_view()
 
     def set_scalebar_color(self, qcolor):
         self.scalebar.set_color(qcolor)
@@ -568,18 +551,28 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
         """
         try:
+            flip_x, flip_y, flip_z = self.get_flips()
+
             if self.orientation == Orientation.axial:
-                pix_intensity = self.layers[layer_index].vol.pixel_axial(self.current_slice_idx, y, x,
-                                                                         self.flipped_x, self.flipped_z)
-            if self.orientation == Orientation.sagittal:
-                pix_intensity = self.layers[layer_index].vol.pixel_sagittal(y, x, self.current_slice_idx,
-                                                                            self.flipped_x, self.flipped_z)
-            if self.orientation == Orientation.coronal:
-                pix_intensity = self.layers[layer_index].vol.pixel_coronal(y, self.current_slice_idx, x,
-                                                                           self.flipped_x, self.flipped_z)
+                pixel_func = self.layers[layer_index].vol.pixel_axial
+            elif self.orientation == Orientation.sagittal:
+                pixel_func = self.layers[layer_index].vol.pixel_sagittal
+            elif self.orientation == Orientation.coronal:
+                pixel_func = self.layers[layer_index].vol.pixel_coronal
+
+            pix_intensity = pixel_func(self.current_slice_idx, y, x, flip_x=flip_x, flip_z=flip_z, flip_y=flip_y)
+
             return pix_intensity
         except AttributeError:
             print(self.layers[layer_index].vol)
+
+    def get_flips(self):
+        flips = self.mapper.flip_info
+        ori = self.orientation.name
+        flip_z = flips[ori]['z']
+        flip_y = flips[ori]['y']
+        flip_x = flips[ori]['x']
+        return flip_x, flip_y, flip_z
 
     def clear_layers(self):
         for layer in self.layers.items():

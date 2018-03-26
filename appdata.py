@@ -22,7 +22,7 @@ import os
 import collections
 from common import Orientation
 
-VPV_APPDATA_VERSION = 2
+VPV_APPDATA_VERSION = 2.1
 
 
 class AppData(object):
@@ -71,9 +71,9 @@ class AppData(object):
         flips = self.app_data.get('flips')
 
         if not flips:
-            self.app_data['flips'] = {'axial':    {'x': False, 'z': False},
-                                      'coronal':  {'x': False, 'z': False},
-                                      'sagittal': {'x': False, 'z': False},
+            self.app_data['flips'] = {'axial':    {'x': False, 'z': False, 'y': False},
+                                      'coronal':  {'x': False, 'z': False, 'y': False},
+                                      'sagittal': {'x': False, 'z': False, 'y': False},
                                       'impc_view': False}
 
         return self.app_data['flips']

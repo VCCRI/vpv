@@ -93,10 +93,10 @@ class Layer(Qt.QObject):
         self.parent.scalebar.updateBar()
 
     def set_slice(self, index):
-         if self.vol:
+        flip_x, flip_y, flip_z = self.parent.get_flips()
+        if self.vol:
             self.image_item.setImage(self.vol.get_data(self.parent.orientation, index - 1,
-                                                       self.parent.flipped_x, self.parent.flipped_z, self.parent.flipped_y),
-                                     autoLevels=False)
+                                                       flip_x, flip_z, flip_y), autoLevels=False)
 
     def set_series_slider(self):
         if self.vol.data_type == 'series':

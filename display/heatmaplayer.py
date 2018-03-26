@@ -87,8 +87,12 @@ class HeatmapLayer(Layer):
 
         """
         if self.vol and self.vol != "None":
+
+            flip_x, flip_y, flip_z = self.parent.get_flips()
+
             slices = self.vol.get_data(self.parent.orientation, index - 1,
-                                       self.parent.flipped_x, self.parent.flipped_z, self.parent.flipped_y)
+                                       flip_x, flip_z, flip_y)
+
             for i, ii in enumerate(self.image_items):
                 ii.setImage(slices[i], autoLevels=False)
 
