@@ -55,106 +55,150 @@
   <widget class="QWidget" name="widgetFlipButtons" native="true">
    <property name="geometry">
     <rect>
-     <x>1</x>
-     <y>90</y>
+     <x>10</x>
+     <y>80</y>
      <width>344</width>
-     <height>90</height>
+     <height>161</height>
     </rect>
    </property>
-   <layout class="QGridLayout" name="gridLayoutFlips">
-    <item row="0" column="0" colspan="3">
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>Orientationns</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLabel" name="label_4">
-      <property name="text">
-       <string>Sagittal</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="2">
-     <widget class="QLabel" name="label_5">
-      <property name="text">
-       <string>coronal</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="3">
-     <widget class="QLabel" name="label_6">
-      <property name="text">
-       <string>axial</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_7">
-      <property name="text">
-       <string>Flip horizontal</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2">
-     <widget class="QCheckBox" name="checkBoxCoronalFlipX">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="3">
-     <widget class="QCheckBox" name="checkBoxAxialFlipx">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="label_8">
-      <property name="text">
-       <string>Reverse slice ordering</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1">
-     <widget class="QCheckBox" name="checkBoxSagittalFlipZ">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="2">
-     <widget class="QCheckBox" name="checkBoxCoronalFlipZ">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="3">
-     <widget class="QCheckBox" name="checkBoxAxialFlipZ">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QCheckBox" name="checkBoxSagittalFlipX">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-   </layout>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>9</y>
+      <width>85</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Orientations</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>304</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Sagittal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>coronal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>axial</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Flip horizontal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QCheckBox" name="checkBoxSagittalFlipX">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QCheckBox" name="checkBoxCoronalFlipX">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QCheckBox" name="checkBoxAxialFlipx">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>flip vertical</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QCheckBox" name="checkBoxSagittalFlipY">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QCheckBox" name="checkBoxCoronalFlipY">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="QCheckBox" name="checkBoxAxialFlipY">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>Reverse slice ordering</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QCheckBox" name="checkBoxSagittalFlipZ">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QCheckBox" name="checkBoxCoronalFlipZ">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="3">
+      <widget class="QCheckBox" name="checkBoxAxialFlipZ">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QLabel" name="label_9">
    <property name="geometry">
     <rect>
      <x>370</x>
      <y>110</y>
-     <width>62</width>
-     <height>15</height>
+     <width>131</width>
+     <height>16</height>
     </rect>
    </property>
    <property name="text">

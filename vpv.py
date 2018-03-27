@@ -289,12 +289,7 @@ class Vpv(QtCore.QObject):
             whether to flip (True) or to display in original orientation
 
         """
-        for view in self.views.values():
-            if view.orientation == orientation:
-                if flip_dim == 'x':
-                    view.flipx(flip)
-                if flip_dim == 'z':
-                    view.flipz(flip)
+        self.update_slice_views()
 
     def current_annotation_volume(self):
         """

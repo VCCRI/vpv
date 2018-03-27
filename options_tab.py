@@ -35,8 +35,6 @@ class OptionsTab(QtGui.QWidget):
 
         self.appdata = appdata
 
-        self.ui.widgetFlipButtons.hide()
-
     def set_orientations(self):
         """
         Load the orientation-specific flip state stored in the appdata
@@ -51,22 +49,22 @@ class OptionsTab(QtGui.QWidget):
         sagittal = self.flips['sagittal']
 
         self.ui.checkBoxAxialFlipx.setChecked(axial['x'])
-        # self.on_axial_flipx(axial['x'])
+
+        self.ui.checkBoxAxialFlipY.setChecked(axial['y'])
 
         self.ui.checkBoxAxialFlipZ.setChecked(axial['z'])
-        # self.on_axial_flipz(axial['z'])
 
         self.ui.checkBoxCoronalFlipX.setChecked(coronal['x'])
-        # self.on_coronal_flipx(coronal['x'])
+
+        self.ui.checkBoxCoronalFlipY.setChecked(coronal['y'])
 
         self.ui.checkBoxCoronalFlipZ.setChecked(coronal['z'])
-        # self.on_coronal_flipz(coronal['z'])
 
         self.ui.checkBoxSagittalFlipX.setChecked(sagittal['x'])
-        # self.on_sagittal_flipx(sagittal['x'])
+
+        self.ui.checkBoxSagittalFlipY.setChecked(sagittal['y'])
 
         self.ui.checkBoxSagittalFlipZ.setChecked(sagittal['z'])
-        # self.on_sagittal_flipz(sagittal['z'])
 
         self.ui.checkBoxImpcView.setChecked(self.flips['impc_view'])
         self.on_impc_view(self.flips['impc_view'])
@@ -79,6 +77,10 @@ class OptionsTab(QtGui.QWidget):
         self.flip_signal.emit(Orientation.axial, 'x', checked)
         self.flips['axial']['x'] = checked
 
+    def on_axial_flipy(self, checked: bool):
+        self.flip_signal.emit(Orientation.axial, 'y', checked)
+        self.flips['axial']['y'] = checked
+
     def on_axial_flipz(self, checked: bool):
         self.flip_signal.emit(Orientation.axial, 'z', checked)
         self.flips['axial']['z'] = checked
@@ -87,6 +89,10 @@ class OptionsTab(QtGui.QWidget):
         self.flip_signal.emit(Orientation.coronal, 'x', checked)
         self.flips['coronal']['x'] = checked
 
+    def on_coronal_flipy(self, checked: bool):
+        self.flip_signal.emit(Orientation.coronal, 'y', checked)
+        self.flips['coronal']['y'] = checked
+
     def on_coronal_flipz(self, checked: bool):
         self.flip_signal.emit(Orientation.coronal, 'z', checked)
         self.flips['coronal']['z'] = checked
@@ -94,6 +100,10 @@ class OptionsTab(QtGui.QWidget):
     def on_sagittal_flipx(self, checked: bool):
         self.flip_signal.emit(Orientation.sagittal, 'x', checked)
         self.flips['sagittal']['x'] = checked
+
+    def on_sagittal_flipy(self, checked: bool):
+        self.flip_signal.emit(Orientation.sagittal, 'y', checked)
+        self.flips['sagittal']['y'] = checked
 
     def on_sagittal_flipz(self, checked: bool):
         self.flip_signal.emit(Orientation.sagittal, 'z', checked)
