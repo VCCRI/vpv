@@ -348,7 +348,7 @@ class ManageData(QtGui.QWidget):
     def update_connected_components(self, vol_name):
         self.blob_table.clear()
         self.blob_table.setRowCount(0)
-        self.blob_table.setHorizontalHeaderLabels(['Count', 'Mean', 'location'])
+        self.blob_table.setHorizontalHeaderLabels(['Count', 'Mean', 'location x:x, y:y, z:z'])
 
         # set the connected component list
         conn = self.model.getdata(vol_name).connected_components
@@ -365,7 +365,7 @@ class ManageData(QtGui.QWidget):
         roi_widget = self.blob_table.item(row, 2)
         roi_str = roi_widget.text()
         roi = [x.strip() for x in roi_str.split(', ')]
-        self.roi_signal.emit(roi[4:6], roi[2:4], roi[0:2])
+        self.roi_signal.emit(roi[0:2], roi[2:4], roi[4:6])
 
     def vector_changed(self, vol_name):
         self.modify_layer(Layers.vectors, 'set_volume', vol_name)

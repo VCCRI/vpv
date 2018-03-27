@@ -74,7 +74,7 @@
      <string>Orientations</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -191,19 +191,6 @@
      </item>
     </layout>
    </widget>
-  </widget>
-  <widget class="QLabel" name="label_9">
-   <property name="geometry">
-    <rect>
-     <x>370</x>
-     <y>110</y>
-     <width>131</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>impc view</string>
-   </property>
   </widget>
   <widget class="QCheckBox" name="checkBoxImpcView">
    <property name="geometry">

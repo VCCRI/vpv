@@ -36,6 +36,9 @@ class OptionsTab(QtGui.QWidget):
 
         self.ui.checkBoxImpcView.clicked.connect(self.on_impc_view)
 
+        self.ui.checkBoxImpcView.hide()  # not using ofr now
+
+
         self.appdata = appdata
 
     def set_orientations(self):

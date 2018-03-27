@@ -176,7 +176,7 @@ class Vpv(QtCore.QObject):
             return
 
         # map to the volume space
-        vol_points = self.mapper.view_to_volume(x, y, z, src_view)
+        vol_points = self.mapper.view_to_volume(x, y, z, src_view.orientation, src_view.main_volume.shape_xyz())
 
         try:
             pix = vol.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
@@ -192,8 +192,8 @@ class Vpv(QtCore.QObject):
 
         if modifiers == QtCore.Qt.ShiftModifier:
 
-            # With mouse move signal, also send currebt vol.
-            # If veiews are not synchronised, syncyed sliceing only occurs within volumes
+            # With mouse move signal, also send current vol.
+            # If veiews are not synchronised, syncyed slicing only occurs within volumes
             self.mouse_shift(x, y, z, src_view)
 
     def map_annotation_signal_view_to_view(self, slice_idx: int, x: int, y: int, src_view: SliceWidget,
@@ -219,9 +219,11 @@ class Vpv(QtCore.QObject):
 
         if not self.annotations_manager.annotating:
             return
+        dims = self.current_annotation_volume().shape_xyz()
         for dest_view in self.views.values():
             # First map the annotation marker between views
-            dest_x, dest_y, dest_index = self.mapper.view_to_view(x, y, slice_idx, src_view, dest_view)
+            dest_x, dest_y, dest_index = self.mapper.view_to_view(x, y, slice_idx, src_view.orientation,
+                                                                  dest_view.orientation, dims)
 
             dest_view.set_slice(dest_index)
             # Set the annotation marker. Red for pre-annoation, green indicates annotation save
@@ -231,7 +233,7 @@ class Vpv(QtCore.QObject):
             # The coordinates need to be in axial space do map back to them if necessary
             if dest_view.orientation == Orientation.axial:
                 # Now map it back to image coordinates
-                xa, ya, idxa = self.mapper.view_to_volume(x, y, slice_idx, src_view)
+                xa, ya, idxa = self.mapper.view_to_volume(x, y, slice_idx, src_view.orientation, dims)
                 self.annotations_manager.set_annotation_position_label(xa, ya, idxa)
 
 
@@ -253,7 +255,7 @@ class Vpv(QtCore.QObject):
             The volume belonging to the source view
         """
 
-        #TODO: AttributeError: 'SliceWidget' object has no attribute 'Layers'
+        dims = self.current_annotation_volume().shape_xyz()
         for dest_view in self.views.values():
 
             # if not self.data_manager.link_views:
@@ -262,7 +264,7 @@ class Vpv(QtCore.QObject):
             #     #     continue
 
             # _, dest_y, dest_index = self.mapper.view_to_view(x, y, src_index, None, dest_view)
-            dest_x, dest_y, dest_z = self.mapper.view_to_view(x, y, z, src_view, dest_view) # document!
+            dest_x, dest_y, dest_z = self.mapper.view_to_view(x, y, z, src_view.orientation, dest_view.orientation, dims)
             try:
                 dest_view.set_slice(dest_z, crosshair_xy=(dest_x, dest_y))
             except IndexError:
@@ -442,7 +444,7 @@ class Vpv(QtCore.QObject):
         """
 
         try:
-            x1, y1, z1 = self.mapper.view_to_volume(x, y, z, src_view)
+            x1, y1, z1 = self.mapper.view_to_volume(x, y, z, src_view.orientation, src_view.main_volume.shape_xyz())
         except TypeError:
             pass #Todo: Another bodge. If there are no views that are axial we have a problem
         else:
@@ -536,33 +538,12 @@ class Vpv(QtCore.QObject):
         -------
 
         """
-
-        impc = self.appdata.get_flips()['impc_view']
-
+        dims = self.current_annotation_volume().shape_xyz()
         for dest_view in self.views.values():
-
-            dest_x, dest_y, dest_z = self.mapper.view_to_view(x, y, z, self.current_view, dest_view)
-
-            if dest_view.orientation == Orientation.sagittal:
-
-                    dest_view.show_annotation_marker(dest_x, dest_y, color, radius)
-
-            elif dest_view.orientation == Orientation.coronal:
-                if impc:
-                    dest_view.set_slice(dest_z_rev)
-                    dest_view.show_annotation_marker(dest_x_rev, dest_y_rev, color, radius)
-                else:
-                    dest_view.set_slice(dest_z)
-                    dest_view.show_annotation_marker(dest_x_rev, dest_y, color, radius)
-
-            elif dest_view.orientation == Orientation.axial:
-                if impc:
-                    dest_view.set_slice(dest_z_rev)
-                    dest_view.show_annotation_marker(dest_x_rev, dest_y_rev, color, radius)
-                else:
-                    dest_view.set_slice(dest_z)
-                    dest_view.show_annotation_marker(dest_x_rev, dest_y, color, radius)
-
+            dest_x, dest_y, dest_z = self.mapper.view_to_view(x, y, z, Orientation.axial, dest_view.orientation,
+                                                              dims, from_saved=True)
+            dest_view.set_slice(dest_z)
+            dest_view.show_annotation_marker(dest_x, dest_y, color, radius)
 
     def control_visiblity(self, visible):
         for slice_ in self.slice_widgets.values():
