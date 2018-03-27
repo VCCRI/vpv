@@ -536,20 +536,15 @@ class Vpv(QtCore.QObject):
         -------
 
         """
-        src_index = z
+
         impc = self.appdata.get_flips()['impc_view']
 
         for dest_view in self.views.values():
 
-            dest_x, dest_y, dest_z = self.mapper.view_to_view(x, y, src_index, None, dest_view)
-            dest_x_rev, dest_y_rev, dest_z_rev = self.mapper.view_to_view(x, y, src_index, None, dest_view, rev=True) # document!
+            dest_x, dest_y, dest_z = self.mapper.view_to_view(x, y, z, self.current_view, dest_view)
 
             if dest_view.orientation == Orientation.sagittal:
-                dest_view.set_slice(dest_z_rev)
 
-                if impc:
-                    dest_view.show_annotation_marker(dest_x_rev, dest_y_rev, color, radius)
-                else:
                     dest_view.show_annotation_marker(dest_x, dest_y, color, radius)
 
             elif dest_view.orientation == Orientation.coronal:

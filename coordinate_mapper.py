@@ -47,17 +47,17 @@ class Coordinate_mapper(object):
         else:
             src_orientation = src_view.orientation
 
-        dest_dims = src_view.main_volume.shape_xyz()
+        src_dims = src_view.main_volume.shape_xyz()
 
         # Flip the source view points if needed
         if self.flip_info[src_orientation.name]['y']:
-            y = dest_dims[1] - y
+            y = src_dims[1] - y
 
         if self.flip_info[src_orientation.name]['x']:
-            x = dest_dims[0] - x
+            x = src_dims[0] - x
 
         if self.flip_info[src_orientation.name]['z']:
-            z = dest_dims[2] - z
+            z = src_dims[2] - z
 
         # first map to axial space
 
