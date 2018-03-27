@@ -9,8 +9,7 @@ class Coordinate_mapper(object):
         self.views = views  # Get a reference to the views dict that contains the slice view widgets
         self.flip_info = saved_flip_info
 
-
-    def view_to_volume(self, x: int, y: int, idx: int, src_view: SliceWidget) -> tuple:
+    def view_to_volume(self, x: int, y: int, z: int, src_view: SliceWidget) -> tuple:
         """
         Given coordinates from a slice view, convert to actual coordinates in the correct volume space
         This is required as we do some inversion of the order of slices as they come off the volumes to show
@@ -22,7 +21,7 @@ class Coordinate_mapper(object):
         ----------
         x: int
         y: int
-        idx: int
+        z: int
         src_view: SliceWidget
         reverse: bool
             True: map from volume space to image space
@@ -43,36 +42,33 @@ class Coordinate_mapper(object):
         position labels
 
         """
-        # This will break if there are no axial views present
+        if src_view is None:
+            src_orientation = Orientation.axial
+        else:
+            src_orientation = src_view.orientation
 
-        src_dims = src_view.main_volume.shape_xyz()
+        dest_dims = src_view.main_volume.shape_xyz()
 
-        # first map to axial space. the new order of the pint at that position
+        # Flip the source view points if needed
+        if self.flip_info[src_orientation.name]['y']:
+            y = dest_dims[1] - y
+
+        if self.flip_info[src_orientation.name]['x']:
+            x = dest_dims[0] - x
+
+        if self.flip_info[src_orientation.name]['z']:
+            z = dest_dims[2] - z
+
+        # first map to axial space
 
         flip_to_axial_order = {
-            Orientation.axial: [0, 1, 2],
-            Orientation.coronal: [0, 2, 1],
+            Orientation.axial:    [0, 1, 2],
+            Orientation.coronal:  [0, 2, 1],
             Orientation.sagittal: [1, 2, 0]
         }
 
-        # # Pyqtgraph indexes the x dimension in the opposite direction to Slicer, so flip it
-        # dims = self.main_volume.shape_xyz()
-        if src_view.orientation in (Orientation.axial, Orientation.coronal):
-            x = src_dims[0] - x
-        elif src_view.orientation == Orientation.sagittal:
-            x = src_dims[1] - x
-
-        order = flip_to_axial_order[src_view.orientation]
-        axial_space_points = [j for _, j in sorted(zip(order, [x, y, idx]), key=lambda pair: pair[0])]
-
-        if self.flip_info['impc_view']:
-            if src_view.orientation == Orientation.axial:
-                axial_space_points[2] = src_dims[2] - axial_space_points[2]
-                axial_space_points[1] = src_dims[1] - axial_space_points[1]
-
-            if src_view.orientation == Orientation.coronal:
-                axial_space_points[1] = src_dims[1] - axial_space_points[1]
-
+        order = flip_to_axial_order[src_orientation]
+        axial_space_points = [j for _, j in sorted(zip(order, [x, y, z]), key=lambda pair: pair[0])]
         return axial_space_points
 
     def view_to_view(self, x, y, z, src_view, dest_view, rev=False):
@@ -100,35 +96,13 @@ class Coordinate_mapper(object):
 
         """
 
-        if src_view is None:
-            src_orientation = Orientation.axial
-        else:
-            src_orientation = src_view.orientation
-
         dest_orientation = dest_view.orientation
         dest_dims = dest_view.main_volume.shape_xyz()
 
-        # Flip the source view points if needed
-        if self.flip_info[src_orientation.name]['y']:
-            y = dest_dims[1] - y
+        # Get the points in volume space
+        axial_space_points = self.view_to_volume(x, y, z, src_view)
 
-        if self.flip_info[src_orientation.name]['x']:
-            x = dest_dims[0] - x
-
-        if self.flip_info[src_orientation.name]['z']:
-            z = dest_dims[2] - z
-
-        # first map to axial space
-
-        flip_to_axial_order = {
-            Orientation.axial:    [0, 1, 2],
-            Orientation.coronal:  [0, 2, 1],
-            Orientation.sagittal: [1, 2, 0]
-        }
-
-        order = flip_to_axial_order[src_orientation]
-        axial_space_points = [j for _, j in sorted(zip(order, [x, y, z]), key=lambda pair: pair[0])]
-
+        # And map to the destination space
         flip_from_axial_order = {
             Orientation.axial:    [0, 1, 2],
             Orientation.coronal:  [0, 2, 1],
@@ -146,7 +120,6 @@ class Coordinate_mapper(object):
 
         if self.flip_info[dest_orientation.name]['z']:
             dest_points[2] = dest_dims[2] - dest_points[2]
-
 
         return dest_points
 

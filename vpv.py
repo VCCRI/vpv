@@ -161,8 +161,14 @@ class Vpv(QtCore.QObject):
         self.options_tab.set_orientations()
 
     def on_slice_view_mouse_move(self, x: int, y: int, z: int, src_view: SliceWidget):
+        """
+        Given coordinates of mouse hover position, do ....
+        Parameters
+        ----------
+        src_view: the emitting slice widget
 
-        # Get the pixel value of the main volume at the given coordinates
+        """
+
         vol = src_view.main_volume
         if not vol:
             return
@@ -171,8 +177,9 @@ class Vpv(QtCore.QObject):
 
         # map to the volume space
         vol_points = self.mapper.view_to_volume(x, y, z, src_view)
+
         try:
-            pix = vol.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]] )
+            pix = vol.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
         except IndexError:
             pass
         else:

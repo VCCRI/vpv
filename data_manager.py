@@ -762,7 +762,8 @@ class ManageData(QtGui.QWidget):
         else:
             v = self.controller.current_view
             v.set_orientation(orientation)
-            
+
+
 class ColorScaleBar(object):
     def __init__(self, layout, neg_lut, pos_lut):
         self.color_scale_widget = pg.GraphicsLayoutWidget()
