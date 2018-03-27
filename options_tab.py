@@ -13,7 +13,7 @@ tab widget
 
 
 class OptionsTab(QtGui.QWidget):
-    flip_signal = QtCore.pyqtSignal(Orientation, str, bool)
+    flip_signal = QtCore.pyqtSignal()
     impc_view_signal = QtCore.pyqtSignal(bool)
     save_options_signal = QtCore.pyqtSignal()
 
@@ -23,12 +23,15 @@ class OptionsTab(QtGui.QWidget):
         self.ui.setupUi(self)
 
         self.ui.checkBoxAxialFlipx.clicked.connect(self.on_axial_flipx)
+        self.ui.checkBoxAxialFlipY.clicked.connect(self.on_axial_flipy)
         self.ui.checkBoxAxialFlipZ.clicked.connect(self.on_axial_flipz)
 
         self.ui.checkBoxCoronalFlipX.clicked.connect(self.on_coronal_flipx)
+        self.ui.checkBoxCoronalFlipY.clicked.connect(self.on_coronal_flipy)
         self.ui.checkBoxCoronalFlipZ.clicked.connect(self.on_coronal_flipz)
 
         self.ui.checkBoxSagittalFlipX.clicked.connect(self.on_sagittal_flipx)
+        self.ui.checkBoxSagittalFlipY.clicked.connect(self.on_sagittal_flipy)
         self.ui.checkBoxSagittalFlipZ.clicked.connect(self.on_sagittal_flipz)
 
         self.ui.checkBoxImpcView.clicked.connect(self.on_impc_view)
@@ -70,41 +73,42 @@ class OptionsTab(QtGui.QWidget):
         self.on_impc_view(self.flips['impc_view'])
 
     def on_impc_view(self, checked: bool):
-        self.impc_view_signal.emit(checked)
         self.flips['impc_view'] = checked
+        self.flip_signal.emit()
 
     def on_axial_flipx(self, checked: bool):
-        self.flip_signal.emit(Orientation.axial, 'x', checked)
         self.flips['axial']['x'] = checked
+        self.flip_signal.emit()
 
     def on_axial_flipy(self, checked: bool):
-        self.flip_signal.emit(Orientation.axial, 'y', checked)
         self.flips['axial']['y'] = checked
+        self.flip_signal.emit()
 
     def on_axial_flipz(self, checked: bool):
-        self.flip_signal.emit(Orientation.axial, 'z', checked)
         self.flips['axial']['z'] = checked
+        self.flip_signal.emit()
 
     def on_coronal_flipx(self, checked: bool):
-        self.flip_signal.emit(Orientation.coronal, 'x', checked)
         self.flips['coronal']['x'] = checked
+        self.flip_signal.emit()
 
     def on_coronal_flipy(self, checked: bool):
-        self.flip_signal.emit(Orientation.coronal, 'y', checked)
         self.flips['coronal']['y'] = checked
+        self.flip_signal.emit()
 
     def on_coronal_flipz(self, checked: bool):
-        self.flip_signal.emit(Orientation.coronal, 'z', checked)
         self.flips['coronal']['z'] = checked
+        self.flip_signal.emit()
 
     def on_sagittal_flipx(self, checked: bool):
-        self.flip_signal.emit(Orientation.sagittal, 'x', checked)
         self.flips['sagittal']['x'] = checked
+        self.flip_signal.emit()
 
     def on_sagittal_flipy(self, checked: bool):
-        self.flip_signal.emit(Orientation.sagittal, 'y', checked)
         self.flips['sagittal']['y'] = checked
+        self.flip_signal.emit()
 
     def on_sagittal_flipz(self, checked: bool):
-        self.flip_signal.emit(Orientation.sagittal, 'z', checked)
         self.flips['sagittal']['z'] = checked
+        self.flip_signal.emit()
+

@@ -120,7 +120,7 @@ class Vpv(QtCore.QObject):
         self.volume_pixel_signal.connect(self.mainwindow.set_volume_pix_intensity)
 
         self.options_tab = OptionsTab(self.mainwindow, self.appdata)
-        self.options_tab.flip_signal.connect(self.on_options_flip)
+        self.options_tab.flip_signal.connect(self.update_slice_views)
         self.options_tab.impc_view_signal.connect(self.on_impc_view)
 
         # Sometimes QT console is a pain to install. If not availale do not make console tab
@@ -273,23 +273,6 @@ class Vpv(QtCore.QObject):
                 self.mapper.impc_view = do_impc
             if view.orientation == Orientation.coronal:
                 view.flipz(do_impc)
-
-
-    def on_options_flip(self, orientation: Orientation, flip_dim: str, flip: bool):
-        """
-        Recieves signals that instruct a flip on the data
-        The flip can be in x or z (in slice view coordinates) and will apply to all views in a given orientation
-        Parameters
-        ----------
-        orientation: Orientation enum
-            the orientation to take effect on
-        flip_dim: str
-            'x' or 'z'
-        flip: bool
-            whether to flip (True) or to display in original orientation
-
-        """
-        self.update_slice_views()
 
     def current_annotation_volume(self):
         """

@@ -756,24 +756,13 @@ class ManageData(QtGui.QWidget):
         # convert the str to an enum member
         orientation = Orientation[orientation]
 
-        def get_flip(orientation):
-            fx = self.appdata.get_flips()[orientation.name]['x']
-            fz = self.appdata.get_flips()[orientation.name]['z']
-            return fx, fz
-
         if self.link_views:
             for v in self.views.values():
                 v.set_orientation(orientation)
-                fx, fz = get_flip(v.orientation)
-                v.flipx(fx)
         else:
-            v =self.controller.current_view
+            v = self.controller.current_view
             v.set_orientation(orientation)
-            fx, fz = get_flip(v.orientation)
-            v.flipx(fx)
-
-
-
+            
 class ColorScaleBar(object):
     def __init__(self, layout, neg_lut, pos_lut):
         self.color_scale_widget = pg.GraphicsLayoutWidget()

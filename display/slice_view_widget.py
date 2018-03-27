@@ -688,7 +688,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
     def set_slice(self, index, crosshair_xy=None):
         """
-        Sets the current visible slice when no caused by the slider (eg wheel scroll).
+        Sets the current visible slice when not caused by the slider (eg wheel scroll, flips).
         Parameters
         ----------
         index: int
