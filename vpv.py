@@ -259,7 +259,7 @@ class Vpv(QtCore.QObject):
             try:
                 dest_view.set_slice(dest_z, crosshair_xy=(dest_x, dest_y))
             except IndexError:
-                print('dfksj')
+                pass
 
     def on_impc_view(self, do_impc: bool):
         return

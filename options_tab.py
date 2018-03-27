@@ -51,22 +51,22 @@ class OptionsTab(QtGui.QWidget):
         sagittal = self.flips['sagittal']
 
         self.ui.checkBoxAxialFlipx.setChecked(axial['x'])
-        self.on_axial_flipx(axial['x'])
+        # self.on_axial_flipx(axial['x'])
 
         self.ui.checkBoxAxialFlipZ.setChecked(axial['z'])
-        self.on_axial_flipz(axial['z'])
+        # self.on_axial_flipz(axial['z'])
 
         self.ui.checkBoxCoronalFlipX.setChecked(coronal['x'])
-        self.on_coronal_flipx(coronal['x'])
+        # self.on_coronal_flipx(coronal['x'])
 
         self.ui.checkBoxCoronalFlipZ.setChecked(coronal['z'])
-        self.on_coronal_flipz(coronal['z'])
+        # self.on_coronal_flipz(coronal['z'])
 
         self.ui.checkBoxSagittalFlipX.setChecked(sagittal['x'])
-        self.on_sagittal_flipx(sagittal['x'])
+        # self.on_sagittal_flipx(sagittal['x'])
 
         self.ui.checkBoxSagittalFlipZ.setChecked(sagittal['z'])
-        self.on_sagittal_flipz(sagittal['z'])
+        # self.on_sagittal_flipz(sagittal['z'])
 
         self.ui.checkBoxImpcView.setChecked(self.flips['impc_view'])
         self.on_impc_view(self.flips['impc_view'])

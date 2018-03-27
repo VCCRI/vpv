@@ -83,9 +83,11 @@ class ImageReader(object):
         self.space = self.img.GetDirection()
         self.vol = sitk.GetArrayFromImage(self.img)
         import numpy as np
-        # Testing
+        # PyqtGraph displays the views on their sides.
+        # This transormation puts them the right way up and effectively flips the views so that
+        # Axial is the last dimension and sagittal the first
         self.vol = np.rot90(self.vol, axes=(0, 2), k=1)
-        # self.vol = np.rot90(self.vol, axes=(2, 1), k=1)
+
 
 def read_image(img_path, convert_to_ras=False):
     if img_path.endswith('.gz'):

@@ -35,10 +35,10 @@ class Volume(Qt.QObject):
         self.space = None
 
     def shape_zyx(self):
-        return self._arr_data.shape
+        return tuple(reversed(self._arr_data.shape))
 
     def shape_xyz(self):
-        return tuple(reversed(self._arr_data.shape))
+        return self._arr_data.shape
 
     def get_axial_slot(self):
         print('get_axial_slot')
@@ -147,9 +147,10 @@ class Volume(Qt.QObject):
 
     def _get_coronal(self, index, flipx, flipz, flipy, xy=None):
         if flipz:
-            index = self._arr_data.shape[1] - index
-        # slice_ = np.rot90(self._arr_data[:, index, :], 1)
+            index = self.shape_xyz()[1] - index
         slice_ = self._arr_data[:, index, :]
+        if flipy:
+            slice_ = np.fliplr(slice_)
         if flipx:
             slice_ = np.flipud(slice_)
         if xy:
@@ -157,12 +158,12 @@ class Volume(Qt.QObject):
             slice_ = slice_[y, x]
         return slice_
 
-    # Testing. Adding reverse option to try and get same view sequence as IEV. Need to flip now
     def _get_sagittal(self, index, flipx, flipz, flipy, xy=None):
         if flipz:
-            index = self._arr_data.shape[2] - index
-        # slice_ = np.rot90(self._arr_data[:, :, index], 1)
+            index = self.shape_xyz()[0] - index
         slice_ = self._arr_data[index, :, :]
+        if flipy:
+            slice_ = np.fliplr(slice_)
         if flipx:
             slice_ = np.flipud(slice_)
         if xy:
@@ -172,8 +173,7 @@ class Volume(Qt.QObject):
 
     def _get_axial(self, index, flipx, flipz, flipy, xy=None):
         if flipz:
-            index = self._arr_data.shape[0] - index
-        # slice_ = np.rot90(self._arr_data[index, :, :], 1)
+            index = self.shape_xyz()[2] - index
         slice_ = self._arr_data[:, :, index]
         if flipy:
             slice_ = np.fliplr(slice_)

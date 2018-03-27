@@ -108,7 +108,17 @@ class Coordinate_mapper(object):
         dest_orientation = dest_view.orientation
         dest_dims = dest_view.main_volume.shape_xyz()
 
-        # first map to axial space. the new order of the pint at that position
+        # Flip the source view points if needed
+        if self.flip_info[src_orientation.name]['y']:
+            y = dest_dims[1] - y
+
+        if self.flip_info[src_orientation.name]['x']:
+            x = dest_dims[0] - x
+
+        if self.flip_info[src_orientation.name]['z']:
+            z = dest_dims[2] - z
+
+        # first map to axial space
 
         flip_to_axial_order = {
             Orientation.axial:    [0, 1, 2],
@@ -119,9 +129,6 @@ class Coordinate_mapper(object):
         order = flip_to_axial_order[src_orientation]
         axial_space_points = [j for _, j in sorted(zip(order, [x, y, z]), key=lambda pair: pair[0])]
 
-        if rev:  # CROSS HAIRS
-            axial_space_points = [d - p for p, d in zip(axial_space_points, dest_dims)]
-
         flip_from_axial_order = {
             Orientation.axial:    [0, 1, 2],
             Orientation.coronal:  [0, 2, 1],
@@ -131,39 +138,14 @@ class Coordinate_mapper(object):
         order = flip_from_axial_order[dest_orientation]
         dest_points = [j for _, j in sorted(zip(order, axial_space_points), key=lambda pair: pair[0])]
 
-        # #this is to get into pyqtgraph space
-        # if dest_orientation == Orientation.sagittal and src_orientation is not Orientation.sagittal:
-        #     dest_points[0] = dest_dims[1] - dest_points[0]
-        #     dest_points[2] = dest_dims[0] - dest_points[2]
-        #
-        # if src_orientation == Orientation.sagittal and dest_orientation is Orientation.coronal:
-        #     dest_points[0] = dest_dims[0] - dest_points[0]
-        #     dest_points[2] = dest_dims[1] - dest_points[2]
-        #
-        # if src_orientation == Orientation.sagittal and dest_orientation is Orientation.axial:
-        #     dest_points[1] = dest_dims[1] - dest_points[1]
-        #     dest_points[0] = dest_dims[0] - dest_points[0]
-        #
-        # if self.impc_view:
-        #     if src_orientation == Orientation.coronal and dest_orientation is Orientation.axial:
-        #         dest_points[2] = dest_dims[2] - dest_points[2]
-        #
-        #     if src_orientation == Orientation.coronal and dest_orientation is Orientation.sagittal:
-        #         dest_points[0] = dest_dims[1] - dest_points[0]
-        #
-        #     if src_orientation == Orientation.axial and dest_orientation in (Orientation.coronal, Orientation.sagittal):
-        #         dest_points[1] = dest_dims[2] - dest_points[1]
-        #
-        #     if src_orientation == Orientation.axial and dest_orientation is Orientation.sagittal:
-        #         dest_points[0] = dest_dims[1] - dest_points[0]
-        #
-        #     if src_orientation == Orientation.sagittal and dest_orientation is Orientation.coronal:
-        #         dest_points[2] = dest_dims[1] - dest_points[2]
-        #
-        #     if src_orientation == Orientation.sagittal and dest_orientation is Orientation.axial:
-        #         dest_points[1] = dest_dims[1] - dest_points[1]
-        #         dest_points[2] = dest_dims[2] - dest_points[2]
+        if self.flip_info[dest_orientation.name]['y']:
+            dest_points[1] = dest_dims[1] - dest_points[1]
 
+        if self.flip_info[dest_orientation.name]['x']:
+            dest_points[0] = dest_dims[0] - dest_points[0]
+
+        if self.flip_info[dest_orientation.name]['z']:
+            dest_points[2] = dest_dims[2] - dest_points[2]
 
 
         return dest_points
