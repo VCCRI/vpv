@@ -123,7 +123,6 @@ class Vpv(QtCore.QObject):
 
         self.options_tab = OptionsTab(self.mainwindow, self.appdata)
         self.options_tab.flip_signal.connect(self.update_slice_views)
-        self.options_tab.impc_view_signal.connect(self.on_impc_view)
 
         # Sometimes QT console is a pain to install. If not availale do not make console tab
         if console_imported:
@@ -271,19 +270,6 @@ class Vpv(QtCore.QObject):
                 dest_view.set_slice(dest_z, crosshair_xy=(dest_x, dest_y))
             except IndexError:
                 pass
-
-    def on_impc_view(self, do_impc: bool):
-        return
-
-        # For RAS, we need to vertically flip the axial view. Need to add other views as well
-        for view in self.views.values():
-            view.roi.clear()
-            if view.orientation == Orientation.axial:
-                view.flipy(do_impc)
-                view.flipz(do_impc)
-                self.mapper.impc_view = do_impc
-            if view.orientation == Orientation.coronal:
-                view.flipz(do_impc)
 
     def current_annotation_volume(self):
         """

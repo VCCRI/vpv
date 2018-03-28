@@ -284,9 +284,6 @@ class SliceWidget(QWidget, Ui_SliceWidget):
     volume_position_signal = QtCore.pyqtSignal(int, int, int, object)
 
     mouse_moved_signal = QtCore.pyqtSignal(int, int, int, object, name='mouse_move')
-
-    volume_pixel_signal = QtCore.pyqtSignal(float)
-    data_pixel_signal = QtCore.pyqtSignal(float)
     object_counter = 0
     manage_views_signal = QtCore.pyqtSignal(int)
     voxel_clicked_signal = QtCore.pyqtSignal(tuple, Orientation, tuple)  # vols, orientation, (x, y)
@@ -397,6 +394,17 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         return self.layers[Layers.vol1].vol
 
     @property
+    def heatmap_volume(self):
+        """
+        Wrapper to get volume associated with the second layer
+        Returns
+        -------
+        Volume
+
+        """
+        return self.layers[Layers.heatmap].vol
+
+    @property
     def scale_bar_visible(self):
         return self.scalebar.scale_bar_label_visible
 
@@ -494,44 +502,6 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
         self.mouse_moved_signal.emit(x, y, self.current_slice_idx, self)
 
-
-        #
-        # # Pyqtgraph indexes the x dimension in the opposite direction to Slicer, so flip it
-        # dims = self.main_volume.shape_xyz()
-        # if self.orientation in (Orientation.axial, Orientation.coronal):
-        #     x = dims[0] - x
-        # elif self.orientation == Orientation.sagittal:
-        #     x = dims[1] - x
-        #
-        # if x < 0 or y < 0:
-        #     return
-        # if self.layers[Layers.vol1].vol:
-        #     try:
-        #         pix = self.get_pixel(Layers.vol1, self.current_slice_idx, y, x)
-        #         self.volume_position_signal.emit(self.current_slice_idx, y, x , self)
-        #     except IndexError:  # mouse placed outside the image can yield non-existent indices
-        #         pass
-        #     else:
-        #         self.volume_pixel_signal.emit(round(float(pix), 2))
-        #
-        # if self.layers[Layers.heatmap].vol:
-        #     try:
-        #         pix = self.get_pixel(Layers.heatmap, self.current_slice_idx, y, x)
-        #     except IndexError:
-        #         pass
-        #     else:
-        #         self.data_pixel_signal.emit(round(float(pix), 6))
-        #         self.data_pixel_signal.emit(round(float(pix), 6))
-        #
-        # modifiers = QtGui.QApplication.keyboardModifiers()
-        #
-        # # If shift is pressed emit signal to get other views to get to the same or interscting slice
-        # if modifiers == QtCore.Qt.ShiftModifier:
-        #
-        #     # With mouse move signal, also send currebt vol.
-        #     # If veiews are not synchronised, syncyed sliceing only occurs within volumes
-        #     self.mouse_shift.emit(self.current_slice_idx, x, y, self)
-
     def get_pixel(self, layer_index, z, y, x):
         """
         given a layer index and coords, get the corresponding voxel value
@@ -579,7 +549,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
             layer[1].clear()
             #layer[1].clear()
 
-    def register_layers(self):
+    def register_layers(self) -> OrderedDict:
         """
         Create a new Layer object and add to display
         """

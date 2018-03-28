@@ -101,6 +101,11 @@ QCheckBox::indicator:unchecked {
     image: url(:/images/checkbox_unchecked);
 }
 
+QCheckBox::indicator:disabled {
+    image: url(:/images/checkbox_disabled);
+}
+
+
 
 QCheckBox::indicator:unchecked:pressed {
     image: url(:/images/checkbox_unchecked_pressed.png);

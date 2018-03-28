@@ -1,9 +1,7 @@
-import numpy as np
+
 from PyQt5 import QtGui, QtCore
 from ui.ui_options_tab import Ui_options
-from common import Orientation
 from appdata import AppData
-from common import info_dialog
 
 
 """
@@ -14,30 +12,42 @@ tab widget
 
 class OptionsTab(QtGui.QWidget):
     flip_signal = QtCore.pyqtSignal()
-    impc_view_signal = QtCore.pyqtSignal(bool)
-    save_options_signal = QtCore.pyqtSignal()
 
     def __init__(self, mainwindow, appdata: AppData):
         super(OptionsTab, self).__init__(mainwindow)
         self.ui = Ui_options()
         self.ui.setupUi(self)
 
-        self.ui.checkBoxAxialFlipx.clicked.connect(self.on_axial_flipx)
-        self.ui.checkBoxAxialFlipY.clicked.connect(self.on_axial_flipy)
-        self.ui.checkBoxAxialFlipZ.clicked.connect(self.on_axial_flipz)
+        self.ui.checkBoxAxialFlipx.stateChanged.connect(self.on_axial_flipx)
+        self.ui.checkBoxAxialFlipY.stateChanged.connect(self.on_axial_flipy)
+        self.ui.checkBoxAxialFlipZ.stateChanged.connect(self.on_axial_flipz)
 
-        self.ui.checkBoxCoronalFlipX.clicked.connect(self.on_coronal_flipx)
-        self.ui.checkBoxCoronalFlipY.clicked.connect(self.on_coronal_flipy)
-        self.ui.checkBoxCoronalFlipZ.clicked.connect(self.on_coronal_flipz)
+        self.ui.checkBoxCoronalFlipX.stateChanged.connect(self.on_coronal_flipx)
+        self.ui.checkBoxCoronalFlipY.stateChanged.connect(self.on_coronal_flipy)
+        self.ui.checkBoxCoronalFlipZ.stateChanged.connect(self.on_coronal_flipz)
 
-        self.ui.checkBoxSagittalFlipX.clicked.connect(self.on_sagittal_flipx)
-        self.ui.checkBoxSagittalFlipY.clicked.connect(self.on_sagittal_flipy)
-        self.ui.checkBoxSagittalFlipZ.clicked.connect(self.on_sagittal_flipz)
+        self.ui.checkBoxSagittalFlipX.stateChanged.connect(self.on_sagittal_flipx)
+        self.ui.checkBoxSagittalFlipY.stateChanged.connect(self.on_sagittal_flipy)
+        self.ui.checkBoxSagittalFlipZ.stateChanged.connect(self.on_sagittal_flipz)
+
+        self.all_flip_check_boxes = [
+            self.ui.checkBoxAxialFlipx,
+            self.ui.checkBoxAxialFlipY,
+            self.ui.checkBoxAxialFlipZ,
+            self.ui.checkBoxCoronalFlipX,
+            self.ui.checkBoxCoronalFlipY,
+            self.ui.checkBoxCoronalFlipZ,
+            self.ui.checkBoxSagittalFlipX,
+            self.ui.checkBoxSagittalFlipY,
+            self.ui.checkBoxSagittalFlipZ
+        ]
+        self.impc_flip_boxes = [
+            self.ui.checkBoxAxialFlipZ,
+            self.ui.checkBoxAxialFlipY,
+            self.ui.checkBoxCoronalFlipZ
+        ]
 
         self.ui.checkBoxImpcView.clicked.connect(self.on_impc_view)
-
-        self.ui.checkBoxImpcView.hide()  # not using ofr now
-
 
         self.appdata = appdata
 
@@ -73,10 +83,28 @@ class OptionsTab(QtGui.QWidget):
         self.ui.checkBoxSagittalFlipZ.setChecked(sagittal['z'])
 
         self.ui.checkBoxImpcView.setChecked(self.flips['impc_view'])
+
         self.on_impc_view(self.flips['impc_view'])
 
     def on_impc_view(self, checked: bool):
+        """
+        IMPC view is a series of flips to make the data look like as agreed.
+        Uncheck all and set agred on flips
+        """
         self.flips['impc_view'] = checked
+        if checked:
+            for box in self.all_flip_check_boxes:
+                if box not in self.impc_flip_boxes:
+                    box.setEnabled(False)
+                    box.setChecked(False)
+                else:
+                    box.setEnabled(True)
+                    box.setChecked(True)
+
+        else:
+            for box in self.all_flip_check_boxes:
+                box.setEnabled(True)
+
         self.flip_signal.emit()
 
     def on_axial_flipx(self, checked: bool):

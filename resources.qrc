@@ -21,5 +21,6 @@
 <qresource prefix="/images">
     <file alias="checkbox_checked">icons/checkbox_checked.png</file>
     <file alias="checkbox_unchecked">icons/checkbox_unchecked.png</file>
+    <file alias="checkbox_disabled">icons/checkbox_disabled.png</file>
 </qresource>
 </RCC>

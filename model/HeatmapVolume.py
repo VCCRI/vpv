@@ -1,10 +1,9 @@
 from .volume import Volume
 import numpy as np
 import os
-import tempfile
 from collections import OrderedDict
 import SimpleITK as sitk
-from common import read_image, timing, ImageReader
+from common import timing, ImageReader
 
 from lookup_tables import Lut
 from read_minc import mincstats_to_numpy
@@ -40,7 +39,7 @@ class HeatmapVolume(Volume):
         self.pos_levels = [float(pos_lower), float(pos_upper)]
 
         self.non_zero_mins = self._get_non_zero_mins()
-        #self.find_largest_connected_components() switch off for now as it slows down loading
+
         self.set_lut(initial_lut)
 
         self.max = self._arr_data.max()

@@ -22,7 +22,7 @@ import os
 import collections
 from common import Orientation
 
-VPV_APPDATA_VERSION = 2.1
+VPV_APPDATA_VERSION = 2.2
 
 
 class AppData(object):
