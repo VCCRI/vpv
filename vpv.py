@@ -93,6 +93,7 @@ class Vpv(QtCore.QObject):
     crosshair_visible_signal = QtCore.pyqtSignal()
     crosshair_invisible_signal = QtCore.pyqtSignal()
     volume_pixel_signal = QtCore.pyqtSignal(int)
+    heatmap_pixel_signal = QtCore.pyqtSignal(int)
     volume_position_signal = QtCore.pyqtSignal(int, int, int)
 
     def __init__(self):
@@ -118,6 +119,7 @@ class Vpv(QtCore.QObject):
         self.annotations_manager.roi_highlight_off_signal.connect(self.reset_roi)
 
         self.volume_pixel_signal.connect(self.mainwindow.set_volume_pix_intensity)
+        self.heatmap_pixel_signal.connect(self.mainwindow.set_data_pix_intensity)
 
         self.options_tab = OptionsTab(self.mainwindow, self.appdata)
         self.options_tab.flip_signal.connect(self.update_slice_views)
@@ -170,6 +172,7 @@ class Vpv(QtCore.QObject):
         """
 
         vol = src_view.main_volume
+        hm = src_view.heatmap_volume
         if not vol:
             return
         if any(i < 0 for i in (x, y, z)):
@@ -179,13 +182,17 @@ class Vpv(QtCore.QObject):
         vol_points = self.mapper.view_to_volume(x, y, z, src_view.orientation, src_view.main_volume.shape_xyz())
 
         try:
-            pix = vol.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
+            vol_hover_voxel_value = vol.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
         except IndexError:
             pass
         else:
             if x > 0 and x > 0:
-                self.volume_pixel_signal.emit(round(float(pix), 2))
+                self.volume_pixel_signal.emit(round(float(vol_hover_voxel_value), 2))
                 self.mainwindow.set_mouse_position(*vol_points)
+                if hm:
+                    hm_hover_voxel_value = hm.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
+                    self.heatmap_pixel_signal.emit((round(float(hm_hover_voxel_value), 2)))
+
 
         # # If shift is pressed emit signal to get other views to get to the same or interscting slice
         modifiers = QtGui.QApplication.keyboardModifiers()
@@ -420,8 +427,6 @@ class Vpv(QtCore.QObject):
 
         """
         view = SliceWidget(orientation, self.model, color, mapper)
-        view.data_pixel_signal.connect(self.mainwindow.set_data_pix_intensity)
-        # view.volume_position_signal.connect(self.mouse_position_slot)
         view.manage_views_signal.connect(self.update_manager)
         self.views[id_] = view
         return view
