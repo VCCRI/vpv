@@ -2,6 +2,19 @@ from common import Orientation
 import numpy as np
 from display.slice_view_widget import SliceWidget
 
+flip_to_axial_order = {
+    Orientation.axial:    [0, 1, 2],
+    Orientation.coronal:  [0, 2, 1],
+    Orientation.sagittal: [1, 2, 0]
+}
+
+flip_from_axial_order = {
+    Orientation.axial:    [0, 1, 2],
+    Orientation.coronal:  [0, 2, 1],
+    Orientation.sagittal: [2, 0, 1]
+}
+
+
 class Coordinate_mapper(object):
     """Map coordinates between views and volumes
     """
@@ -42,29 +55,24 @@ class Coordinate_mapper(object):
         position labels
 
         """
-
         # Flip the source view points if needed
         if not from_saved:
+            # Flip the dimensions so thay match the view
+            dims_order = flip_from_axial_order[src_ori]
+            new_dims = [j for _, j in sorted(zip(dims_order, dims), key=lambda pair: pair[0])]
             if self.flip_info[src_ori.name]['y']:
-                y = dims[1] - y
+                y = new_dims[1] - y
 
             if self.flip_info[src_ori.name]['x']:
-                x = dims[0] - x
+                x = new_dims[0] - x
 
             if self.flip_info[src_ori.name]['z']:
-                z = dims[2] - z
-
-        # first map to axial space
-
-        flip_to_axial_order = {
-            Orientation.axial:    [0, 1, 2],
-            Orientation.coronal:  [0, 2, 1],
-            Orientation.sagittal: [1, 2, 0]
-        }
+                z = new_dims[2] - z
 
         order = flip_to_axial_order[src_ori]
-        axial_space_points = [j for _, j in sorted(zip(order, [x, y, z]), key=lambda pair: pair[0])]
-        return axial_space_points
+        xa, ya, za = [j for _, j in sorted(zip(order, [x, y, z]), key=lambda pair: pair[0])]
+
+        return xa, ya, za
 
     def view_to_view(self, x, y, z, src_ori, dest_ori, dims, from_saved=False):
         """
@@ -94,23 +102,21 @@ class Coordinate_mapper(object):
         axial_space_points = self.view_to_volume(x, y, z, src_ori, dims, from_saved)
 
         # And map to the destination space
-        flip_from_axial_order = {
-            Orientation.axial:    [0, 1, 2],
-            Orientation.coronal:  [0, 2, 1],
-            Orientation.sagittal: [2, 0, 1]
-        }
 
         order = flip_from_axial_order[dest_ori]
         dest_points = [j for _, j in sorted(zip(order, axial_space_points), key=lambda pair: pair[0])]
 
+        dims_order = flip_from_axial_order[dest_ori]
+        new_dims = [j for _, j in sorted(zip(dims_order, dims), key=lambda pair: pair[0])]
+
         if self.flip_info[dest_ori.name]['y']:
-            dest_points[1] = dims[1] - dest_points[1]
+            dest_points[1] = new_dims[1] - dest_points[1]
 
         if self.flip_info[dest_ori.name]['x']:
-            dest_points[0] = dims[0] - dest_points[0]
+            dest_points[0] = new_dims[0] - dest_points[0]
 
         if self.flip_info[dest_ori.name]['z']:
-            dest_points[2] = dims[2] - dest_points[2]
+            dest_points[2] = new_dims[2] - dest_points[2]
 
         return dest_points
 
@@ -146,7 +152,7 @@ class Coordinate_mapper(object):
             h = abs(points_1[1] - points_2[1])
             dest_view.set_slice(midslice)
 
-            # for flipping
+            # we need to set the start of the roi as the lowest valued x and y. These change if flips occur
             new_x = min((points_1[0], points_2[0]))
             new_y = min((points_1[1], points_2[1]))
             dest_view.set_roi(new_x, new_y, w, h)

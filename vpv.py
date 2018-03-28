@@ -236,36 +236,31 @@ class Vpv(QtCore.QObject):
                 xa, ya, idxa = self.mapper.view_to_volume(x, y, slice_idx, src_view.orientation, dims)
                 self.annotations_manager.set_annotation_position_label(xa, ya, idxa)
 
-
     def mouse_shift(self, x, y, z, src_view):
         """
-        Gets mouse moved signal. Sets corresponding slices in other views if views are linked
+        Gets mouse moved signal. Sets corresponding slices in other views if linked
 
         Parameters
         ----------
-        src_index: int
+        z: int
             the current slice of the calling view
         x: int
             the x position of the mouse
         y: int
             the y position of the mouse
-        src_orientation: str
-            the orientation of the calling view
-        src_vol: ImageVolume
-            The volume belonging to the source view
+        src_view: SliceWidget
+            the calling view
         """
 
         dims = self.current_annotation_volume().shape_xyz()
+
         for dest_view in self.views.values():
 
-            # if not self.data_manager.link_views:
-            #     # if dest_view.main_volume != src_view.layers[Layers.vol1].vol:
-            #     #     dest_view.hide_crosshair()
-            #     #     continue
-
-            # _, dest_y, dest_index = self.mapper.view_to_view(x, y, src_index, None, dest_view)
             dest_x, dest_y, dest_z = self.mapper.view_to_view(x, y, z, src_view.orientation, dest_view.orientation, dims)
+
             try:
+                if dest_view.orientation == Orientation.sagittal:
+                    print(dest_x, dest_y)
                 dest_view.set_slice(dest_z, crosshair_xy=(dest_x, dest_y))
             except IndexError:
                 pass

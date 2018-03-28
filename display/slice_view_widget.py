@@ -689,18 +689,14 @@ class SliceWidget(QWidget, Ui_SliceWidget):
     def set_slice(self, index, crosshair_xy=None):
         """
         Sets the current visible slice when not caused by the slider (eg wheel scroll, flips).
+        optionally sets a cross hair location inf=dicator
         Parameters
         ----------
         index: int
             the slice to show
-        reverse: bool
-            Due to the way pyqtgraph indexes the volumes, for some orientations we need to count from the other side of the volume
         crosshair_xy: tuple
             xy coordinates of the cross hair
         """
-        # if reverse:
-        #     index = self.display[Layer.vol1].vol.dimension_length(self.orientation) - index
-
         self.ui.sliderSlice.setValue(index)
         self._set_slice(index, crosshair_xy)
 
@@ -712,7 +708,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         index: int
             slice index to show
         crosshair_xy: tuple
-            X Y pisition (in slice view coordiates) to show cross hair
+            X Y position (in slice view coordiates) of cross hair
 
         Returns
         -------
@@ -762,27 +758,14 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         self.viewbox.autoRange()
 
     def set_slice_slider(self, range, index):
-        # Temp fix to reverse the order of the coronal and axial slices so Ann et.al are happy is to reverse the
-        # Numbering of the sliders
-
         self.ui.sliderSlice.setRange(0, range)
         self.ui.sliderSlice.setValue(int(index))
-
-
-
-        # self.ui.sliderSlice.setRange(0, new_orientation_len)
-        # self.ui.sliderSlice.setValue(self.current_slice_idx)
 
     def show_controls(self, show):
         self.ui.controlsWidget.setVisible(show)
 
     def show_index_slider(self, show):
         self.ui.controlsWidget.setVisible(show)
-
-    # def opacity_change(self, value):
-    #     opacity = 1.0 / value
-    #     if value == 10:
-    #         opacity = 0
 
     def on_change_slice(self, index):
         self._set_slice(int(index))
@@ -848,8 +831,8 @@ class SliceWidget(QWidget, Ui_SliceWidget):
             self.scroll_button_released()
         elif event.key() == QtCore.Qt.Key_Right:
             self.scroll_button_released()
-            # Propagate unused signals to parent widget
-            # else:
+        # Propagate unused signals to parent widget
+        # else:
         event.ignore()
 
     def move_to_next_volume(self, reverse=False):
@@ -871,38 +854,3 @@ class SliceWidget(QWidget, Ui_SliceWidget):
                 new_index = current_vol_idx + 1
         new_vol_name = vol_ids[new_index]
         self.layers[Layers.vol1].set_volume(new_vol_name)
-
-    # def mousePressEvent(self, e):
-    #     """
-    #     Find the position that was clicked and emit them along with any stats data volumes in the display
-    #     """
-    #     xy = self.viewbox.mapFromItemToView(self.viewbox, QtCore.QPointF(e.pos().x(), e.pos().y()))
-    #     clickpos = (xy.x(), xy.y(), self.current_slice_idx)
-    #     datavols = tuple(l.vol for l in self.layers.values() if l.vol and l.vol.data_type == 'stats')
-    #     self.voxel_clicked_signal.emit(datavols, self.orientation, clickpos)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
