@@ -784,7 +784,8 @@ class ColorScaleBar(object):
         self.pos_text_coords = [10, 210]
         self.tstat_label_coords = [-5, 140]
 
-    def update(self, max_pos, min_pos, min_neg, max_neg):
+    def update(self, max_pos, min_neg, min_pos, max_neg):
+ 
         if self.color_scale_view:
             self.color_scale_widget.removeItem(self.color_scale_view)
         self.color_scale_view = self.color_scale_widget.addViewBox(row=0, col=0, enableMouse=False, lockAspect=True)
