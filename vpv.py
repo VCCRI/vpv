@@ -159,7 +159,6 @@ class Vpv(QtCore.QObject):
         self.gradient_editor_widget = None
 
         self.options_tab.set_orientations()
-        self.options_tab.set_orientations()
 
     def on_slice_view_mouse_move(self, x: int, y: int, z: int, src_view: SliceWidget):
         """

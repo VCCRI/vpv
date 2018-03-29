@@ -33,15 +33,11 @@ class HeatmapLayer(Layer):
 
     def reload(self):
         """
-        TODO: Find out is this is needed and delete if not
         """
-        return
         # need to work out if this is needed. It currently puts heatmap data in wrong flip at first view
         if self.vol:
-            slices = self.vol.get_data(self.parent.orientation, self.parent.current_slice_idx)
-            for i, ii in enumerate(self.image_items):
-                ii.setImage(slices[i], autoLevels=False)
-
+            self.set_slice(self.parent.current_slice_idx)
+           
     def set_volume(self, volname):
         """
         :param vol, Volume object from model.py

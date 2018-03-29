@@ -711,9 +711,21 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
         self._set_slice(self.current_slice_idx + num_slices)
 
-    def set_orientation(self, orientation):
+    def set_orientation(self, orientation: Orientation):
+        """
+        Sets the orientation of theis view
 
-        self.orientation = orientation  # Covert str from combobox to enum member
+        Parameters
+        ----------
+        orientation: Orientation
+
+        Notes
+        -----
+        TODO: Heatmap layers do not appear to update on orientation change. Need to move a slice to do this
+        """
+
+        self.orientation = orientation
+
         # Get the range and midslice of the new orientation
         new_orientation_len = self.layers[Layers.vol1].vol.dimension_length(self.orientation)
         self.current_slice_idx = int(new_orientation_len/2)
