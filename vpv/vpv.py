@@ -32,6 +32,9 @@ p = sys.path
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 
+from vpv import common
+from vpv.ui.controllers import importer
+
 try:
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)

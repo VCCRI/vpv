@@ -1,7 +1,10 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
+
+import sys
+if sys.version_info[0] < 3:
+    sys.exit("VPV must me run with Python3. Exiting")
 
 from PyQt5 import QtGui
-import sys
 from vpv.vpv import Vpv
 
 if __name__ == '__main__':
