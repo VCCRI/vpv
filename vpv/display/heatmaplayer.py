@@ -43,31 +43,12 @@ class HeatmapLayer(Layer):
         """
         if volname == "None":
             self.volume_label_signal.emit("None")
-            for i, image_item in enumerate(self.image_items):
-                image_item.setImage(opacity=0.0)
+            self.clear()
             self.vol = None
             return
 
         self.volume_label_signal.emit(volname)
-
-        self.vol = self.model.getvol(volname) # this is the problem
-
-        orientation = self.parent.orientation
-
-        self.parent.overlay.set_data_label(volname)
-        dim_len = self.vol.dimension_length(orientation)
-
-        # If there is a volume image, use the same slice index
-        # if not self.parent.layers[Layers.vol1].vol:
-        #     # A slice for 'data' is a list of negative and positive values. Get the midslice
-        #     slice_ = self.vol.get_data(orientation, dim_len / 2)
-        #     #self.parent.set_slice_slider(self.dim_len, self.dim_len / 2)
-        # else:
-        #     # Get the parent current index slice
-        #     slice_ = self.vol.get_data(orientation, self.parent.current_slice_idx)
-        # #self.vol.levels = self.image_item.getLevels()
-        # z = self.layer_type.value
-
+        self.vol = self.model.getvol(volname)
         self.neg_image_item.setLookupTable(self.vol.negative_lut)
         self.pos_image_item.setLookupTable(self.vol.positive_lut)
         self.set_slice(self.parent.current_slice_idx)
@@ -89,7 +70,7 @@ class HeatmapLayer(Layer):
                                        flip_x, flip_z, flip_y)
 
             for i, ii in enumerate(self.image_items):
-                ii.setImage(slices[i], autoLevels=False)
+                ii.setImage(slices[i], autoLevels=False, opacity=(1.0))
 
     def set_t_threshold(self, t):
         if self.vol:
@@ -102,8 +83,8 @@ class HeatmapLayer(Layer):
         :return:
         """
         self.vol = None
-        #clear the image item with an empty array
-
-        self.image_items[0].setImage(np.zeros((2, 2)))
-        self.image_items[1].setImage(np.zeros((2, 2)))
-        self.item = None
+        # #clear the image item with an empty array
+        #
+        self.image_items[0].setImage(opacity=0.0)
+        self.image_items[1].setImage(opacity=0.0)
+        # self.item = None

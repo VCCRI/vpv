@@ -57,7 +57,6 @@ class ManageData(QtGui.QWidget):
         self.appdata = appdata
         lut = Lut()
         self.controller = controller  # vpv.py
-        self.ui.pushButtonRecalcConnectComponents.clicked.connect(self.controller.recalc_connected_components)
 
         self.hotred = lut._hot_red_blue()[0]
         self.hotblue = lut._hot_red_blue()[1]
@@ -70,19 +69,12 @@ class ManageData(QtGui.QWidget):
 
         self._link_views = True
         self.ui.checkBoxLinkViews.setChecked(True)
-        self.ui.checkBoxLinkViews.clicked.connect(self.on_link_views)
-
-        self.ui.comboBoxOrientation.activated['QString'].connect(self.on_orientation)
-
-        self.ui.pushButtonScreenShot.clicked.connect(self.controller.take_screen_shot)
-
-        self.ui.checkBoxInterpolate.clicked.connect(self.on_interpolate)
 
         self.vector_mag_slider = QRangeSlider((0, 0, 0))
         # Just need one handle, so hide the minimum handle
         self.vector_mag_slider.head.setDisabled(True)
         self.ui.horizontalLayoutMagnitudeSlider.insertWidget(1, self.vector_mag_slider)
-        self.ui.pushButtonVectorMagnitudeFilter.pressed.connect(self.lower_magnitude_changed)
+
         self.vector_mag_slider.setMin(0)
         self.vector_mag_slider.setMax(10.0)
         self.vector_mag_slider.setStart(0)
@@ -92,21 +84,9 @@ class ManageData(QtGui.QWidget):
         self.volume_levels_slider = QRangeSlider((255, 255, 255))
         self.ui.horizontalLayoutVol1Levels.insertWidget(1, self.volume_levels_slider)
 
-        self.volume_levels_slider.startValueChanged.connect(self.lower_level_volume_changed)
-        self.volume_levels_slider.endValueChanged.connect(self.upper_level_volume_changed)
-
-        self.ui.comboBoxVolume.activated['QString'].connect(self.volume_changed)
-        self.ui.comboBoxVolumeLut.activated['QString'].connect(self.on_vol_lut_changed)
-
         # upper volume levels slider and comboboxes
         self.volume_levels_slider2 = QRangeSlider((255, 255, 255))
         self.ui.horizontalLayoutVol2Levels.insertWidget(1, self.volume_levels_slider2)
-
-        self.volume_levels_slider2.startValueChanged.connect(self.lower_level_volume2_changed)
-        self.volume_levels_slider2.endValueChanged.connect(self.upper_level_volume2_changed)
-
-        self.ui.comboBoxVolume2.activated['QString'].connect(self.volume2_changed)
-        self.ui.comboBoxVolumeLut2.activated['QString'].connect(self.on_vol2_lut_changed)
 
         # data sliders
         self.data_levels_positive_slider = QRangeSlider((0, 255, 0))
@@ -119,6 +99,62 @@ class ManageData(QtGui.QWidget):
         self.data_levels_negative_slider.handle.setStyleSheet(neg_bg)
         self.ui.horizontalLayoutDataSliders.insertWidget(0, self.data_levels_negative_slider)
 
+        self.ui.pushButtonManagerGrey.hide()
+        self.ui.pushButtonManagerCyan.hide()
+        self.ui.pushButtonManagerOrange.hide()
+
+        self.six_views_visible = False
+
+        self.ui.checkBox6Views.setChecked(False)
+
+        self.blob_table = QtGui.QTableWidget(self)
+        self.ui.verticalLayoutConnectedComponents.addWidget(self.blob_table, 0)
+
+        self.blob_table.setColumnCount(3)
+        self.blob_table.setHorizontalHeaderLabels(['Count', 'Mean', 'location'])
+
+        self.ui.doubleSpinBoxVoxelSize.setMaximum(1000.0)
+        self.ui.doubleSpinBoxVoxelSize.setValue(DEFAULT_SCALE_BAR_SIZE)
+        self.ui.doubleSpinBoxVoxelSize.setKeyboardTracking(False)
+        self.ui.doubleSpinBoxVoxelSize.valueChanged.connect(self.set_voxel_size)
+
+        self.ui.doubleSpinBoxScaleBarLength.setMaximum(10000)
+        self.ui.doubleSpinBoxScaleBarLength.setValue(1000)
+        self.ui.doubleSpinBoxScaleBarLength.setKeyboardTracking(False)
+
+        self.colour_bar = ColorScaleBar(self.ui.verticalLayoutColorScale, self.hotblue, self.hotred)
+        self.ui.vol2ControlsWidget.hide()
+        self.ui.vectorWidget.hide()
+        self.ui.dataWidget.hide()
+
+        self.ui.doubleSpinBoxNegThresh.setMaximum(0)
+        self.ui.doubleSpinBoxNegThresh.setMinimum(-100)
+        self.ui.doubleSpinBoxNegThresh.setSingleStep(0.1)
+
+        self.ui.doubleSpinBoxPosThresh.setSingleStep(0.1)
+
+        self.connect_signal_slots()
+
+    def connect_signal_slots(self):
+        self.ui.pushButtonRecalcConnectComponents.clicked.connect(self.controller.recalc_connected_components)
+        self.ui.comboBoxVolume.activated['QString'].connect(partial(self.modify_layer, Layers.vol1, 'set_volume'))
+        self.ui.checkBoxLinkViews.clicked.connect(self.on_link_views)
+
+        self.ui.comboBoxOrientation.activated['QString'].connect(self.on_orientation)
+
+        self.ui.pushButtonScreenShot.clicked.connect(self.controller.take_screen_shot)
+
+        self.ui.checkBoxInterpolate.clicked.connect(self.on_interpolate)
+        self.ui.pushButtonVectorMagnitudeFilter.pressed.connect(self.lower_magnitude_changed)
+
+        self.volume_levels_slider.startValueChanged.connect(self.lower_level_volume_changed)
+        self.volume_levels_slider.endValueChanged.connect(self.upper_level_volume_changed)
+        self.ui.comboBoxVolumeLut.activated['QString'].connect(self.on_vol_lut_changed)
+        self.volume_levels_slider2.startValueChanged.connect(self.lower_level_volume2_changed)
+        self.volume_levels_slider2.endValueChanged.connect(self.upper_level_volume2_changed)
+
+        self.ui.comboBoxVolume2.activated['QString'].connect(self.volume2_changed)
+        self.ui.comboBoxVolumeLut2.activated['QString'].connect(self.on_vol2_lut_changed)
         self.ui.comboBoxLutHeatmap.activated['QString'].connect(self.on_heatmap_lut_changed)
 
         self.ui.comboBoxData.activated['QString'].connect(self.data_changed)
@@ -136,9 +172,6 @@ class ManageData(QtGui.QWidget):
         self.ui.pushButtonManagerOrange.clicked.connect(self.showOrangeViewManagerSlot)
         self.ui.pushButtonManagerGrey.clicked.connect(self.showYellowViewManagerSlot)
         self.ui.pushButtonManagerCyan.clicked.connect(self.showCyanViewManagerSlot)
-        self.ui.pushButtonManagerGrey.hide()
-        self.ui.pushButtonManagerCyan.hide()
-        self.ui.pushButtonManagerOrange.hide()
 
         self.ui.checkBoxLeftView.clicked.connect(self.left_view_visibility)
         self.ui.checkBoxCentralView.clicked.connect(self.central_view_visibility)
@@ -149,30 +182,9 @@ class ManageData(QtGui.QWidget):
         self.ui.spinBoxVectorSubsampling.valueChanged.connect(self.vector_subsampling_changed)
         self.ui.pushButtonVectorColor.pressed.connect(self.vector_change_color)
 
-        self.six_views_visible = False
-
-        self.ui.checkBox6Views.setChecked(False)
-        self.ui.checkBox6Views.clicked.connect(self.show2Rows)
-
-        self.blob_table = QtGui.QTableWidget(self)
-        self.ui.verticalLayoutConnectedComponents.addWidget(self.blob_table, 0)
         self.blob_table.cellClicked.connect(self.on_connected_table_clicked)
-        self.blob_table.setColumnCount(3)
-        self.blob_table.setHorizontalHeaderLabels(['Count', 'Mean', 'location'])
-
-        self.ui.doubleSpinBoxVoxelSize.setMaximum(1000.0)
-        self.ui.doubleSpinBoxVoxelSize.setValue(DEFAULT_SCALE_BAR_SIZE)
-        self.ui.doubleSpinBoxVoxelSize.setKeyboardTracking(False)
-        self.ui.doubleSpinBoxVoxelSize.valueChanged.connect(self.set_voxel_size)
-
-        self.ui.doubleSpinBoxScaleBarLength.setMaximum(10000)
-        self.ui.doubleSpinBoxScaleBarLength.setValue(1000)
-        self.ui.doubleSpinBoxScaleBarLength.setKeyboardTracking(False)
         self.ui.doubleSpinBoxScaleBarLength.valueChanged.connect(self.set_scalebar_length)
-        self.colour_bar = ColorScaleBar(self.ui.verticalLayoutColorScale, self.hotblue, self.hotred)
-        self.ui.vol2ControlsWidget.hide()
-        self.ui.vectorWidget.hide()
-        self.ui.dataWidget.hide()
+
         self.ui.checkBoxShowVol2Controls.clicked.connect(self.vol2_controls_visibility)
         self.ui.checkBoxShowVectorControls.clicked.connect(self.vector_controls_visibility)
         self.ui.checkBoxShowDataControls.clicked.connect(self.data_controls_visibility)
@@ -182,13 +194,10 @@ class ManageData(QtGui.QWidget):
         self.ui.pushButtonScaleBarColor.clicked.connect(self.on_scalebar_color)
 
         self.ui.doubleSpinBoxNegThresh.valueChanged.connect(self.on_neg_thresh_spin)
-        self.ui.doubleSpinBoxNegThresh.setMaximum(0)
-        self.ui.doubleSpinBoxNegThresh.setMinimum(-100)
-        self.ui.doubleSpinBoxNegThresh.setSingleStep(0.1)
+
+        self.ui.checkBox6Views.clicked.connect(self.show2Rows)
 
         self.ui.doubleSpinBoxPosThresh.valueChanged.connect(self.on_pos_thresh_spin)
-        self.ui.doubleSpinBoxPosThresh.setSingleStep(0.1)
-
         self.ui.checkBoxScaleBarLabel.clicked.connect(self.on_scalebar_label_checked)
 
     def on_scalebar_label_checked(self, checked):
@@ -327,12 +336,6 @@ class ManageData(QtGui.QWidget):
         """
         self.modify_layer(Layers.heatmap, 'set_t_threshold', t)
 
-    def volume_changed(self, vol_name):
-        """
-        When volume is changed from the combobox
-        """
-        self.modify_layer(Layers.vol1, 'set_volume', vol_name)
-
     def volume2_changed(self, vol_name):
         """
         When volume is changed from the combobox
@@ -347,18 +350,20 @@ class ManageData(QtGui.QWidget):
 
     def update_connected_components(self, vol_name):
         self.blob_table.clear()
-        self.blob_table.setRowCount(0)
+        self.blob_table.setRowCount(0) # clear
         self.blob_table.setHorizontalHeaderLabels(['Count', 'Mean', 'location x:x, y:y, z:z'])
 
         # set the connected component list
-        conn = self.model.getdata(vol_name).connected_components
+        if vol_name != 'None':
+            conn = self.model.getdata(vol_name).connected_components
 
-        for i, (size_mean, bbox) in enumerate(conn.items()):
-            self.blob_table.insertRow(i)
-            bbox_string = ', '.join(str(x) for x in bbox)
-            self.blob_table.setItem(i, 0, QtGui.QTableWidgetItem(str(size_mean[0])))
-            self.blob_table.setItem(i, 1, QtGui.QTableWidgetItem(str(size_mean[1])))
-            self.blob_table.setItem(i, 2, QtGui.QTableWidgetItem(bbox_string))
+            for i, (size_mean, bbox) in enumerate(conn.items()):
+                self.blob_table.insertRow(i)
+                bbox_string = ', '.join(str(x) for x in bbox)
+                self.blob_table.setItem(i, 0, QtGui.QTableWidgetItem(str(size_mean[0])))
+                self.blob_table.setItem(i, 1, QtGui.QTableWidgetItem(str(size_mean[1])))
+                self.blob_table.setItem(i, 2, QtGui.QTableWidgetItem(bbox_string))
+
         self.blob_table.resizeColumnsToContents()
 
     def on_connected_table_clicked(self, row, _):
@@ -595,7 +600,7 @@ class ManageData(QtGui.QWidget):
         else:
             self.ui.comboBoxData.setCurrentIndex(self.ui.comboBoxData.findText('None'))
 
-    def modify_layer(self, layer_idx, method, *args):
+    def modify_layer(self, layer_idx: Layers, method: str, *args):
         if self.link_views:
             for view in self.views.values():
                 getattr(view.layers[layer_idx], method)(*args)

@@ -1,6 +1,6 @@
 import os
 import yaml
-from lib.addict import Dict
+from vpv.lib.addict import Dict
 from vpv.common import Stage, AnnotationOption
 
 # E145_PATO_TERMS_FILE = 'ontologies/e14.5/pato_terms.csv'
