@@ -31,6 +31,8 @@ class Layer(Qt.QObject):
         self.vol = None  # When setting to "None" in the view manager we get problems. Needs rewriting
         self.layer_type = layer_type # this should be unique
         self.lt = Lut()
+        self.isvisible = True
+        self.opacity = 1.0
 
     def clear(self):
         slice_ = np.copy(self.image_item.image)
@@ -54,7 +56,6 @@ class Layer(Qt.QObject):
         reload the current image. For example when the orientation has changed
         """
         self.set_slice(self.parent.current_slice_idx)
-        # self.image_item.setImage()
 
     def set_volume(self, volname, initial=False):
         """
@@ -90,11 +91,12 @@ class Layer(Qt.QObject):
         self.parent.viewbox.autoRange()
         self.parent.scalebar.updateBar()
 
-    def set_slice(self, index):
+    def set_slice(self, index: int):
+        opacity = self.opacity if self.isvisible else 0.0
         flip_x, flip_y, flip_z = self.parent.get_flips()
         if self.vol:
             self.image_item.setImage(self.vol.get_data(self.parent.orientation, index - 1,
-                                                       flip_x, flip_z, flip_y), autoLevels=False)
+                                                       flip_x, flip_z, flip_y), autoLevels=False, opacity=opacity)
 
     def set_series_slider(self):
         if self.vol.data_type == 'series':
@@ -111,3 +113,9 @@ class Layer(Qt.QObject):
         self.vol.set_image(idx)
         self.parent.ui.labelImageSeriesNumber.setText(str(idx))
         self.reload()
+
+    def set_visibility(self, isvisible: bool):
+        self.isvisible = isvisible
+
+    def set_opacity(self, opacity: float):
+        self.opacity = opacity

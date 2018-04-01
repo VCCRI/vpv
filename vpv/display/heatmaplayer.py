@@ -53,7 +53,7 @@ class HeatmapLayer(Layer):
         self.pos_image_item.setLookupTable(self.vol.positive_lut)
         self.set_slice(self.parent.current_slice_idx)
 
-    def set_slice(self, index):
+    def set_slice(self, index: int):
         """Set the heatmap layer to the specified index
 
         Parameters
@@ -62,6 +62,7 @@ class HeatmapLayer(Layer):
             the index to set
 
         """
+        opacity = 1.0 if self.isvisible else 0.0
         if self.vol and self.vol != "None":
 
             flip_x, flip_y, flip_z = self.parent.get_flips()
@@ -70,7 +71,7 @@ class HeatmapLayer(Layer):
                                        flip_x, flip_z, flip_y)
 
             for i, ii in enumerate(self.image_items):
-                ii.setImage(slices[i], autoLevels=False, opacity=(1.0))
+                ii.setImage(slices[i], autoLevels=False, opacity=opacity)
 
     def set_t_threshold(self, t):
         if self.vol:

@@ -133,11 +133,19 @@ class ManageData(QtGui.QWidget):
 
         self.ui.doubleSpinBoxPosThresh.setSingleStep(0.1)
 
+        self.ui.doubleSpinBoxVol2Opacity.setRange(0.0, 1.0)
+        self.ui.doubleSpinBoxVol2Opacity.setSingleStep(0.1)
+        self.ui.doubleSpinBoxVol2Opacity.setValue(1.0)
+
         self.connect_signal_slots()
 
     def connect_signal_slots(self):
         self.ui.pushButtonRecalcConnectComponents.clicked.connect(self.controller.recalc_connected_components)
         self.ui.comboBoxVolume.activated['QString'].connect(partial(self.modify_layer, Layers.vol1, 'set_volume'))
+
+        self.ui.checkBoxVisibilityVol2.clicked.connect(partial(self.modify_layer, Layers.vol2, 'set_visibility'))
+        self.ui.checkBoxVisibilityHeatmap.clicked.connect(partial(self.modify_layer, Layers.heatmap, 'set_visibility'))
+
         self.ui.checkBoxLinkViews.clicked.connect(self.on_link_views)
 
         self.ui.comboBoxOrientation.activated['QString'].connect(self.on_orientation)
@@ -199,6 +207,8 @@ class ManageData(QtGui.QWidget):
 
         self.ui.doubleSpinBoxPosThresh.valueChanged.connect(self.on_pos_thresh_spin)
         self.ui.checkBoxScaleBarLabel.clicked.connect(self.on_scalebar_label_checked)
+
+        self.ui.doubleSpinBoxVol2Opacity.valueChanged.connect(partial(self.modify_layer, Layers.vol2, 'set_opacity'))
 
     def on_scalebar_label_checked(self, checked):
         for view in self.views.values():

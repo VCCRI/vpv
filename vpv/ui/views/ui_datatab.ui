@@ -258,16 +258,20 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="labelVolume">
-       <property name="styleSheet">
-        <string notr="true">background-color:rgb(102, 95, 95);
+      <layout class="QHBoxLayout" name="horizontalLayout_12">
+       <item>
+        <widget class="QLabel" name="labelVolume">
+         <property name="styleSheet">
+          <string notr="true">background-color:rgb(102, 95, 95);
 padding: 3px;
 color: rgb(223, 223, 223);</string>
-       </property>
-       <property name="text">
-        <string>Volume 1</string>
-       </property>
-      </widget>
+         </property>
+         <property name="text">
+          <string>Volume 1</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -289,7 +293,7 @@ color: rgb(223, 223, 223);</string>
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../resources.qrc">
+          <iconset resource="../../resources/resources.qrc">
            <normaloff>:/icons/edit.png</normaloff>:/icons/edit.png</iconset>
          </property>
          <property name="iconSize">
@@ -354,6 +358,22 @@ color: rgb(223, 223, 223);</string>
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QCheckBox" name="checkBoxVisibilityVol2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item>
@@ -379,6 +399,29 @@ color: rgb(223, 223, 223);</string>
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="doubleSpinBoxVol2Opacity">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>opacity</string>
               </property>
              </widget>
             </item>
@@ -425,6 +468,22 @@ color: rgb(223, 223, 223);</string>
        </property>
        <property name="text">
         <string>Heatmap Data</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkBoxVisibilityHeatmap">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -734,7 +793,7 @@ color: rgb(223, 223, 223);</string>
   </layout>
  </widget>
  <resources>
-  <include location="../resources.qrc"/>
+  <include location="../../resources/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -22,5 +22,7 @@
     <file alias="checkbox_checked">icons/checkbox_checked.png</file>
     <file alias="checkbox_unchecked">icons/checkbox_unchecked.png</file>
     <file alias="checkbox_disabled">icons/checkbox_disabled.png</file>
+    <file alias="visible">icons/visibility.png</file>
+    <file alias="hidden">icons/visibility_hidden.png</file>
 </qresource>
 </RCC>
