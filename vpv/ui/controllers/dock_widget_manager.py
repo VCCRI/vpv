@@ -67,7 +67,7 @@ class ManagerDockWidget(QDockWidget):
         When changing tab, execute code required for that tab
         """
         if indx == 1:
-            self.tab_map.get(indx).tab_is_active()
+            self.tab_map.get(indx).activate_tab()
             if indx == 1:  # Need to link views for the annotations tab
                 self.data_manager.link_views = True
                 self.annotations.annotating = True

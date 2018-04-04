@@ -3,25 +3,8 @@ import yaml
 from vpv.lib.addict import Dict
 from vpv.common import Stage, AnnotationOption
 
-# E145_PATO_TERMS_FILE = 'ontologies/e14.5/pato_terms.csv'
-# E145_EMAP_TERMS_FILE = 'ontologies/e14.5/emap_terms.csv'
-
-# E155_OPTIONS_FILE = 'ontologies/e15.5/options.csv'
-# E155_EMAP_TERMS_FILE = 'ontologies/e15.5/emap_terms.csv'
-E155_EMAP_TERMS_FILE = '../annotations/ontologies/e15.5/VPV_e15_5_terms.yaml'
-# E185_PATO_TERMS_FILE = 'ontologies/e18.5/pato_terms.csv'
-# E185_EMAP_TERMS_FILE = 'ontologies/e18.5/emap_terms.csv'
-#
-# E125_PATO_TERMS_FILE = 'ontologies/e12.5/pato_terms.csv'
-# E125_EMAP_TERMS_FILE = 'ontologies/e12.5/emap_terms.csv'
-
-
-EMAP_OPTIONS = ['unobserved', 'normal', 'abnormal']
-
-#        self.terms[Stage.e15_5]['option'] = self.parse_options(E155_OPTIONS_FILE)
-#        # self.terms[Stage.e15_5]['emap'] = self.parse_emap(E155_EMAP_TERMS_FILE)
-#        self.terms[Stage.e15_5]['emap'] = self.parse_emap_yaml(E155_EMAP_TERMS_FILE)
-#
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+OPTIONS_CONFIG_PATH = os.path.join(SCRIPT_DIR, '../options/annotation_conf.yaml')
 
 
 class Annotation(object):
@@ -75,7 +58,7 @@ class VolumeAnnotations(object):
     Associated with a single Volume instance
     Holds coordinates, ontological term, and option associated with manual annotations
     
-    For testing we re just doing the E15.5 stage. We will have to have multiple stages later and there will need
+    For testing we're just doing the E15.5 stage. We will have to have multiple stages later and there will need
     to be some way of only allowing one stage of annotation per volume
     """
 
@@ -83,7 +66,7 @@ class VolumeAnnotations(object):
         self.annotations = []
         self.col_count = 4
         self.dims = dims
-        self.load_emap_yaml(E155_EMAP_TERMS_FILE)
+        self.load_annotation_options()
         self.index = len(self.annotations)
 
     def add_emap_annotation(self, x, y, z, emapa, option, stage, category=None):
@@ -129,34 +112,20 @@ class VolumeAnnotations(object):
         self.index = len(self.annotations)
         return False
 
-    def load_emap_yaml(self, emap_file):
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        emap_path = os.path.join(script_dir, emap_file)
+    def load_annotation_options(self):
+
         try:
-            with open(emap_path, 'r') as fh:
-                emap_terms = yaml.load(fh)
-                for category, terms in emap_terms.items():
-                    for term in terms:
-                        # Add a default annotation for the term, with no coordinates and option of unobserved
-                        self.add_emap_annotation(None, None, None, term,
-                                                 AnnotationOption.image_only, Stage.e15_5, category)
+            with open(OPTIONS_CONFIG_PATH, 'r') as fh:
+                opts = yaml.load(fh)
 
         except OSError:
-            print('could not open the annotations yaml file {}'.format(emap_path))
+            print('could not open the annotations yaml file {}'.format(OPTIONS_CONFIG_PATH))
             raise
 
-
-            # # Create a dict to store all the annotation terms for each stage
- #        self.terms = Dict()
- #        self.terms[Stage.e12_5]['pato'] = self.parse_options(E125_PATO_TERMS_FILE)
- #        self.terms[Stage.e12_5]['emap'] = self.parse_emap(E125_EMAP_TERMS_FILE)
- #
- #        self.terms[Stage.e14_5]['option'] = self.parse_options(E145_PATO_TERMS_FILE)
- #        self.terms[Stage.e14_5]['emap'] = self.parse_emap(E145_EMAP_TERMS_FILE)
- #
- #        self.terms[Stage.e15_5]['option'] = self.parse_options(E155_OPTIONS_FILE)
- #        # self.terms[Stage.e15_5]['emap'] = self.parse_emap(E155_EMAP_TERMS_FILE)
- #        self.terms[Stage.e15_5]['emap'] = self.parse_emap_yaml(E155_EMAP_TERMS_FILE)
- #
- #        self.terms[Stage.e18_5]['pato'] = self.parse_options(E185_PATO_TERMS_FILE)
- #        self.terms[Stage.e18_5]['emap'] = self.parse_emap(E185_EMAP_TERMS_FILE)
+        for center_id, centre_data in opts['centres'].items():
+            stages = centre_data
+        # for category, terms in emap_terms.items():
+        #     for term in terms:
+        #         # Add a default annotation for the term, with no coordinates and option of unobserved
+        #         self.add_emap_annotation(None, None, None, term,
+        #                                  AnnotationOption.image_only, Stage.e15_5, category)

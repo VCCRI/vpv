@@ -37,7 +37,7 @@ class Console(QWidget):
         widget = ExampleWidget(variables, parent=vpv)
         self.ui.mainLayout.addWidget(widget)
 
-    def tab_is_active(self):
+    def activate_tab(self):
         pass
 
     def current_volume(self):

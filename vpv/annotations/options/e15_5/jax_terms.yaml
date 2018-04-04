@@ -1,0 +1,8 @@
+---
+parameters:
+   parameter_one: 
+	name: 'Pinna'
+	   impc_id: 'IMPC_EMO_124_001'
+	   options: options_one
+	   default_value: 'imageOnly'
+	   mandatory: 'yes'

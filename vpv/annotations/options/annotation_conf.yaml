@@ -1,0 +1,21 @@
+---
+# This config file specifies how to setup the annotations tab for VPV
+available_options:
+ options_one:  ['present','absent','abnormal','unobservable','ambiguous','imageOnly']
+ options_two: ['yes','no','unobservable']
+
+centres:
+  jax:
+    stages:
+      e15_5:
+        file_: e15_5/jax_terms.yaml
+  bcm:
+    stages:
+      e15_5:
+        file_: e15_5/jax_terms.yaml
+#  tcp:
+#    e15.5
+#  jax:
+#    e15.5
+#  ucd:
+#    e15.5

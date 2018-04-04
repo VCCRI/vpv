@@ -214,7 +214,7 @@ class ManageData(QtGui.QWidget):
         for view in self.views.values():
             view.scale_bar_visible = checked
 
-    def tab_is_active(self):
+    def activate_tab(self):
             pass
 
     def on_neg_thresh_spin(self, value):

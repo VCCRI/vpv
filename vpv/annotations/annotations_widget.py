@@ -11,9 +11,10 @@ from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QComboBox, QFileDialog, QComboBox
 from vpv.ui.views.ui_annotations import Ui_Annotations
 import json
-from vpv.common import Stage, Layers, AnnotationOption
+from vpv.common import Stage, Layers, AnnotationOption, info_dialog, error_dialog
 from vpv.lib.addict import Dict
 from collections import defaultdict
+import datetime
 
 
 OPTION_COLOR_MAP = {
@@ -78,6 +79,17 @@ class Annotations(QWidget):
 
         self.reset_roi()
 
+        self.set_current_date()
+
+        self.center = None
+        self.stage = None
+
+    def set_current_date(self):
+        d = datetime.datetime.now()
+
+        self.ui.dateEdit.setDate(QtCore.QDate(d.year, d.month, d.day))
+
+
     def on_tree_clicked(self, item: QTreeWidgetItem):
         """
         Responds to clicks on the QtreeWidget containing the annoations
@@ -108,7 +120,7 @@ class Annotations(QWidget):
             return
         self.annotation_highlight_signal.emit(ann.x, ann.y, ann.z, [0, 255, 0], self.annotation_radius)
 
-    def tab_is_active(self):
+    def activate_tab(self):  # Change function name
 
         vol = self.controller.current_annotation_volume()
 
@@ -119,6 +131,10 @@ class Annotations(QWidget):
         for view in self.controller.views.values():
             view.layers[Layers.vol1].set_volume(vol.name)
 
+        if None in (self.stage, self.center):
+            info_dialog(self, 'Chose centre and stage', 'You must choose a centre and stage from the options tab')
+            return
+
         self.populate_available_terms()
         self.update()
 
@@ -127,24 +143,24 @@ class Annotations(QWidget):
 
     def populate_available_terms(self):
         """
-        Run this at start up and when volume is changed
+        Runs at start up and when volume is changed. Poulates the avaible annotation terms
         """
         self.ui.treeWidgetAvailableTerms.clear()
 
         def setup_signal(box_: QComboBox, child_: QTreeWidgetItem):
             """
-            Created this inner function otherwise the last cbox made was always giving the signal?
+            Connect the Qcombobox
             """
             box.activated.connect(lambda: self.update_annotation(child_, box_))
 
         header = QTreeWidgetItem(['category', 'term', 'option'])
         self.ui.treeWidgetAvailableTerms.setHeaderItem(header)
-        ann_by_cat = defaultdict(list)  # sort the annotations into categories
+        # ann_by_cat = defaultdict(list)  # sort the annotations into categories
 
-        # Load the default 'unobserved' annotation for each term for the current volume
         vol = self.controller.current_annotation_volume()
         if not vol:
             return
+
 
         for ann in vol.annotations:
             ann_by_cat[ann.category].append(ann)
@@ -227,10 +243,10 @@ class Annotations(QWidget):
             else:
                 saved_files.append(out_file)
         if not success:
-            common.error_dialog(self, 'Error', 'The was an error writing the annotation files')
+            error_dialog(self, 'Error', 'The was an error writing the annotation files')
         else:
             sf_str = '\n'.join(saved_files)
-            common.info_dialog(self, 'Success', 'Annotation files saved:{}'.format(sf_str))
+            info_dialog(self, 'Success', 'Annotation files saved:{}'.format(sf_str))
 
         self.annotation_recent_dir_signal.emit(out_dir)
         self.resize_table()
@@ -252,7 +268,7 @@ class Annotations(QWidget):
         """
         vol = self.controller.current_annotation_volume()
         if not vol:
-            common.error_dialog(self, "Error", "No volume selected")
+            error_dialog(self, "Error", "No volume selected")
             return
         try:
             x = int(self.ui.labelXPos.text())
@@ -282,14 +298,14 @@ class Annotations(QWidget):
 
         elif option in (AnnotationOption.abnormal, AnnotationOption.ambiguous):
             if None in (x, y, z):
-                common.info_dialog(self, 'Select a region!',
+                info_dialog(self, 'Select a region!',
                                    "For option '{}' coordinates must be specified".format(option.name))
                 # this will rest the option back to what it is on the volume.annotation object
                 cbox.setCurrentIndex(cbox.findText(vol.annotations.get_by_term(term).option.value))
                 return
 
         if not term:
-            common.error_dialog(self, "Error", "No term is selected!")
+            error_dialog(self, "Error", "No term is selected!")
             return
 
         color = OPTION_COLOR_MAP[option]
