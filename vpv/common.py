@@ -19,11 +19,15 @@ generic_anatomy_label_map_path = join(resources_dir, 'generic_anatomy.csv')
 
 
 def info_dialog(parent, title, msg):
-    dialog = QMessageBox.information(parent, title, msg, QMessageBox.Ok)
+    QMessageBox.information(parent, title, msg, QMessageBox.Ok)
 
 
 def error_dialog(parent, title, msg):
-    dialog = QMessageBox.warning(parent, title, msg, QMessageBox.Ok)
+    QMessageBox.warning(parent, title, msg, QMessageBox.Ok)
+
+
+def question_dialog(parent, title, question):
+    return QMessageBox.question(parent, title, question)
 
 
 class ImType(Enum):

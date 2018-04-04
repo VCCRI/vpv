@@ -11,7 +11,7 @@ from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QComboBox, QFileDialog, QComboBox
 from vpv.ui.views.ui_annotations import Ui_Annotations
 import json
-from vpv.common import Stage, Layers, AnnotationOption, info_dialog, error_dialog
+from vpv.common import Stage, Layers, AnnotationOption, info_dialog, error_dialog, question_dialog
 from vpv.lib.addict import Dict
 from collections import defaultdict
 import datetime
@@ -81,8 +81,25 @@ class Annotations(QWidget):
 
         self.set_current_date()
 
-        self.center = None
-        self.stage = None
+        self.ui.lineEditCentre.textChanged.connect(self.centre_changed)
+
+    def centre_changed(self, center):
+        vol = self.controller.current_annotation_volume()
+        if not vol.center:
+            a = question_dialog(self, 'Change centre?', 'Do you want to change center associated with this volume?\n'
+                                'If you select YES, all annotaiton on this volume will be erased.')
+            if a:
+                vol.clear_annotations
+        vol.annotations.center = center
+
+    def stage_changed(self, stage):
+        vol = self.controller.current_annotation_volume()
+        vol.annotations.center = stage
+
+    def annotator_id_changed(self):
+        id_ = str(self.ui.lineEditAnnotatorId.text())
+        if not id_ or id_.isspace():
+            return
 
     def set_current_date(self):
         d = datetime.datetime.now()

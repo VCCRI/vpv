@@ -383,6 +383,26 @@
         <string>Stage</string>
        </property>
       </widget>
+      <widget class="QLineEdit" name="lineEditCentre">
+       <property name="geometry">
+        <rect>
+         <x>210</x>
+         <y>40</y>
+         <width>113</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEditStage">
+       <property name="geometry">
+        <rect>
+         <x>210</x>
+         <y>80</y>
+         <width>113</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
       <widget class="QWidget" name="">
        <property name="geometry">
         <rect>
@@ -423,5 +443,38 @@
  <resources>
   <include location="../../resources/resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>comboBox</sender>
+   <signal>activated(QString)</signal>
+   <receiver>lineEditCentre</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>130</x>
+     <y>89</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>237</x>
+     <y>93</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox_2</sender>
+   <signal>activated(QString)</signal>
+   <receiver>lineEditStage</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>109</x>
+     <y>136</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>260</x>
+     <y>130</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

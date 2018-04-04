@@ -185,6 +185,12 @@ class Ui_Annotations(object):
         self.label_5 = QtWidgets.QLabel(self.tab_4)
         self.label_5.setGeometry(QtCore.QRect(150, 80, 67, 17))
         self.label_5.setObjectName("label_5")
+        self.lineEditCentre = QtWidgets.QLineEdit(self.tab_4)
+        self.lineEditCentre.setGeometry(QtCore.QRect(210, 40, 113, 25))
+        self.lineEditCentre.setObjectName("lineEditCentre")
+        self.lineEditStage = QtWidgets.QLineEdit(self.tab_4)
+        self.lineEditStage.setGeometry(QtCore.QRect(210, 80, 113, 25))
+        self.lineEditStage.setObjectName("lineEditStage")
         self.widget = QtWidgets.QWidget(self.tab_4)
         self.widget.setGeometry(QtCore.QRect(31, 131, 280, 59))
         self.widget.setObjectName("widget")
@@ -210,6 +216,8 @@ class Ui_Annotations(object):
 
         self.retranslateUi(Annotations)
         self.tabWidgetOptions.setCurrentIndex(1)
+        self.comboBox.activated['QString'].connect(self.lineEditCentre.setText)
+        self.comboBox_2.activated['QString'].connect(self.lineEditStage.setText)
         QtCore.QMetaObject.connectSlotsByName(Annotations)
 
     def retranslateUi(self, Annotations):

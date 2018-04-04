@@ -66,8 +66,13 @@ class VolumeAnnotations(object):
         self.annotations = []
         self.col_count = 4
         self.dims = dims
-        self.load_annotation_options()
+        # self.load_annotation_options() # We don't load annotations until center + stage is selected
         self.index = len(self.annotations)
+
+        # The center where the annotation is taking place
+        self.center = None
+        # The developmental stage of the embryo being annotated
+        self.stage = None
 
     def add_emap_annotation(self, x, y, z, emapa, option, stage, category=None):
         """
@@ -87,6 +92,9 @@ class VolumeAnnotations(object):
 
     def remove(self, row):
         del self.annotations[row]
+
+    def remove_all(self):
+        self.annotations.clear()
 
     def __getitem__(self, index):
         return self.annotations[index]
