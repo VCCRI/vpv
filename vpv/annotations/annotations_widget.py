@@ -7,14 +7,15 @@ Works something like this:
 
 """
 import os
+import datetime
 from PyQt5 import QtGui, QtCore
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QComboBox, QFileDialog, QComboBox
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QFileDialog, QComboBox
 from vpv.ui.views.ui_annotations import Ui_Annotations
 import json
 from vpv.common import Stage, Layers, AnnotationOption, info_dialog, error_dialog, question_dialog
 from vpv.lib.addict import Dict
-from collections import defaultdict
-import datetime
+from vpv.annotations.annotations_model import centre_stage_options
+
 
 
 OPTION_COLOR_MAP = {
@@ -27,7 +28,7 @@ OPTION_COLOR_MAP = {
 }
 
 
-class Annotations(QWidget):
+class AnnotationsWidget(QWidget):
     annotation_highlight_signal = QtCore.pyqtSignal(int, int, int, list, int)
     annotation_radius_signal = QtCore.pyqtSignal(int)
     annotation_recent_dir_signal = QtCore.pyqtSignal(str)
@@ -43,7 +44,7 @@ class Annotations(QWidget):
         main_window: QtWidgets.QmainWindow
             The mainwindow. Used as a parent for other widgets
         """
-        super(Annotations, self).__init__(main_window)
+        super(AnnotationsWidget, self).__init__(main_window)
         self.controller = controller
 
         self.ui = Ui_Annotations()
@@ -81,20 +82,38 @@ class Annotations(QWidget):
 
         self.set_current_date()
 
-        self.ui.lineEditCentre.textChanged.connect(self.centre_changed)
+        self.ui.comboBoxCentre.activated['QString'].connect(self.ui.lineEditCentre.setText)
+        self.ui.comboBoxStage.activated['QString'].connect(self.ui.lineEditStage.setText)
+        self.ui.lineEditCentre.textChanged.connect(self.center_changed)
+        self.ui.lineEditStage.textChanged.connect(self.stage_changed)
 
-    def centre_changed(self, center):
+        self.ui.comboBoxCentre.addItems(centre_stage_options.all_centers())
+
+    def center_changed(self, center):
         vol = self.controller.current_annotation_volume()
-        if not vol.center:
+        if vol.annotations.center:
             a = question_dialog(self, 'Change centre?', 'Do you want to change center associated with this volume?\n'
                                 'If you select YES, all annotaiton on this volume will be erased.')
             if a:
-                vol.clear_annotations
+                vol.annotations.clear()
+
         vol.annotations.center = center
+        self.populate_available_terms()
+        self.ui.lineEditStage.clear()
+        # Now we've changed center, we need to change the stage combobox. Set it to the first
+        available_stages = centre_stage_options.all_stages(center)
+        self.ui.comboBoxStage.addItems(available_stages)
 
     def stage_changed(self, stage):
         vol = self.controller.current_annotation_volume()
-        vol.annotations.center = stage
+        if vol.annotations.stage:
+            a = question_dialog(self, 'Change centre?', 'Do you want to change center associated with this volume?\n'
+                                'If you select YES, all annotaiton on this volume will be erased.')
+            if not a:
+                return
+        # If center and stage are now set, let's fill respective options
+        vol.annotations.stage = stage
+        self.populate_available_terms()
 
     def annotator_id_changed(self):
         id_ = str(self.ui.lineEditAnnotatorId.text())
@@ -105,7 +124,6 @@ class Annotations(QWidget):
         d = datetime.datetime.now()
 
         self.ui.dateEdit.setDate(QtCore.QDate(d.year, d.month, d.day))
-
 
     def on_tree_clicked(self, item: QTreeWidgetItem):
         """
@@ -129,7 +147,7 @@ class Annotations(QWidget):
         if not ann:
             return
         info_str = "Annotation information\nterm: {}\noption: {}\nx:{}, y:{}, z:{}".format(
-          ann.term, ann.option.value, ann.x, ann.y, ann.z
+          ann.term, ann.selected_option, ann.x, ann.y, ann.z
         )
         self.ui.textEditAnnotationInfo.setText(info_str)
         if None in (ann.x, ann.y, ann.z):
@@ -148,10 +166,6 @@ class Annotations(QWidget):
         for view in self.controller.views.values():
             view.layers[Layers.vol1].set_volume(vol.name)
 
-        if None in (self.stage, self.center):
-            info_dialog(self, 'Chose centre and stage', 'You must choose a centre and stage from the options tab')
-            return
-
         self.populate_available_terms()
         self.update()
 
@@ -162,7 +176,13 @@ class Annotations(QWidget):
         """
         Runs at start up and when volume is changed. Poulates the avaible annotation terms
         """
+
         self.ui.treeWidgetAvailableTerms.clear()
+
+        vol = self.controller.current_annotation_volume()
+        if not vol and None in (vol.annotations.stage, vol.annotations.center):
+            # info_dialog(self, 'Chose centre and stage', 'You must choose a centre and stage from the options tab')
+            return
 
         def setup_signal(box_: QComboBox, child_: QTreeWidgetItem):
             """
@@ -170,39 +190,34 @@ class Annotations(QWidget):
             """
             box.activated.connect(lambda: self.update_annotation(child_, box_))
 
-        header = QTreeWidgetItem(['category', 'term', 'option'])
+        header = QTreeWidgetItem(['', 'term', 'name', 'option'])
+
         self.ui.treeWidgetAvailableTerms.setHeaderItem(header)
         # ann_by_cat = defaultdict(list)  # sort the annotations into categories
 
-        vol = self.controller.current_annotation_volume()
-        if not vol:
-            return
+        parent = QTreeWidgetItem(self.ui.treeWidgetAvailableTerms)
+        parent.setText(0, 'Parameters')
+        parent.setFlags(parent.flags())
 
+        for ann in vol.annotations:  # remember to make iteration occur in order in the ann model
 
-        for ann in vol.annotations:
-            ann_by_cat[ann.category].append(ann)
-        for category, annotations in ann_by_cat.items():
-            parent = QTreeWidgetItem(self.ui.treeWidgetAvailableTerms)
-            parent.setText(0, category)
-            parent.setFlags(parent.flags())
-            for i, annotation in enumerate(annotations):
-                child = QTreeWidgetItem(parent)
-                child.setText(1, annotation.term)
-                option = annotation.option
-                color = OPTION_COLOR_MAP[option]
-                parent.addChild(child)
+            child = QTreeWidgetItem(parent)
+            child.setText(1, ann.term)
+            child.setText(2, ann.name)
+            option = ann.selected_option
+            # color = OPTION_COLOR_MAP[option]
+            parent.addChild(child)
 
-                # Set up the combobox and highlight the currently selected one
-                box = QComboBox()
-                for opt in AnnotationOption:
-                    box.addItem(opt.value, opt)
+            # Set up the combobox and highlight the currently selected one
+            box = QComboBox()
+            for opt in ann.options:
+                box.addItem(opt)
 
-                box.setCurrentIndex(box.findText(option.value))
-                # Setup combobox selection signal
-                setup_signal(box, child)
-                self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)
-                child.setBackground(1, QtGui.QBrush(QtGui.QColor(*color)))  # Unpack the tuple of colors and opacity
-        self.mark_complete_categories()
+            box.setCurrentIndex(box.findText(option))
+            # Setup combobox selection signal
+            setup_signal(box, child)
+            self.ui.treeWidgetAvailableTerms.setItemWidget(child, 3, box)
+            # child.setBackground(1, QtGui.QBrush(QtGui.QColor(*color)))  # Unpack the tuple of colors and opacity
 
         # Set the roi coords to None
         self.roi_highlight_off_signal.emit()
@@ -233,9 +248,9 @@ class Annotations(QWidget):
             space = vol.space
             for i,  a in enumerate(ann.annotations):
                 annotations_dict[i]['annotation_type'] = a.type
-                annotations_dict[i]['emapa_term'] = a.term
-                annotations_dict[i]['emapa_id'] = 'dummy id'
-                annotations_dict[i]['option'] = a.option.value
+                annotations_dict[i]['name'] = a.name
+                annotations_dict[i]['impc_id'] = a.term
+                annotations_dict[i]['selected_option'] = a.selected_option
                 annotations_dict[i]['x'] = a.x
                 annotations_dict[i]['y'] = a.y
                 annotations_dict[i]['z'] = a.z
@@ -245,7 +260,7 @@ class Annotations(QWidget):
                 # annotations_dict[vol_id][i]['free_text'] = a.free_text
                 annotations_dict[i]['volume_dimensions_xyz'] = a.dims
                 annotations_dict[i]['space'] = space
-                annotations_dict[i]['stage'] = a.stage.value
+                annotations_dict[i]['stage'] = a.stage
 
             # If no annotations available for the volume, do not save
             if not annotations_dict:
@@ -294,42 +309,32 @@ class Annotations(QWidget):
         except ValueError:
             x = y = z = None
 
-        if self.ui.radioButtonE145.isChecked():
-            stage = Stage.e14_5
-        elif self.ui.radioButtonE185.isChecked():
-            stage = Stage.e18_5
-        elif self.ui.radioButtonE125.isChecked():
-            stage = Stage.e12_5
-        elif self.ui.radioButtonE155.isChecked():
-            stage = Stage.e15_5
-
         base_node = child
         term = base_node.text(1)
 
-        option = cbox.itemData(cbox.currentIndex(), QtCore.Qt.UserRole)
+        option = cbox.currentText()
 
         # If we are updating the annotation to ImageOnly, we should wipe any coordinates that may have been added to
         # a previous annotation option.
-        if option == AnnotationOption.image_only:
+        if option == 'imageOnly':
             x = y = z = None
 
-        elif option in (AnnotationOption.abnormal, AnnotationOption.ambiguous):
+        elif option in (centre_stage_options.opts['options_requiring_points']):
             if None in (x, y, z):
                 info_dialog(self, 'Select a region!',
-                                   "For option '{}' coordinates must be specified".format(option.name))
-                # this will rest the option back to what it is on the volume.annotation object
-                cbox.setCurrentIndex(cbox.findText(vol.annotations.get_by_term(term).option.value))
+                                   "For option '{}' coordinates must be specified".format(option))
+                # this will reset the option back to what it is on the volume.annotation object
+                cbox.setCurrentIndex(cbox.findText(vol.annotations.get_by_term(term).selected_option))
                 return
 
         if not term:
             error_dialog(self, "Error", "No term is selected!")
             return
 
-        color = OPTION_COLOR_MAP[option]
-        base_node.setBackground(1, QtGui.QBrush(QtGui.QColor(*color)))
+        # color = OPTION_COLOR_MAP[option]
+        # base_node.setBackground(1, QtGui.QBrush(QtGui.QColor(*color)))
 
-        vol.annotations.add_emap_annotation(x, y, z, term, option, stage)
-        self.mark_complete_categories()
+        vol.annotations.update_annotation(term, x, y, z, option)
         self.on_tree_clicked(base_node)
 
     def reset_roi(self):
@@ -337,24 +342,6 @@ class Annotations(QWidget):
         self.ui.labelYPos.setText(None)
         self.ui.labelZPos.setText(None)
         self.roi_highlight_off_signal.emit()
-
-    def mark_complete_categories(self):
-        """
-        Check each category in the treewidget and if all items have been modified add a tick box to show it's been done
-        """
-        root = self.ui.treeWidgetAvailableTerms.invisibleRootItem()
-        child_count = root.childCount()
-        for i in range(child_count):
-            cat = root.child(i)
-            all_done = True
-            for j in range(cat.childCount()):
-                cbox = self.ui.treeWidgetAvailableTerms.itemWidget(cat.child(j), 2)
-                option = cbox.currentText()
-                if option == AnnotationOption.image_only.value:
-                    all_done = False
-                    break  # still some to be annotated
-            if all_done:
-                cat.setBackground(0, QtGui.QBrush(QtGui.QColor(0, 255, 0, 100)))
 
     def set_annotation_position_label(self, x: int, y: int, z: int):
         """

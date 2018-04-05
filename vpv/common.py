@@ -4,6 +4,7 @@ import SimpleITK as sitk
 import tempfile
 import gzip
 from os.path import splitext, dirname, realpath, join
+import yaml
 
 
 
@@ -17,6 +18,11 @@ resources_dir = join(_this_dir, 'resources')
 style_sheet_path = join(resources_dir, 'stylesheet.qss')
 generic_anatomy_label_map_path = join(resources_dir, 'generic_anatomy.csv')
 
+
+def load_yaml(path):
+    with open(path, 'r') as fh:
+        yaml_data = yaml.load(fh)
+    return yaml_data
 
 def info_dialog(parent, title, msg):
     QMessageBox.information(parent, title, msg, QMessageBox.Ok)

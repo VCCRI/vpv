@@ -1,5 +1,5 @@
 from .volume import Volume
-from .annotations import VolumeAnnotations
+from vpv.annotations.annotations_model import VolumeAnnotations
 
 
 class ImageVolume(Volume):

@@ -337,7 +337,7 @@
       <attribute name="title">
        <string/>
       </attribute>
-      <widget class="QComboBox" name="comboBox">
+      <widget class="QComboBox" name="comboBoxCentre">
        <property name="geometry">
         <rect>
          <x>50</x>
@@ -360,7 +360,7 @@
         <string>Centre</string>
        </property>
       </widget>
-      <widget class="QComboBox" name="comboBox_2">
+      <widget class="QComboBox" name="comboBoxStage">
        <property name="geometry">
         <rect>
          <x>50</x>
@@ -443,38 +443,5 @@
  <resources>
   <include location="../../resources/resources.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>comboBox</sender>
-   <signal>activated(QString)</signal>
-   <receiver>lineEditCentre</receiver>
-   <slot>setText(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>130</x>
-     <y>89</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>237</x>
-     <y>93</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>comboBox_2</sender>
-   <signal>activated(QString)</signal>
-   <receiver>lineEditStage</receiver>
-   <slot>setText(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>109</x>
-     <y>136</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>260</x>
-     <y>130</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

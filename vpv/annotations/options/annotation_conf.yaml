@@ -4,15 +4,19 @@ available_options:
  options_one:  ['present','absent','abnormal','unobservable','ambiguous','imageOnly']
  options_two: ['yes','no','unobservable']
 
-centres:
+options_requiring_points: 
+  - abnormal
+  - ambiguous
+
+centers:
   jax:
     stages:
-      e15_5:
+      e15.5:
         file_: e15_5/jax_terms.yaml
   bcm:
     stages:
-      e15_5:
-        file_: e15_5/jax_terms.yaml
+      e15.5:
+        file_: e15_5/bcm_terms.yaml
 #  tcp:
 #    e15.5
 #  jax:

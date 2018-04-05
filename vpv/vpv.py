@@ -62,7 +62,7 @@ from vpv.common import Orientation, Layers
 from vpv.display.slice_view_widget import SliceWidget
 from vpv.ui.controllers.data_manager import ManageData
 from vpv.ui.controllers.options_tab import OptionsTab
-from vpv.annotations.annotations_widget import Annotations
+from vpv.annotations.annotations_widget import AnnotationsWidget
 from vpv.model.coordinate_mapper import Coordinate_mapper
 from vpv.ui.controllers import main_window
 
@@ -113,7 +113,7 @@ class Vpv(QtCore.QObject):
         self.data_manager = ManageData(self, self.model, self.mainwindow, self.appdata)
         self.data_manager.gradient_editor_signal.connect(self.gradient_editor)
 
-        self.annotations_manager = Annotations(self, self.mainwindow)
+        self.annotations_manager = AnnotationsWidget(self, self.mainwindow)
         self.annotations_manager.annotation_highlight_signal.connect(self.show_saved_annotations)
         self.annotations_manager.annotation_radius_signal.connect(self.annotation_radius_changed)
         self.annotations_manager.roi_highlight_off_signal.connect(self.reset_roi)
