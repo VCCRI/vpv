@@ -7,6 +7,7 @@ Works something like this:
 
 """
 import os
+from os.path import dirname, abspath, join
 import datetime
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QFileDialog, QComboBox
@@ -15,7 +16,11 @@ import json
 from vpv.common import Stage, Layers, AnnotationOption, info_dialog, error_dialog, question_dialog
 from vpv.lib.addict import Dict
 from vpv.annotations.annotations_model import centre_stage_options
+from vpv.annotations import export_impc_xml
 
+
+SCRIPT_DIR = dirname(abspath(__file__))
+PROC_METADATA_PATH = join(SCRIPT_DIR, 'options', 'procedure_metadata.yaml')  # TODO: read this from the analysis zip. Just testing
 
 
 OPTION_COLOR_MAP = {
@@ -231,6 +236,9 @@ class AnnotationsWidget(QWidget):
         success = True
         saved_files = []
 
+        date_of_annotation = self.ui.dateEdit.date()
+        experimenter_id = self.ui.lineEditAnnotatorId.text()
+
         default_dir = self.appdata.get_last_dir_browsed()[0]
         if not os.path.isdir(default_dir):
             default_dir = os.path.expanduser("~")
@@ -242,6 +250,9 @@ class AnnotationsWidget(QWidget):
             QFileDialog.ShowDirsOnly))
 
         for vol in self.controller.model.all_volumes():
+
+            xml_exporter = export_impc_xml.ExportXML(date_of_annotation, experimenter_id, PROC_METADATA_PATH)
+
             annotations_dict = Dict()
             ann = vol.annotations
             vol_id = vol.name
@@ -262,6 +273,8 @@ class AnnotationsWidget(QWidget):
                 annotations_dict[i]['space'] = space
                 annotations_dict[i]['stage'] = a.stage
 
+                xml_exporter.add_parameter(a.term, a.selected_option)
+
             # If no annotations available for the volume, do not save
             if not annotations_dict:
                 continue
@@ -274,6 +287,10 @@ class AnnotationsWidget(QWidget):
                 success = False
             else:
                 saved_files.append(out_file)
+
+            xml_path = os.path.join(out_dir, vol_id + '.xml')
+            xml_exporter.write(xml_path)
+
         if not success:
             error_dialog(self, 'Error', 'The was an error writing the annotation files')
         else:

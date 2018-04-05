@@ -1,8 +1,8 @@
 ---
 # This config file specifies how to setup the annotations tab for VPV
 available_options:
- options_one:  ['present','absent','abnormal','unobservable','ambiguous','imageOnly']
- options_two: ['yes','no','unobservable']
+  - ['present','absent','abnormal','unobservable','ambiguous','imageOnly']
+  - ['yes','no','unobservable']
 
 options_requiring_points: 
   - abnormal

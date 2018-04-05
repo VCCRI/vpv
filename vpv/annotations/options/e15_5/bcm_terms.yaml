@@ -5,7 +5,7 @@ parameters:
     order: 1
     term: bad_face
     impc_id: IMPC_EMO_124_001
-    options: options_one
+    options: 1
     default_option: imageOnly
     mandatory: yes
   pinna_2_b:
@@ -13,6 +13,6 @@ parameters:
     order: 2
     term: bad_face
     impc_id: IMPC_EMO_124_002
-    options: options_one
+    options: 1
     default_option: imageOnly
     mandatory: yes
