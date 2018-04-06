@@ -13,7 +13,7 @@ from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QFileDialog, QComboBox
 from vpv.ui.views.ui_annotations import Ui_Annotations
 import json
-from vpv.common import Stage, Layers, AnnotationOption, info_dialog, error_dialog, question_dialog
+from vpv.common import error_dialog, Layers, AnnotationOption, info_dialog, error_dialog, question_dialog
 from vpv.lib.addict import Dict
 from vpv.annotations.annotations_model import centre_stage_options
 from vpv.annotations import export_impc_xml
@@ -91,6 +91,10 @@ class AnnotationsWidget(QWidget):
         self.ui.comboBoxStage.activated['QString'].connect(self.ui.lineEditStage.setText)
         self.ui.lineEditCentre.textChanged.connect(self.center_changed)
         self.ui.lineEditStage.textChanged.connect(self.stage_changed)
+
+        # Make the line edits non editable
+        self.ui.lineEditStage.setReadOnly(True)
+        self.ui.lineEditCentre.setReadOnly(True)
 
         self.ui.comboBoxCentre.addItems(centre_stage_options.all_centers())
 
@@ -237,7 +241,11 @@ class AnnotationsWidget(QWidget):
         saved_files = []
 
         date_of_annotation = self.ui.dateEdit.date()
+
         experimenter_id = self.ui.lineEditAnnotatorId.text()
+        if experimenter_id.isspace() or not experimenter_id:
+            error_dialog(self, 'Experimenter ID missing', "An annotator ID is required")
+            return
 
         default_dir = self.appdata.get_last_dir_browsed()[0]
         if not os.path.isdir(default_dir):

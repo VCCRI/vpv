@@ -19,6 +19,7 @@ class ExportXML(object):
                  ):
 
         md = load_metadata(metadata)
+        self.metadata= md['meta_data']
 
         # Create separate file for each modality
         self.root = etree.Element('centreProcedureSet',
@@ -37,14 +38,14 @@ class ExportXML(object):
         self.procedure_element = etree.SubElement(self.experiment, 'procedure', procedureID=md['procedure_id'])
 
     def add_metadata(self):
-        for id_, param_value in self.metadata_params:
+        for id_, param_value in self.metadata.items():
             parameter = etree.SubElement(self.procedure_element, 'procedureMetadata', parameterID=id_)
             # Create value element
             value = etree.SubElement(parameter, 'value')
-            value.text = param_value
+            value.text = str(param_value)
 
     def write(self, file_path):
-
+        self.add_metadata()
         # print etree.tostring(root, pretty_print=True, xml_declaration=True, encoding='UTF-8', standalone='yes')
         etree.ElementTree(self.root).write(file_path, pretty_print=True, xml_declaration=True, encoding='UTF-8',
                                       standalone='yes')
@@ -65,7 +66,7 @@ class ExportXML(object):
         """
 
         # Get parameter info and append to procedure
-        parameter = etree.SubElement(self.procedure_element, 'seriesMediaParameter', parameterID=param_id)
+        parameter = etree.SubElement(self.procedure_element, 'simpleParameter', parameterID=param_id)
 
         # Create value element
         value = etree.SubElement(parameter, 'value')
