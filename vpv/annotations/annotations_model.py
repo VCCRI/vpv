@@ -87,6 +87,8 @@ class VolumeAnnotations(object):
 
     @stage.setter
     def stage(self, stage):
+        # After setting stage we can then set the avaialble annotiton objects
+        self.clear()
         self._stage = stage
         if all([self.center, self.stage]):
             self._load_annotations()

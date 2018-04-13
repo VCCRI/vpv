@@ -1,0 +1,289 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<centreProcedureSet xmlns="http://www.mousephenotype.org/dcc/exportlibrary/datastructure/core/procedure">
+  <centre centreID="H" pipeline="HRWL_001" project="MRC">
+    <experiment dateOfExperiment="Fri Apr 13 2018" experimentID="awdasds">
+      <specimenID>test_specimen_id</specimenID>
+      <procedure procedureID="IMPC_?">
+        <simpleParameter parameterID="IMPC_EMO_098_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_153_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_115_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_026_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_078_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_021_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_060_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_137_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_141_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_144_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_143_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_087_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_086_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_122_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_039_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_133_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_142_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_121_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_120_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_073_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_104_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_161_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_169_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_024_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_042_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_022_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_038_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_168_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_156_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_097_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_093_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_095_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_094_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_096_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_027_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_160_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_047_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_149_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_046_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_055_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_048_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_077_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_050_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_084_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_074_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_066_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_138_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_025_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_075_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_106_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_110_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_107_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_029_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_170_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_139_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_140_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_131_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_162_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_111_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_037_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_018_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_020_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_033_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_034_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_083_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_031_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_032_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_102_001">
+          <value>present</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_103_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_177_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_174_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_175_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_171_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_172_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_124_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_041_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_150_001">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_159_001">
+          <value>present</value>
+        </simpleParameter>
+        <procedureMetadata parameterID="IMPC_EMO_002_001">
+          <value>3641614</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_003_001">
+          <value>11M01182</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_004_001">
+          <value>Bruker</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_005_001">
+          <value>Skyscan1172</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_006_001">
+          <value>F</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_007_001">
+          <value>2.96</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_008_001">
+          <value>HAR_E14.5_microCT_SOP.pdf</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_009_001">
+          <value>70.95</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_010_001">
+          <value>216.161</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_011_001">
+          <value>2016-03-08</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_012_001">
+          <value>2015-08-12</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_013_001">
+          <value>2016-03-08</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_014_001">
+          <value>2016-03-08</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_015_001">
+          <value>80</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_016_001">
+          <value>124</value>
+        </procedureMetadata>
+      </procedure>
+    </experiment>
+  </centre>
+</centreProcedureSet>

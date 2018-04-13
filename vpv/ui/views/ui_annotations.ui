@@ -34,7 +34,7 @@
      <widget class="QWidget" name="tab_3">
       <attribute name="icon">
        <iconset resource="../../resources/resources.qrc">
-        <normaloff>:/icons/green_view.png</normaloff>:/icons/green_view.png</iconset>
+        <normaloff>:/icons/pencil.png</normaloff>:/icons/pencil.png</iconset>
       </attribute>
       <attribute name="title">
        <string/>

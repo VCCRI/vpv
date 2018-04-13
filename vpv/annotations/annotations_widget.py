@@ -9,7 +9,8 @@ Works something like this:
 import os
 from os.path import dirname, abspath, join
 import datetime
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QSizePolicy
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QFileDialog, QComboBox
 from vpv.ui.views.ui_annotations import Ui_Annotations
 from vpv.common import Layers, AnnotationOption, info_dialog, error_dialog, question_dialog
@@ -85,10 +86,8 @@ class AnnotationsWidget(QWidget):
             self.ui.lineEditAnnotatorId.setText(self.appdata.annotator_id)
         self.ui.lineEditAnnotatorId.textEdited.connect(self.annotator_id_changed)
 
-        self.ui.comboBoxCentre.currentIndexChanged['QString'].connect(self.ui.lineEditCentre.setText)
-        self.ui.comboBoxStage.currentIndexChanged['QString'].connect(self.ui.lineEditStage.setText)
-        self.ui.lineEditCentre.textChanged.connect(self.center_changed)
-        self.ui.lineEditStage.textChanged.connect(self.stage_changed)
+        self.ui.comboBoxCentre.activated['QString'].connect(self.center_changed)
+        self.ui.comboBoxStage.activated['QString'].connect(self.stage_changed)
 
         # Make the line edits non editable
         self.ui.lineEditStage.setReadOnly(True)
@@ -109,7 +108,10 @@ class AnnotationsWidget(QWidget):
 
     def center_changed(self, center):
         vol = self.controller.current_annotation_volume()
+        self.ui.lineEditCentre.setText(center)
+        # Set the availabe stages for this centre
         available_stages = centre_stage_options.all_stages(center)
+        self.ui.comboBoxStage.clear()
         self.ui.comboBoxStage.addItems(available_stages)
 
         if vol:
@@ -118,6 +120,8 @@ class AnnotationsWidget(QWidget):
                                     'If you select YES, all annotaiton on this volume will be erased.')
                 if a:
                     vol.annotations.clear()
+                else:
+                    return
 
             vol.annotations.center = center
             self.populate_available_terms()
@@ -125,14 +129,18 @@ class AnnotationsWidget(QWidget):
             self.appdata.annotation_centre = center
 
     def stage_changed(self, stage):
+        self.ui.lineEditStage.setText(stage)
         vol = self.controller.current_annotation_volume()
-        if vol:
 
+        if vol:
             if vol.annotations.stage:
-                a = question_dialog(self, 'Change centre?', 'Do you want to change center associated with this volume?\n'
+                a = question_dialog(self, 'stage?', 'Do you want to change stage associated with this volume?\n'
                                     'If you select YES, all annotaiton on this volume will be erased.')
-                if not a:
+                if a:
+                    vol.annotations.clear()
+                else:
                     return
+
             # If center and stage are now set, let's fill respective options
             vol.annotations.stage = stage
             self.populate_available_terms()
@@ -207,33 +215,43 @@ class AnnotationsWidget(QWidget):
             """
             box.activated.connect(lambda: self.update_annotation(child_, box_))
 
-        header = QTreeWidgetItem(['', 'term', 'name', 'option'])
+        header_labels = QTreeWidgetItem(['', 'term', 'name', 'option'])
 
-        self.ui.treeWidgetAvailableTerms.setHeaderItem(header)
+        self.ui.treeWidgetAvailableTerms.setHeaderItem(header_labels)
         # ann_by_cat = defaultdict(list)  # sort the annotations into categories
 
         parent = QTreeWidgetItem(self.ui.treeWidgetAvailableTerms)
-        parent.setText(0, 'Parameters')
+        parent.setText(0, '')
         parent.setFlags(parent.flags())
+        parent.setExpanded(True)
+
+        header = self.ui.treeWidgetAvailableTerms.header()
+
+
+        # Set root column to invisible
+        self.ui.treeWidgetAvailableTerms.setColumnWidth(0, 0)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
 
         for ann in sorted(vol.annotations, key=lambda an_: an_.order):
 
             child = QTreeWidgetItem(parent)
             child.setText(1, ann.term)
-            child.setText(2, ann.name)
+            child.setText(3, ann.name)
             option = ann.selected_option
             # color = OPTION_COLOR_MAP[option]
             parent.addChild(child)
 
             # Set up the combobox and highlight the currently selected one
             box = QComboBox()
+            box.setSizeAdjustPolicy(QComboBox.AdjustToContents)
             for opt in ann.options:
                 box.addItem(opt)
 
             box.setCurrentIndex(box.findText(option))
             # Setup combobox selection signal
             setup_signal(box, child)
-            self.ui.treeWidgetAvailableTerms.setItemWidget(child, 3, box)
+            self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)
             # child.setBackground(1, QtGui.QBrush(QtGui.QColor(*color)))  # Unpack the tuple of colors and opacity
 
         # Set the roi coords to None
