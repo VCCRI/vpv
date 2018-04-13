@@ -163,7 +163,10 @@ class DataModel(QtCore.QObject):
         self._volumes[vol.name] = vol
         self.id_counter += 1
 
-    def load_annotation(self, ann_path):
+    def load_annotations(self, ann_path):
+        pass
+
+    def load_annotation_old_json_method(self, ann_path):
         """
         Load an annotation from a json file. Apply annotations to volumes with the corresponding basename minus
         extension
