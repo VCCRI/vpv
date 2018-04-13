@@ -102,6 +102,7 @@ class Vpv(QtCore.QObject):
         self.view_scale_basrs = False
         self.view_id_counter = 0
         self.appdata = AppData()
+        self.current_view = None
         self.mainwindow = main_window.Mainwindow(self, self.appdata)
         # self.mainwindow.showFullScreen()
         self.model = DataModel()
@@ -189,7 +190,7 @@ class Vpv(QtCore.QObject):
                 self.mainwindow.set_mouse_position(*vol_points)
                 if hm:
                     hm_hover_voxel_value = hm.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
-                    self.heatmap_pixel_signal.emit((round(float(hm_hover_voxel_value), 2)))
+                    self.heatmap_pixel_signal.emit((round(float(hm_hover_voxel_value), 4)))
 
 
         # # If shift is pressed emit signal to get other views to get to the same or interscting slice
@@ -278,7 +279,8 @@ class Vpv(QtCore.QObject):
         -------
         model.ImageVolume instance
         """
-
+        if not self.current_view:
+            return None
         return self.current_view.layers[Layers.vol1].vol
 
     def on_console_enter_pressesd(self):
@@ -291,7 +293,6 @@ class Vpv(QtCore.QObject):
         QtGui.QApplication.clipboard().setPixmap(sshot)
         common.info_dialog(self.mainwindow, 'Message', "Screenshot copied to clipboard")
         #common.infoDialogTimed.information(self.mainwindow, 'Message', "Screenshot copied to clipboard", 100)
-
 
     def volume_changed(self, vol_name):
         self.data_manager.volume_changed(vol_name)
@@ -619,6 +620,7 @@ class Vpv(QtCore.QObject):
             self.model.load_image_series(image_series, memory_map)
             if not self.any_data_loaded:
                 self.add_initial_volume()
+
         # Now load the annotations. Only load if there is a corresponding volume with the same id
         if len(annotations) > 0:
             for ann in annotations:

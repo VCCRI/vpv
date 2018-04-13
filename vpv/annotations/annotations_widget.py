@@ -9,12 +9,10 @@ Works something like this:
 import os
 from os.path import dirname, abspath, join
 import datetime
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtCore
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QFileDialog, QComboBox
 from vpv.ui.views.ui_annotations import Ui_Annotations
-import json
-from vpv.common import error_dialog, Layers, AnnotationOption, info_dialog, error_dialog, question_dialog
-from vpv.lib.addict import Dict
+from vpv.common import Layers, AnnotationOption, info_dialog, error_dialog, question_dialog
 from vpv.annotations.annotations_model import centre_stage_options
 from vpv.annotations import export_impc_xml
 
@@ -38,7 +36,6 @@ class AnnotationsWidget(QWidget):
     annotation_radius_signal = QtCore.pyqtSignal(int)
     annotation_recent_dir_signal = QtCore.pyqtSignal(str)
     roi_highlight_off_signal = QtCore.pyqtSignal()
-    #reset_roi_signal = QtCore.pyqtSignal()  # Set the roi to None so can annotate without giving coords
 
     def __init__(self, controller, main_window):
         """
@@ -57,9 +54,6 @@ class AnnotationsWidget(QWidget):
         self.ui.setupUi(self)
 
         self.appdata = self.controller.appdata
-
-        # Set E15_5 terms as the default
-        self.ui.radioButtonE155.setChecked(True)
 
         # The signal to change volumes from the combobox
         self.ui.comboBoxAnnotationsVolumes.activated['QString'].connect(self.volume_changed)
@@ -87,8 +81,12 @@ class AnnotationsWidget(QWidget):
 
         self.set_current_date()
 
-        self.ui.comboBoxCentre.activated['QString'].connect(self.ui.lineEditCentre.setText)
-        self.ui.comboBoxStage.activated['QString'].connect(self.ui.lineEditStage.setText)
+        if self.appdata.annotator_id:
+            self.ui.lineEditAnnotatorId.setText(self.appdata.annotator_id)
+        self.ui.lineEditAnnotatorId.textEdited.connect(self.annotator_id_changed)
+
+        self.ui.comboBoxCentre.currentIndexChanged['QString'].connect(self.ui.lineEditCentre.setText)
+        self.ui.comboBoxStage.currentIndexChanged['QString'].connect(self.ui.lineEditStage.setText)
         self.ui.lineEditCentre.textChanged.connect(self.center_changed)
         self.ui.lineEditStage.textChanged.connect(self.stage_changed)
 
@@ -97,37 +95,47 @@ class AnnotationsWidget(QWidget):
         self.ui.lineEditCentre.setReadOnly(True)
 
         self.ui.comboBoxCentre.addItems(centre_stage_options.all_centers())
+        if self.appdata.annotation_centre:
+            self.ui.comboBoxCentre.setCurrentText(self.appdata.annotation_centre)
 
-    def center_changed(self, center):
-        vol = self.controller.current_annotation_volume()
-        if vol.annotations.center:
-            a = question_dialog(self, 'Change centre?', 'Do you want to change center associated with this volume?\n'
-                                'If you select YES, all annotaiton on this volume will be erased.')
-            if a:
-                vol.annotations.clear()
-
-        vol.annotations.center = center
-        self.populate_available_terms()
-        self.ui.lineEditStage.clear()
-        # Now we've changed center, we need to change the stage combobox. Set it to the first
-        available_stages = centre_stage_options.all_stages(center)
-        self.ui.comboBoxStage.addItems(available_stages)
-
-    def stage_changed(self, stage):
-        vol = self.controller.current_annotation_volume()
-        if vol.annotations.stage:
-            a = question_dialog(self, 'Change centre?', 'Do you want to change center associated with this volume?\n'
-                                'If you select YES, all annotaiton on this volume will be erased.')
-            if not a:
-                return
-        # If center and stage are now set, let's fill respective options
-        vol.annotations.stage = stage
-        self.populate_available_terms()
+        if self.appdata.annotation_stage:
+            self.ui.comboStage.setCurrentText(self.appdata.annotation_stage)
 
     def annotator_id_changed(self):
         id_ = str(self.ui.lineEditAnnotatorId.text())
         if not id_ or id_.isspace():
             return
+        self.appdata.annotator_id = id_
+
+    def center_changed(self, center):
+        vol = self.controller.current_annotation_volume()
+        available_stages = centre_stage_options.all_stages(center)
+        self.ui.comboBoxStage.addItems(available_stages)
+
+        if vol:
+            if vol.annotations.center:
+                a = question_dialog(self, 'Change centre?', 'Do you want to change center associated with this volume?\n'
+                                    'If you select YES, all annotaiton on this volume will be erased.')
+                if a:
+                    vol.annotations.clear()
+
+            vol.annotations.center = center
+            self.populate_available_terms()
+            self.ui.lineEditStage.clear()
+            self.appdata.annotation_centre = center
+
+    def stage_changed(self, stage):
+        vol = self.controller.current_annotation_volume()
+        if vol:
+
+            if vol.annotations.stage:
+                a = question_dialog(self, 'Change centre?', 'Do you want to change center associated with this volume?\n'
+                                    'If you select YES, all annotaiton on this volume will be erased.')
+                if not a:
+                    return
+            # If center and stage are now set, let's fill respective options
+            vol.annotations.stage = stage
+            self.populate_available_terms()
 
     def set_current_date(self):
         d = datetime.datetime.now()
@@ -208,7 +216,7 @@ class AnnotationsWidget(QWidget):
         parent.setText(0, 'Parameters')
         parent.setFlags(parent.flags())
 
-        for ann in vol.annotations:  # remember to make iteration occur in order in the ann model
+        for ann in sorted(vol.annotations, key=lambda an_: an_.order):
 
             child = QTreeWidgetItem(parent)
             child.setText(1, ann.term)
@@ -237,9 +245,6 @@ class AnnotationsWidget(QWidget):
 
     def save_annotations(self):
 
-        success = True
-        saved_files = []
-
         date_of_annotation = self.ui.dateEdit.date()
 
         experimenter_id = self.ui.lineEditAnnotatorId.text()
@@ -257,52 +262,31 @@ class AnnotationsWidget(QWidget):
             default_dir,
             QFileDialog.ShowDirsOnly))
 
+        saved_file_paths = []
+
         for vol in self.controller.model.all_volumes():
 
             xml_exporter = export_impc_xml.ExportXML(date_of_annotation, experimenter_id, PROC_METADATA_PATH)
 
-            annotations_dict = Dict()
             ann = vol.annotations
             vol_id = vol.name
-            space = vol.space
-            for i,  a in enumerate(ann.annotations):
-                annotations_dict[i]['annotation_type'] = a.type
-                annotations_dict[i]['name'] = a.name
-                annotations_dict[i]['impc_id'] = a.term
-                annotations_dict[i]['selected_option'] = a.selected_option
-                annotations_dict[i]['x'] = a.x
-                annotations_dict[i]['y'] = a.y
-                annotations_dict[i]['z'] = a.z
-                annotations_dict[i]['x_percent'] = a.x_percent
-                annotations_dict[i]['y_percent'] = a.y_percent
-                annotations_dict[i]['z_percent'] = a.z_percent
-                # annotations_dict[vol_id][i]['free_text'] = a.free_text
-                annotations_dict[i]['volume_dimensions_xyz'] = a.dims
-                annotations_dict[i]['space'] = space
-                annotations_dict[i]['stage'] = a.stage
 
+            for i,  a in enumerate(ann.annotations):
                 xml_exporter.add_parameter(a.term, a.selected_option)
 
-            # If no annotations available for the volume, do not save
-            if not annotations_dict:
-                continue
-            out_file = os.path.join(out_dir, vol_id + '.json')
-
-            try:
-                with open(out_file, 'w') as fh:
-                    fh.write(json.dumps(annotations_dict, sort_keys=True, indent = 4, separators = (',', ': ')))
-            except (IOError, OSError):
-                success = False
-            else:
-                saved_files.append(out_file)
+                if all((a.x, a.y, a.z)):
+                    xml_exporter.add_point(a.term, (a.x, a.y, a.z))
 
             xml_path = os.path.join(out_dir, vol_id + '.xml')
-            xml_exporter.write(xml_path)
 
-        if not success:
-            error_dialog(self, 'Error', 'The was an error writing the annotation files')
-        else:
-            sf_str = '\n'.join(saved_files)
+            try:
+                xml_exporter.write(xml_path)
+            except OSError as e:
+                error_dialog(self, 'Save file failure', 'Annotation file not saved:{}'.format(sf_str))
+            else:
+                saved_file_paths.append(xml_path)
+
+            sf_str = '\n'.join(saved_file_paths)
             info_dialog(self, 'Success', 'Annotation files saved:{}'.format(sf_str))
 
         self.annotation_recent_dir_signal.emit(out_dir)

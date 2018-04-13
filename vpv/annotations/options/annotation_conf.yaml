@@ -7,6 +7,7 @@ available_options:
 options_requiring_points: 
   - abnormal
   - ambiguous
+  - absent
 
 centers:
   jax:
@@ -17,6 +18,10 @@ centers:
     stages:
       e15.5:
         file_: e15_5/bcm_terms.yaml
+  har:
+    stages:
+      e15.5:
+        file_: e15_5/har_terms.yaml
 #  tcp:
 #    e15.5
 #  jax:

@@ -78,6 +78,30 @@ class AppData(object):
 
         return self.app_data['flips']
 
+    @property
+    def annotation_centre(self):
+        return self.app_data.get('annotation_centre')
+
+    @annotation_centre.setter
+    def annotation_centre(self, centre):
+        self.app_data['annotation_centre'] = centre
+
+    @property
+    def annotation_stage(self):
+        return self.app_data.get('annotation_stage')
+
+    @annotation_stage.setter
+    def annotation_stage(self, stage):
+       self.app_data['annotation_stage'] = stage
+
+    @property
+    def annotator_id(self):
+        return self.app_data.get('annotator_id')
+
+    @annotator_id.setter
+    def annotator_id(self, id_):
+        self.app_data['annotator_id'] = id_
+
     def write_app_data(self):
         with open(self.app_data_file, 'w') as fh:
             fh.write(yaml.dump(self.app_data))

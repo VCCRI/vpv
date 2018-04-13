@@ -328,7 +328,7 @@ class Import(QDialog):
         if extension == '.zip':
             return IMPC_ANALYSIS
 
-        if extension == '.json':
+        if extension == '.xml':
             return ANNOTATIONS
 
         if extension not in volume_types:

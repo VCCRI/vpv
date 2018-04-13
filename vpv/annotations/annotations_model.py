@@ -45,9 +45,9 @@ class Annotation(object):
         self.z_percent = 100.0 / dims[2] * self.z
 
 
-class EmapaAnnotation(Annotation):
+class ImpcAnnotation(Annotation):
     def __init__(self, x, y, z, emapa_term, name, options, default_option, dims, stage, order, is_mandatory):
-        super(EmapaAnnotation, self).__init__(x, y, z, dims, stage)
+        super(ImpcAnnotation, self).__init__(x, y, z, dims, stage)
         self.term = str(emapa_term)
         self.name = name
         self.options = options
@@ -101,7 +101,7 @@ class VolumeAnnotations(object):
 
         """
         cso = centre_stage_options.opts
-        for param_name, data in cso['centers'][self.center]['stages'][self.stage]['parameters'].items():
+        for _, data in cso['centers'][self.center]['stages'][self.stage]['parameters'].items():
 
             options = centre_stage_options.opts['available_options'][data['options']]
             default = data['default_option']
@@ -110,7 +110,7 @@ class VolumeAnnotations(object):
                                      None,
                                      None,
                                      data['impc_id'],
-                                     param_name,
+                                     data['name'],
                                      options,
                                      default,
                                      self.stage,
@@ -136,7 +136,7 @@ class VolumeAnnotations(object):
         """
         Add an emap type annotaiotn from available terms on file
         """
-        ann = EmapaAnnotation(x, y, z, emapa, name, options, default_option, self.dims, stage, order, is_mandatory)
+        ann = ImpcAnnotation(x, y, z, emapa, name, options, default_option, self.dims, stage, order, is_mandatory)
         self.annotations.append(ann)
 
     def remove(self, row):
