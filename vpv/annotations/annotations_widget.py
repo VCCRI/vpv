@@ -215,7 +215,7 @@ class AnnotationsWidget(QWidget):
             """
             box.activated.connect(lambda: self.update_annotation(child_, box_))
 
-        header_labels = QTreeWidgetItem(['', 'term', 'name', 'option'])
+        header_labels = QTreeWidgetItem(['', 'term', 'name', 'option', 'done?'])
 
         self.ui.treeWidgetAvailableTerms.setHeaderItem(header_labels)
         # ann_by_cat = defaultdict(list)  # sort the annotations into categories
@@ -227,11 +227,11 @@ class AnnotationsWidget(QWidget):
 
         header = self.ui.treeWidgetAvailableTerms.header()
 
-
         # Set root column to invisible
         self.ui.treeWidgetAvailableTerms.setColumnWidth(0, 0)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
 
         for ann in sorted(vol.annotations, key=lambda an_: an_.order):
 
@@ -252,6 +252,7 @@ class AnnotationsWidget(QWidget):
             # Setup combobox selection signal
             setup_signal(box, child)
             self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)
+            self.ui.treeWidgetAvailableTerms.setItemWidget(child, 4, QtWidgets.QCheckBox())
             # child.setBackground(1, QtGui.QBrush(QtGui.QColor(*color)))  # Unpack the tuple of colors and opacity
 
         # Set the roi coords to None
