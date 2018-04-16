@@ -152,7 +152,6 @@ class ManageData(QtGui.QWidget):
 
         self.ui.pushButtonScreenShot.clicked.connect(self.controller.take_screen_shot)
 
-        self.ui.checkBoxInterpolate.clicked.connect(self.on_interpolate)
         self.ui.pushButtonVectorMagnitudeFilter.pressed.connect(self.lower_magnitude_changed)
 
         self.volume_levels_slider.startValueChanged.connect(self.lower_level_volume_changed)

@@ -197,7 +197,7 @@ class Ui_Annotations(object):
         self.verticalLayout_17.addWidget(self.tabWidgetOptions)
 
         self.retranslateUi(Annotations)
-        self.tabWidgetOptions.setCurrentIndex(1)
+        self.tabWidgetOptions.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(Annotations)
 
     def retranslateUi(self, Annotations):

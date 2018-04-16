@@ -218,7 +218,6 @@ class AnnotationsWidget(QWidget):
         header_labels = QTreeWidgetItem(['', 'term', 'name', 'option', 'done?'])
 
         self.ui.treeWidgetAvailableTerms.setHeaderItem(header_labels)
-        # ann_by_cat = defaultdict(list)  # sort the annotations into categories
 
         parent = QTreeWidgetItem(self.ui.treeWidgetAvailableTerms)
         parent.setText(0, '')

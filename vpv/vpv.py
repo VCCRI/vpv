@@ -289,10 +289,9 @@ class Vpv(QtCore.QObject):
 
     def take_screen_shot(self):
         # Hide the sliders, take screenshot, then show slider
-        sshot = QtGui.QPixmap.grabWidget(self.mainwindow.ui.centralwidget)
+        sshot = self.mainwindow.ui.centralwidget.grab()
         QtGui.QApplication.clipboard().setPixmap(sshot)
         common.info_dialog(self.mainwindow, 'Message', "Screenshot copied to clipboard")
-        #common.infoDialogTimed.information(self.mainwindow, 'Message', "Screenshot copied to clipboard", 100)
 
     def volume_changed(self, vol_name):
         self.data_manager.volume_changed(vol_name)
@@ -623,21 +622,24 @@ class Vpv(QtCore.QObject):
 
         # Now load the annotations. Only load if there is a corresponding volume with the same id
         if len(annotations) > 0:
-            for ann in annotations:
-                error = self.model.load_annotation(ann)
-                if error:
-                    common.error_dialog(self.mainwindow, 'Annotations not loaded', error)
-                else:
-                    common.info_dialog(self.mainwindow, 'Load success', 'Annotations loaded')
-            # Switch to annotations tab
-            self.dock_widget.switch_tab(1)
-            self.dock_widget.tab_changed(1)
+            self.load_annotation(annotations)
 
         self.appdata.set_last_dir_browsed(last_dir)
 
         if self.dock_widget.isVisible():
             self.data_manager.update()
             self.annotations_manager.update()
+
+    def load_annotations(self, annotation_file_list):
+        for path in annotation_file_list:
+            error = self.model.load_annotation(path)
+            if error:
+                common.error_dialog(self.mainwindow, 'Annotations not loaded', error)
+            else:
+                common.info_dialog(self.mainwindow, 'Load success', 'Annotations loaded')
+            # Switch to annotations tab
+        self.dock_widget.switch_tab(1)
+        self.dock_widget.tab_changed(1)
 
     def load_volumes(self, file_list, data_type, memory_map=False, fdr_thresholds=False):
         """
