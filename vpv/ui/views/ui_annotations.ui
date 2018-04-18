@@ -29,7 +29,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_3">
       <attribute name="icon">
@@ -55,10 +55,13 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_20">
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_2"/>
-           </item>
-           <item>
             <widget class="QPushButton" name="pushButtonSaveAnnotations">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="toolTip">
               <string>Save annotation as xml</string>
              </property>
@@ -74,26 +77,6 @@
                <width>32</width>
                <height>32</height>
               </size>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="Line" name="line_4">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButtonDiableRoi">
-             <property name="toolTip">
-              <string>Clear ROI coordinates</string>
-             </property>
-             <property name="statusTip">
-              <string>clar the annotation circle</string>
-             </property>
-             <property name="text">
-              <string>Reset roi</string>
              </property>
             </widget>
            </item>
@@ -141,20 +124,7 @@
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_34">
+            <widget class="QLabel" name="label_6">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -162,12 +132,24 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>X: </string>
+              <string>x:</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QLabel" name="labelXPos">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>20</width>
+               <height>16777215</height>
+              </size>
+             </property>
              <property name="text">
               <string>0</string>
              </property>
@@ -188,6 +170,12 @@
            </item>
            <item>
             <widget class="QLabel" name="labelYPos">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="text">
               <string>0</string>
              </property>
@@ -208,6 +196,12 @@
            </item>
            <item>
             <widget class="QLabel" name="labelZPos">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="text">
               <string>0</string>
              </property>

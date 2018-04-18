@@ -15,6 +15,7 @@ from vpv.ui.views.ui_annotations import Ui_Annotations
 from vpv.common import Layers, AnnotationOption, info_dialog, error_dialog, question_dialog
 from vpv.annotations.annotations_model import centre_stage_options
 from vpv.annotations import impc_xml
+from functools import partial
 
 
 SCRIPT_DIR = dirname(abspath(__file__))
@@ -67,14 +68,12 @@ class AnnotationsWidget(QWidget):
 
         self.ui.pushButtonSaveAnnotations.clicked.connect(self.save_annotations)
 
-        self.ui.pushButtonDiableRoi.clicked.connect(self.reset_roi)
-
         self.ui.spinBoxAnnotationCircleSize.setValue(self.appdata.annotation_circle_radius)
         self.ui.spinBoxAnnotationCircleSize.valueChanged.connect(self.annotation_radius_changed)
 
         self.annotating = False
 
-        self.ui.treeWidgetAvailableTerms.itemClicked.connect(self.on_tree_clicked)
+        self.ui.treeWidgetAvailableTerms.itemEntered.connect(self.on_tree_clicked)
 
         # Make sure the tree is resized to fit contents
         self.ui.treeWidgetAvailableTerms.itemExpanded.connect(self.resize_table)
@@ -125,7 +124,6 @@ class AnnotationsWidget(QWidget):
             new_row_idx = cr - 1 if up else cr + 1
         new_item = self.ui.treeWidgetAvailableTerms.itemFromIndex(new_row_idx)
         self.ui.treeWidgetAvailableTerms.setCurrentItem(new_item)
-
 
     def annotator_id_changed(self):
         id_ = str(self.ui.lineEditAnnotatorId.text())
@@ -236,11 +234,13 @@ class AnnotationsWidget(QWidget):
             # info_dialog(self, 'Chose centre and stage', 'You must choose a centre and stage from the options tab')
             return
 
-        def setup_signal(box_: QComboBox, child_: QTreeWidgetItem):
+        def setup_signal(box_: QComboBox, child_: QTreeWidgetItem, row: int):
             """
             Connect the Qcombobox
             """
-            box.activated.connect(lambda: self.update_annotation(child_, box_))
+            box.activated.connect(partial(self.update_annotation, child_, box_))
+            # Setup signal so when combobox is only opened, it sets the selection to that column
+            box.highlighted.connect(partial(self.on_box_highlight, child))
 
         header_labels = QTreeWidgetItem(['', 'term', 'name', 'option', 'done?'])
 
@@ -259,7 +259,7 @@ class AnnotationsWidget(QWidget):
         header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
 
-        for ann in sorted(vol.annotations, key=lambda an_: an_.order):
+        for i, ann in enumerate(sorted(vol.annotations, key=lambda an_: an_.order)):
 
             child = QTreeWidgetItem(parent)
             child.setText(1, ann.term)
@@ -276,13 +276,16 @@ class AnnotationsWidget(QWidget):
 
             box.setCurrentIndex(box.findText(option))
             # Setup combobox selection signal
-            setup_signal(box, child)
+            setup_signal(box, child, i)
             self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)
             self.ui.treeWidgetAvailableTerms.setItemWidget(child, 4, QtWidgets.QCheckBox())
             # child.setBackground(1, QtGui.QBrush(QtGui.QColor(*color)))  # Unpack the tuple of colors and opacity
 
         # Set the roi coords to None
         self.roi_highlight_off_signal.emit()
+
+    def on_box_highlight(self, child):
+        self.ui.treeWidgetAvailableTerms.setCurrentItem(child)
 
     def annotation_radius_changed(self, radius: int):
         self.appdata.annotation_circle_radius = radius
@@ -345,13 +348,16 @@ class AnnotationsWidget(QWidget):
     def update_annotation(self, child: QTreeWidgetItem, cbox: QComboBox):
         """
         On getting a change signal from the parameter option combobox, set options on the volume.annotations object
+        Also set the selected row to acrtive
 
         Parameters
         ----------
         child: is the node in the QTreeWidget that corresponds to our paramter option selection
         cbox: Qt combobox that was clicked
+        row: The row of the qtreewidget where the combobox is
 
         """
+        print('update')
         vol = self.controller.current_annotation_volume()
         if not vol:
             error_dialog(self, "Error", "No volume selected")

@@ -625,7 +625,7 @@ class Vpv(QtCore.QObject):
 
         # Now load the annotations. Only load if there is a corresponding volume with the same id
         if len(annotations) > 0:
-            self.load_annotation(annotations)
+            self.load_annotations(annotations)
 
         self.appdata.set_last_dir_browsed(last_dir)
 
@@ -640,6 +640,8 @@ class Vpv(QtCore.QObject):
                 common.error_dialog(self.mainwindow, 'Annotations not loaded', error)
             else:
                 common.info_dialog(self.mainwindow, 'Load success', 'Annotations loaded')
+                # Load annotations
+                self.annotations_manager.populate_available_terms()
 
     def load_volumes(self, file_list, data_type, memory_map=False, fdr_thresholds=False):
         """

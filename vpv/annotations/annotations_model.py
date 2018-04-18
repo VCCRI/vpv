@@ -14,9 +14,9 @@ class Annotation(object):
     Records a single manual annotation
     """
     def __init__(self, x, y, z, dims, stage):
-        self.x = None
-        self.y = None
-        self.z = None
+        self.x = x
+        self.y = y
+        self.z = z
         self.x_percent = None
         self.y_percent = None
         self.z_percent = None
@@ -135,7 +135,7 @@ class VolumeAnnotations(object):
         ann.x, ann.y, ann.z = x, y, z
         ann.selected_option = selected_option
 
-    def add_impc_annotation(self, x, y, z, impc_param, name, options, default_option, stage, order, is_mandatory, dims):
+    def add_impc_annotation(self, x: int, y:int, z:int, impc_param, name, options, default_option, stage, order, is_mandatory, dims):
         """
         Add an emap type annotation from available terms on file
         """
