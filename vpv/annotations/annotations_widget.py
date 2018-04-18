@@ -95,6 +95,11 @@ class AnnotationsWidget(QWidget):
         self.ui.lineEditStage.setReadOnly(True)
         self.ui.lineEditCentre.setReadOnly(True)
 
+    def on_startup(self):
+        """
+        Populates the centres and combobox, possibly with saved information. There needs to be a loaded volume
+        first so we don't put in constructor
+        """
         self.ui.comboBoxCentre.addItems(centre_stage_options.all_centers())
         if self.appdata.annotation_centre:
             self.ui.comboBoxCentre.setCurrentText(self.appdata.annotation_centre)
@@ -102,7 +107,7 @@ class AnnotationsWidget(QWidget):
 
         if self.appdata.annotation_stage:
             self.stage_changed(self.appdata.annotation_stage)
-            self.ui.comboStage.setCurrentText(self.appdata.annotation_stage)
+            self.ui.comboBoxStage.setCurrentText(self.appdata.annotation_stage)
 
     def d_pressed_slot(self):
         """
@@ -169,6 +174,7 @@ class AnnotationsWidget(QWidget):
             # If center and stage are now set, let's fill respective options
             vol.annotations.stage = stage
             self.populate_available_terms()
+            self.appdata.annotation_stage = stage
 
     def set_current_date(self):
         d = datetime.datetime.now()
@@ -285,6 +291,8 @@ class AnnotationsWidget(QWidget):
         self.roi_highlight_off_signal.emit()
 
     def on_box_highlight(self, child):
+        if self.ui.treeWidgetAvailableTerms.currentItem() != child:
+            self.reset_roi()
         self.ui.treeWidgetAvailableTerms.setCurrentItem(child)
 
     def annotation_radius_changed(self, radius: int):
@@ -357,7 +365,6 @@ class AnnotationsWidget(QWidget):
         row: The row of the qtreewidget where the combobox is
 
         """
-        print('update')
         vol = self.controller.current_annotation_volume()
         if not vol:
             error_dialog(self, "Error", "No volume selected")
@@ -435,3 +442,8 @@ class AnnotationsWidget(QWidget):
             self.ui.comboBoxAnnotationsVolumes.addItem("None")
             self.ui.comboBoxAnnotationsVolumes.setCurrentIndex(self.ui.comboBoxAnnotationsVolumes.findText(vol.name))
             self.resize_table()
+
+
+
+# class CentreStage_selector(QtCore.QObject):
+#     def __init__(self):

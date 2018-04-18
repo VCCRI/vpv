@@ -128,3 +128,10 @@ QCheckBox::indicator:indeterminate:pressed {
     image: url(:/images/checkbox_indeterminate_pressed.png);
 }
 
+
+
+QComboBox:on { /* shift the text when the popup opens */
+    background: black;
+}
+
+

@@ -29,7 +29,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_3">
       <attribute name="icon">
@@ -349,19 +349,19 @@
          <x>31</x>
          <y>131</y>
          <width>280</width>
-         <height>59</height>
+         <height>82</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="0">
-         <widget class="QLineEdit" name="lineEditAnnotatorId"/>
-        </item>
         <item row="0" column="1">
          <widget class="QLabel" name="label">
           <property name="text">
            <string>Annotator ID</string>
           </property>
          </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QDateEdit" name="dateEdit"/>
         </item>
         <item row="1" column="1">
          <widget class="QLabel" name="label_3">
@@ -370,8 +370,8 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QDateEdit" name="dateEdit"/>
+        <item row="0" column="0">
+         <widget class="QLineEdit" name="lineEditAnnotatorId"/>
         </item>
        </layout>
       </widget>

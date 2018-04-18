@@ -677,6 +677,8 @@ class Vpv(QtCore.QObject):
             dialog = QtGui.QMessageBox.warning(self.mainwindow, 'Volumes not loaded', '\n'.join(non_loaded),
                                                QtGui.QMessageBox.Cancel)
 
+        self.annotations_manager.on_startup()
+
     def load_impc_analysis(self, impc_zip_file):
         """
         Load a zip file containing the results of the IMPC automated analysis (TCP pipeline)
