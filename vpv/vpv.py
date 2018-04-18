@@ -676,7 +676,7 @@ class Vpv(QtCore.QObject):
         if len(non_loaded) > 0:
             dialog = QtGui.QMessageBox.warning(self.mainwindow, 'Volumes not loaded', '\n'.join(non_loaded),
                                                QtGui.QMessageBox.Cancel)
-
+        self.any_data_loaded
         self.annotations_manager.on_startup()
 
     def load_impc_analysis(self, impc_zip_file):

@@ -345,6 +345,13 @@ class ManageData(QtGui.QWidget):
         """
         self.modify_layer(Layers.heatmap, 'set_t_threshold', t)
 
+    def volume_changed(self, vol_name):
+        """
+        When volume is changed from the combobox
+        """
+
+        self.modify_layer(Layers.vol1, 'set_volume', vol_name)
+
     def volume2_changed(self, vol_name):
         """
         When volume is changed from the combobox

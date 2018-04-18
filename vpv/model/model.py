@@ -189,15 +189,14 @@ class DataModel(QtCore.QObject):
         if vol:
             # Get the dict that contains the available options for a given center/stage
             default_opts = centre_stage_options.opts
-            available_options = default_opts['available_options']
-            stage = self.get_stage_from_proc_id(simple_and_series_params)
+            stage = self.get_stage_from_proc_id(simple_and_series_params, centerID)
 
             # Get all the simpleParameter entries form the xml file
             for xml_param, xml_data in simple_and_series_params.items():
                 option = xml_data['option']
                 xyz = xml_data.get('xyz')
                 if xyz:
-                    x, y, z = [ int(i) for i in xyz]
+                    x, y, z = [int(i) for i in xyz]
                 else:
                     x = y = z = None
                 dims = vol.shape_xyz()
@@ -214,35 +213,32 @@ class DataModel(QtCore.QObject):
                                 options = default_opts['available_options'][default_param_info['options']]# available options for this parameter
                                 order = default_param_info['options']
                                 is_mandatory = default_param_info['mandatory']
-                                if xml_param == 'IMPC_EMO_150_001':
-                                    print('k')
 
                                 vol.annotations.add_impc_annotation(x, y, z, xml_param, name, options, option, stage,
                                                             order, is_mandatory, dims)
-
-
 
         else:
             return "Could not load annotation: {}. Not able to find loaded volume with same id".format(file_id)
         return None
 
-
-    def get_stage_from_proc_id(self, parameters: dict):
+    def get_stage_from_proc_id(self, parameters: dict, center_id: dict):
         """
         There is nowhere in the IMPC xml to log what stage we are using.
-        We must infer that from the procedures we are using
+        We must infer that from the procedures we are using.
+        If centre is Harwell return e14.5 instead of e15.5
 
         Returns
         -------
         str: stage identifier
+        center_id: the one letter centre code.
         """
         param_id, _ = list(parameters.items())[0]
         if 'EMO' in param_id:
+            if center_id.lower() == 'h':
+                return 'e14.5'
             return 'e15.5'
         elif 'EMP' in param_id:
             return 'e18.5'  # Not sure this is correct. Look up. For now only using E15.5
-
-
 
     def load_annotation_old_json_method(self, ann_path):
         """

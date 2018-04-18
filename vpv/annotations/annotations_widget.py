@@ -73,7 +73,7 @@ class AnnotationsWidget(QWidget):
 
         self.annotating = False
 
-        self.ui.treeWidgetAvailableTerms.itemEntered.connect(self.on_tree_clicked)
+        self.ui.treeWidgetAvailableTerms.itemClicked.connect(self.on_tree_clicked)
 
         # Make sure the tree is resized to fit contents
         self.ui.treeWidgetAvailableTerms.itemExpanded.connect(self.resize_table)
@@ -94,12 +94,17 @@ class AnnotationsWidget(QWidget):
         # Make the line edits non editable
         self.ui.lineEditStage.setReadOnly(True)
         self.ui.lineEditCentre.setReadOnly(True)
+        self.first_run = True
 
     def on_startup(self):
         """
         Populates the centres and combobox, possibly with saved information. There needs to be a loaded volume
         first so we don't put in constructor
         """
+        if not self.first_run:
+            return
+        self.first_run = False
+
         self.ui.comboBoxCentre.addItems(centre_stage_options.all_centers())
         if self.appdata.annotation_centre:
             self.ui.comboBoxCentre.setCurrentText(self.appdata.annotation_centre)
@@ -205,6 +210,8 @@ class AnnotationsWidget(QWidget):
         info_str = "Annotation information\nterm: {}\noption: {}\nx:{}, y:{}, z:{}".format(
           ann.term, ann.selected_option, ann.x, ann.y, ann.z
         )
+
+        # Set the annotation info box
         self.ui.textEditAnnotationInfo.setText(info_str)
         if None in (ann.x, ann.y, ann.z):
             self.reset_roi()
@@ -236,7 +243,7 @@ class AnnotationsWidget(QWidget):
         self.ui.treeWidgetAvailableTerms.clear()
 
         vol = self.controller.current_annotation_volume()
-        if not vol and None in (vol.annotations.stage, vol.annotations.center):
+        if not vol or None in (vol.annotations.stage, vol.annotations.center):
             # info_dialog(self, 'Chose centre and stage', 'You must choose a centre and stage from the options tab')
             return
 
@@ -349,7 +356,17 @@ class AnnotationsWidget(QWidget):
         self.resize_table()
 
     def volume_changed(self, vol_id: str):
+        stage = self.ui.lineEditStage.text()
+        center = self.ui.lineEditCentre.text()
+
         self.controller.volume_changed(vol_id)
+        vol = self.controller.current_annotation_volume()
+        if vol:
+            if (stage and not stage.isspace()) and (center and not center.isspace()):
+                vol.annotations.stage = stage
+                vol.annotations.center = center
+            if not vol.annotations:
+                vol.annotations._load_annotations()
         self.update()
         self.populate_available_terms()
 
