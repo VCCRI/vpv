@@ -119,6 +119,9 @@ class Vpv(QtCore.QObject):
         self.annotations_manager.annotation_radius_signal.connect(self.annotation_radius_changed)
         self.annotations_manager.roi_highlight_off_signal.connect(self.reset_roi)
 
+        self.mainwindow.d_pressed_signal.connect(self.annotations_manager.d_pressed_slot)
+        self.mainwindow.key_up_down_signal.connect(self.annotations_manager.sroll_annotations)
+
         self.volume_pixel_signal.connect(self.mainwindow.set_volume_pix_intensity)
         self.heatmap_pixel_signal.connect(self.mainwindow.set_data_pix_intensity)
 
@@ -637,9 +640,6 @@ class Vpv(QtCore.QObject):
                 common.error_dialog(self.mainwindow, 'Annotations not loaded', error)
             else:
                 common.info_dialog(self.mainwindow, 'Load success', 'Annotations loaded')
-            # Switch to annotations tab
-        self.dock_widget.switch_tab(1)
-        self.dock_widget.tab_changed(1)
 
     def load_volumes(self, file_list, data_type, memory_map=False, fdr_thresholds=False):
         """

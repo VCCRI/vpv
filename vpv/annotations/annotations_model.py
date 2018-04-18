@@ -108,7 +108,7 @@ class VolumeAnnotations(object):
             options = centre_stage_options.opts['available_options'][data['options']]
             default = data['default_option']
 
-            self.add_emap_annotation(None,
+            self.add_impc_annotation(None,
                                      None,
                                      None,
                                      data['impc_id'],
@@ -117,7 +117,8 @@ class VolumeAnnotations(object):
                                      default,
                                      self.stage,
                                      data['order'],
-                                     data['mandatory']
+                                     data['mandatory'],
+                                     self.dims
                                      )
         # Sort the list and set the interator index
         self.annotations.sort(key=lambda x: x.order, reverse=True)
@@ -134,11 +135,11 @@ class VolumeAnnotations(object):
         ann.x, ann.y, ann.z = x, y, z
         ann.selected_option = selected_option
 
-    def add_emap_annotation(self, x, y, z, emapa, name, options, default_option, stage, order, is_mandatory):
+    def add_impc_annotation(self, x, y, z, impc_param, name, options, default_option, stage, order, is_mandatory, dims):
         """
-        Add an emap type annotaiotn from available terms on file
+        Add an emap type annotation from available terms on file
         """
-        ann = ImpcAnnotation(x, y, z, emapa, name, options, default_option, self.dims, stage, order, is_mandatory)
+        ann = ImpcAnnotation(x, y, z, impc_param, name, options, default_option, dims, stage, order, is_mandatory)
         self.annotations.append(ann)
 
     def remove(self, row):
@@ -193,6 +194,12 @@ class CenterStageOptions(object):
     def load_centre_stage_file(self, yaml_name):
         path = join(OPTIONS_DIR, yaml_name)
         opts = load_yaml(path)
+        # Now add the IMPC as key insterad of useless param_1, param_2 etc
+        renamed = {}
+        for k in list(opts['parameters']):
+            new_key =  opts['parameters'][k]['impc_id']
+            renamed[new_key] = opts['parameters'][k]
+        opts['parameters'] = renamed
         return opts['parameters']
 
     def all_stages(self, center):

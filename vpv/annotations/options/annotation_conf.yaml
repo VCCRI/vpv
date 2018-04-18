@@ -11,14 +11,17 @@ options_requiring_points:
 
 centers:
   jax:
+    short_name: J
     stages:
       e15.5:
         file_: e15_5/jax_terms.yaml
   bcm:
+    short_name: B
     stages:
       e15.5:
         file_: e15_5/bcm_terms.yaml
-  har:
+  har: 
+    short_name: H
     stages:
       e15.5:
         file_: e15_5/har_terms.yaml

@@ -23,6 +23,7 @@ import collections
 from vpv.common import Orientation
 
 VPV_APPDATA_VERSION = 2.2
+ANNOTATION_CRICLE_RADIUS_DEFAULT = 40
 
 
 class AppData(object):
@@ -77,6 +78,14 @@ class AppData(object):
                                       'impc_view': False}
 
         return self.app_data['flips']
+
+    @property
+    def annotation_circle_radius(self):
+        return self.app_data.get('annotation_cricle_radius', ANNOTATION_CRICLE_RADIUS_DEFAULT)
+
+    @annotation_circle_radius.setter
+    def annotation_circle_radius(self, radius):
+        self.app_data['annotation_cricle_radius'] = radius
 
     @property
     def annotation_centre(self):

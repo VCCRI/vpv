@@ -10,16 +10,20 @@ import os
 from os.path import dirname, abspath, join
 import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QSizePolicy
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QFileDialog, QComboBox
 from vpv.ui.views.ui_annotations import Ui_Annotations
 from vpv.common import Layers, AnnotationOption, info_dialog, error_dialog, question_dialog
 from vpv.annotations.annotations_model import centre_stage_options
-from vpv.annotations import export_impc_xml
+from vpv.annotations import impc_xml
 
 
 SCRIPT_DIR = dirname(abspath(__file__))
 PROC_METADATA_PATH = join(SCRIPT_DIR, 'options', 'procedure_metadata.yaml')  # TODO: read this from the analysis zip. Just testing
+
+ROW_INDICES = {'term': 0,
+               'name': 1,
+               'option': 2,
+               'done': 3}
 
 
 OPTION_COLOR_MAP = {
@@ -65,9 +69,8 @@ class AnnotationsWidget(QWidget):
 
         self.ui.pushButtonDiableRoi.clicked.connect(self.reset_roi)
 
+        self.ui.spinBoxAnnotationCircleSize.setValue(self.appdata.annotation_circle_radius)
         self.ui.spinBoxAnnotationCircleSize.valueChanged.connect(self.annotation_radius_changed)
-
-        self.annotation_radius = 10
 
         self.annotating = False
 
@@ -96,9 +99,33 @@ class AnnotationsWidget(QWidget):
         self.ui.comboBoxCentre.addItems(centre_stage_options.all_centers())
         if self.appdata.annotation_centre:
             self.ui.comboBoxCentre.setCurrentText(self.appdata.annotation_centre)
+            self.center_changed(self.appdata.annotation_centre)
 
         if self.appdata.annotation_stage:
+            self.stage_changed(self.appdata.annotation_stage)
             self.ui.comboStage.setCurrentText(self.appdata.annotation_stage)
+
+    def d_pressed_slot(self):
+        """
+        Get the signal from the mainwindow when the d key is pressed. USe this signal to indicate if the currently
+        active parameter should be marked as 'done'
+        """
+        if self.annotating:
+            item = self.ui.treeWidgetAvailableTerms.currentItem()
+            if item:
+                checkbox = self.ui.treeWidgetAvailableTerms.itemWidget(item, 4)
+                if checkbox:
+                    # print(self.ui.treeWidgetAvailableTerms.child(i))
+                    checkbox.toggle()
+
+    def sroll_annotations(self, up: bool):
+        current_row_idx = self.ui.treeWidgetAvailableTerms.currentIndex()
+        if current_row_idx:
+            cr = current_row_idx.row()
+            new_row_idx = cr - 1 if up else cr + 1
+        new_item = self.ui.treeWidgetAvailableTerms.itemFromIndex(new_row_idx)
+        self.ui.treeWidgetAvailableTerms.setCurrentItem(new_item)
+
 
     def annotator_id_changed(self):
         id_ = str(self.ui.lineEditAnnotatorId.text())
@@ -178,7 +205,7 @@ class AnnotationsWidget(QWidget):
         if None in (ann.x, ann.y, ann.z):
             self.reset_roi()
             return
-        self.annotation_highlight_signal.emit(ann.x, ann.y, ann.z, [0, 255, 0], self.annotation_radius)
+        self.annotation_highlight_signal.emit(ann.x, ann.y, ann.z, [0, 255, 0], self.appdata.annotation_circle_radius)
 
     def activate_tab(self):  # Change function name
 
@@ -258,7 +285,7 @@ class AnnotationsWidget(QWidget):
         self.roi_highlight_off_signal.emit()
 
     def annotation_radius_changed(self, radius: int):
-        self.annotation_radius = radius
+        self.appdata.annotation_circle_radius = radius
         self.annotation_radius_signal.emit(radius)
 
     def save_annotations(self):
@@ -284,7 +311,7 @@ class AnnotationsWidget(QWidget):
 
         for vol in self.controller.model.all_volumes():
 
-            xml_exporter = export_impc_xml.ExportXML(date_of_annotation, experimenter_id, PROC_METADATA_PATH)
+            xml_exporter = impc_xml.ExportXML(date_of_annotation, experimenter_id, PROC_METADATA_PATH)
 
             ann = vol.annotations
             vol_id = vol.name

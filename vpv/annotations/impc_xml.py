@@ -1,8 +1,5 @@
 from lxml import etree
-import pprint
 import yaml
-
-from vpv.annotations.annotations_model import ImpcAnnotation
 
 """
 Generate an IMPC xml submsiion form for the manual annotation procedure
@@ -125,3 +122,78 @@ def load_metadata(yaml_path):
     with open(yaml_path, 'r') as fh:
         data = yaml.load(fh)
     return data
+
+
+def load_xml(xml_file):
+    """
+    Reads in a manual annotation xml file
+    """
+    from addict import Dict
+    root = etree.parse(xml_file)
+    root = strip_ns_prefix(root)
+
+    simple_params = Dict()
+    procedure_metadata = []
+
+
+    for a in root.iter():
+        if a.tag == 'centre':
+            centreID = a.attrib['centreID']
+            pipeline = a.attrib['pipeline']
+            project = a.attrib['project']
+
+        elif a.tag == 'experiment':
+            doe = a.attrib['dateOfExperiment']
+            ex_id = a.attrib['experimentID']
+
+        elif a.tag == 'specimenID':
+            spec_id = a.text
+
+        elif a.tag == 'procedure':
+            proc_id = a.attrib['procedureID']
+
+        elif a.tag == 'simpleParameter':
+            param_id = a.attrib['parameterID']
+            value = a.find('value').text
+            simple_params[param_id].option = value
+
+        elif a.tag == 'procedureMetadata':
+            param_id = a.attrib['parameterID']
+            value = a.find('value').text
+            procedure_metadata.append((param_id, value))
+
+        elif a.tag == 'seriesMediaParameter':
+            value_tag = a.find('value')
+            param_assoc = value_tag.find('parameterAssociation')
+            param_id = param_assoc.attrib['parameterID']
+            for dim in param_assoc.findall('dim'):
+                if dim.attrib['id'] == 'x':
+                    x = dim.text
+                elif dim.attrib['id'] == 'y':
+                    y = dim.text
+                elif dim.attrib['id'] == 'z':
+                    z = dim.text
+            simple_params[param_id].xyz = (x, y, z)
+            # associate the dimensions to the simpleParameter
+
+    return centreID, pipeline, project, doe, ex_id, spec_id, proc_id, simple_params, procedure_metadata
+
+
+def strip_ns_prefix(tree):
+    """
+    remove the namespace from the tree
+    Parameters
+    ----------
+    tree
+
+    Returns
+    -------
+
+    """
+    #xpath query for selecting all element nodes in namespace
+    query = "descendant-or-self::*[namespace-uri()!='']"
+    #for each element returned by the above xpath query...
+    for element in tree.xpath(query):
+        #replace element name with its local name
+        element.tag = etree.QName(element).localname
+    return tree

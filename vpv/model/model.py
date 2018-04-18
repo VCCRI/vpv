@@ -25,7 +25,9 @@ from PIL import Image
 from PyQt5 import QtCore
 import json
 from vpv.lib.addict import Dict
-from vpv.common import Stage, AnnotationOption, read_image
+from vpv.common import Stage, AnnotationOption, read_image, info_dialog
+from vpv.annotations.impc_xml import load_xml
+from vpv.annotations.annotations_model import centre_stage_options
 
 from .ImageVolume import ImageVolume
 from .HeatmapVolume import HeatmapVolume
@@ -127,6 +129,7 @@ class DataModel(QtCore.QObject):
 
         for key in self._data.keys():
             self._data[key].destroy()
+
     def all_volumes(self):
         return [vol for vol in self._volumes.values()]
 
@@ -163,8 +166,77 @@ class DataModel(QtCore.QObject):
         self._volumes[vol.name] = vol
         self.id_counter += 1
 
-    def load_annotations(self, ann_path):
-        pass
+    def load_annotation(self, ann_path):
+        """
+        Load annotations from an IMPC xml file.
+
+        Parameters
+        ----------
+        ann_path: str
+            path to xml annotation file
+
+        Returns
+        -------
+
+        """
+        #  def add_impc_annotation(self, x, y, z, impc_param, name, options, default_option, stage, order, is_mandatory, dims):
+        centerID, pipeline, project, doe, ex_id, spec_id, proc_id, \
+        simple_params, procedure_metadata = load_xml(ann_path)
+
+        file_id = os.path.splitext(os.path.basename(ann_path))[0]
+        vol = self._volumes.get(file_id)
+
+        if vol:
+            # Get the dict that contains the available options for a given center/stage
+            cso = centre_stage_options.opts
+            available_options = cso['available_options']
+            stage = self.get_stage_from_proc_id(simple_params)
+
+            for center, data in cso['centers'].items():
+                if data['short_name'] == centerID:
+                    params = data['stages'][stage]['parameters']
+
+                    dims = vol.shape_xyz()
+
+                    for param_id, param_info in params.items():
+
+                        name = param_info['name']
+                        option = param_info['option']
+                        xyz = param_info.get('xyz')
+                        if xyz:
+                            x, y, z = xyz
+                        else:
+                            x = y = z = None
+                        options = available_options[param_info['options']]
+                        order = param_info['order']
+                        is_man
+
+                        vol.annotations.add_impc_annotation(x, y, z, param_id, name, options, option, stage,
+                                                            order, is_mandatory, dims)
+
+
+
+        else:
+            return "Could not load annotation: {}. Not able to find loaded volume with same id".format(file_id)
+        return None
+
+
+    def get_stage_from_proc_id(self, parameters: dict):
+        """
+        There is nowhere in the IMPC xml to log what stage we are using.
+        We must infer that from the procedures we are using
+
+        Returns
+        -------
+        str: stage identifier
+        """
+        param_id, _ = list(parameters.items())[0]
+        if 'EMO' in param_id:
+            return 'e15.5'
+        elif 'EMP' in param_id:
+            return 'e18.5'  # Not sure this is correct. Look up. For now only using E15.5
+
+
 
     def load_annotation_old_json_method(self, ann_path):
         """
@@ -204,7 +276,7 @@ class DataModel(QtCore.QObject):
                     if a.annotation_type == 'mp': # can get rif of ths?
                         vol.annotations.add_mp(a.x, a.y, a.z, a.mp_term, stage)
                     elif a.annotation_type == 'emapa':
-                        vol.annotations.add_emap_annotation(a.x, a.y, a.z, a.emapa_term, option, stage)
+                        vol.annotations.add_impc_annotation(a.x, a.y, a.z, a.emapa_term, option, stage)
         else:
             return "Could not load annotation: {}. Not able to find loaded volume with same id".format(file_id)
         return None

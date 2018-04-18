@@ -796,11 +796,10 @@ class SliceWidget(QWidget, Ui_SliceWidget):
             self.set_orientation(Orientation.coronal)
         elif event.key() == QtCore.Qt.Key_A:
             self.set_orientation(Orientation.axial)
-        elif event.key() == QtCore.Qt.Key_PageUp or event.key() == QtCore.Qt.Key_Up:
+        elif event.key() == QtCore.Qt.Key_PageUp:
             self.move_to_next_vol_signal.emit(self.id, True)
-        elif event.key() == QtCore.Qt.Key_PageDown or event.key() == QtCore.Qt.Key_Down:
+        elif event.key() == QtCore.Qt.Key_PageDown:
             self.move_to_next_vol_signal.emit(self.id, False)
-        # Propagate unused signals to parent widget
         else:
             event.ignore()
 

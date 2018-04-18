@@ -25,6 +25,8 @@ from vpv.common import style_sheet_path
 
 class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
     hide_view_signal = QtCore.pyqtSignal(int)
+    d_pressed_signal = QtCore.pyqtSignal()
+    key_up_down_signal= QtCore.pyqtSignal(bool)
 
     def __init__(self, controller, appdata):
 
@@ -202,7 +204,8 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.on_checkbox_index_slider(visible)
         elif event.key() == QtCore.Qt.Key_P:
             self.controller.take_screen_shot()
-
+        elif event.key() == QtCore.Qt.Key_F:
+            self.d_pressed_signal.emit()
 
     def on_view_full_screen(self, checked):
         if checked:
