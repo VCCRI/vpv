@@ -1,12 +1,21 @@
 import os
 from os.path import join, dirname, abspath
 import yaml
-from vpv.common import Stage, AnnotationOption, load_yaml
+from vpv.common import get_stage_from_proc_id, load_yaml, info_dialog
+from os.path import splitext, isfile, isdir
 
 SCRIPT_DIR = dirname(abspath(__file__))
 OPTIONS_DIR = join(SCRIPT_DIR, 'options')
 OPTIONS_CONFIG_PATH = os.path.join(OPTIONS_DIR, 'annotation_conf.yaml')
+PROCEDURE_METADATA = 'procedure_metadata.yaml'
 
+
+cen_id_to_short = {
+     'J': 'jax',
+     'B': 'bcm',
+     'H': 'har',
+     'T': 'tcp'
+}
 
 
 class Annotation(object):
@@ -69,9 +78,19 @@ class VolumeAnnotations(object):
     to be some way of only allowing one stage of annotation per volume
     """
 
-    def __init__(self, dims):
+    def __init__(self, dims: tuple, vol_path: str):
+        """
+        Parameters
+        ----------
+        dims: The dimensions of the image being annotated
+        vol_path: The original path of hte volume being annotated
+        """
+        self.vol_path = vol_path
+        self.annotation_dir = splitext(self.vol_path)[0]
+        if not isdir(self.annotation_dir):
+            self.annotation_dir = None
         self.annotations = []
-        self.col_count = 4
+        self.col_count = 4  # is this needed?
         self.dims = dims
         # self.load_annotation_options() # We don't load annotations until center + stage is selected
         self.index = len(self.annotations)
@@ -81,6 +100,8 @@ class VolumeAnnotations(object):
         # The developmental stage of the embryo being annotated
         self._stage = None
 
+        self._load_annotations()
+
     @property
     def stage(self):
         return self._stage
@@ -88,36 +109,57 @@ class VolumeAnnotations(object):
     @stage.setter
     def stage(self, stage):
         # After setting stage we can then set the avaialble annotiton objects
-        self.clear()
         self._stage = stage
-        if all([self.center, self.stage]):
-            self._load_annotations()
 
     def _load_annotations(self):
         """
-        Once the center and stage have been set on this VolumeAnnotations object we can now load the respective default
-        parameters
+        The volume has been loaded. Now see if there is an associated annotation folder that will contain the IMPC
+        metadata parameter file
 
         Returns
         -------
 
         """
-        cso = centre_stage_options.opts
-        for _, data in cso['centers'][self.center]['stages'][self.stage]['parameters'].items():
+        if not self.annotation_dir:
+            return
 
-            options = centre_stage_options.opts['available_options'][data['options']]
-            default = data['default_option']
+        metadata_parameter_file = join(self.annotation_dir, PROCEDURE_METADATA)
+        if not isfile(metadata_parameter_file):
+            return
+
+        self.xml_path = join(self.annotation_dir, 'xml_export_not real_name.xml')
+
+        cso = centre_stage_options.opts
+
+        with open(metadata_parameter_file, 'r') as fh:
+            metadata_params = yaml.load(fh)
+            proc_id = metadata_params['procedure_id']
+            center_id = metadata_params['centre_id']
+            stage_id = get_stage_from_proc_id(proc_id, center_id)
+            center_short_name = cen_id_to_short[center_id]
+
+            self.stage = stage_id
+            self.center = center_short_name
+
+
+        # Get the procedure parameters for the given center/stage
+        center_stage_default_params = cso['centers'][center_short_name]['stages'][stage_id]['parameters']
+
+        for _, stage_params in center_stage_default_params.items():
+
+            options = centre_stage_options.opts['available_options'][stage_params['options']]
+            default = stage_params['default_option']
 
             self.add_impc_annotation(None,
                                      None,
                                      None,
-                                     data['impc_id'],
-                                     data['name'],
+                                     stage_params['impc_id'],
+                                     stage_params['name'],
                                      options,
                                      default,
                                      self.stage,
-                                     data['order'],
-                                     data['mandatory'],
+                                     stage_params['order'],
+                                     stage_params['mandatory'],
                                      self.dims
                                      )
         # Sort the list and set the interator index

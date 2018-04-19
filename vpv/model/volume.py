@@ -16,12 +16,22 @@ class Volume(Qt.QObject):
     """
     axial_slice_signal = QtCore.pyqtSignal(str, name='axial_signal')
 
-    def __init__(self, vol, model, datatype,  memory_map=False):
+    def __init__(self, vol_path: str, model: "vpv.model.model", datatype: str,  memory_map: bool=False):
+        """
+
+        Parameters
+        ----------
+        vol_path:
+        model
+        datatype
+        memory_map
+        """
         super(Volume, self).__init__()
         self.data_type = datatype
         self.name = None
         self.model = model
-        self._arr_data = self._load_data(vol, memory_map)
+        self.vol_path = vol_path
+        self._arr_data = self._load_data(vol_path, memory_map)
         self.voxel_size = 28  # Temp hard coding
         self.interpolate = False
         # Set to False if Volume to be destroyed. We can't just delete this object as there are reference to

@@ -3,7 +3,7 @@ experiment_id: test_exp_id
 centre_id: H
 pipeline: HRWL_001
 project: MRC
-procedure_id: IMPC_?
+procedure_id: IMPC_EMO_001
 annotation_data: 2016-03-08
 reconstruction_uri: ftp://ftp.mlc.har.mrc.ac.uk/mousedata/MicroCT/project-IMPC_MCT/processed_recons/20140228_SLC39A8_E14.5_16.2_d_HET_rec/IMPC_cropped_20140228_SLC39A8_E14.5_16.2_d_HET_rec.nrrd.bz2
 procedureMetadata:
@@ -22,4 +22,3 @@ procedureMetadata:
   IMPC_EMO_014_001: 2016-03-08
   IMPC_EMO_015_001: 80
   IMPC_EMO_016_001: 124
-

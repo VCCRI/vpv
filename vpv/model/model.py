@@ -25,9 +25,9 @@ from PIL import Image
 from PyQt5 import QtCore
 import json
 from vpv.lib.addict import Dict
-from vpv.common import Stage, AnnotationOption, read_image, info_dialog
+from vpv.common import Stage, AnnotationOption, read_image, get_stage_from_proc_id, load_yaml
 from vpv.annotations.impc_xml import load_xml
-from vpv.annotations.annotations_model import centre_stage_options
+from vpv.annotations.annotations_model import centre_stage_options, PROCEDURE_METADATA
 
 from .ImageVolume import ImageVolume
 from .HeatmapVolume import HeatmapVolume
@@ -179,17 +179,23 @@ class DataModel(QtCore.QObject):
         -------
 
         """
-        #  def add_impc_annotation(self, x, y, z, impc_param, name, options, default_option, stage, order, is_mandatory, dims):
+        # Load in data from xml
         centerID, pipeline, project, doe, ex_id, spec_id, proc_id, \
         simple_and_series_params, procedure_metadata = load_xml(ann_path)
 
-        file_id = os.path.splitext(os.path.basename(ann_path))[0]
-        vol = self._volumes.get(file_id)
+        # try to find a corresponding procedure_metadata.yaml file
+        ann_dir = os.path.split(ann_path)[0]
+        procedure_metadata_file = os.path.join(ann_dir, PROCEDURE_METADATA)
+        if not os.path.isfile(procedure_metadata_file):
+            vol = None
+        else:
+            vol_id = os.path.basename(ann_dir) # The annotation directory is the same name as the annotated volume
+            vol = self._volumes.get(vol_id)
 
         if vol:
             # Get the dict that contains the available options for a given center/stage
             default_opts = centre_stage_options.opts
-            stage = self.get_stage_from_proc_id(simple_and_series_params, centerID)
+            stage = get_stage_from_proc_id(proc_id, centerID)
 
             # Get all the simpleParameter entries form the xml file
             for xml_param, xml_data in simple_and_series_params.items():
@@ -220,25 +226,6 @@ class DataModel(QtCore.QObject):
         else:
             return "Could not load annotation: {}. Not able to find loaded volume with same id".format(file_id)
         return None
-
-    def get_stage_from_proc_id(self, parameters: dict, center_id: dict):
-        """
-        There is nowhere in the IMPC xml to log what stage we are using.
-        We must infer that from the procedures we are using.
-        If centre is Harwell return e14.5 instead of e15.5
-
-        Returns
-        -------
-        str: stage identifier
-        center_id: the one letter centre code.
-        """
-        param_id, _ = list(parameters.items())[0]
-        if 'EMO' in param_id:
-            if center_id.lower() == 'h':
-                return 'e14.5'
-            return 'e15.5'
-        elif 'EMP' in param_id:
-            return 'e18.5'  # Not sure this is correct. Look up. For now only using E15.5
 
     def load_annotation_old_json_method(self, ann_path):
         """

@@ -643,6 +643,7 @@ class Vpv(QtCore.QObject):
             else:
                 # Load annotations
                 self.annotations_manager.populate_available_terms()
+                self.annotations_manager.update()
         if not non_loaded:
             common.info_dialog(self.mainwindow, 'Load success', 'Annotations loaded')
 
@@ -681,7 +682,6 @@ class Vpv(QtCore.QObject):
             dialog = QtGui.QMessageBox.warning(self.mainwindow, 'Volumes not loaded', '\n'.join(non_loaded),
                                                QtGui.QMessageBox.Cancel)
         self.any_data_loaded
-        self.annotations_manager.on_startup()
 
     def load_impc_analysis(self, impc_zip_file):
         """

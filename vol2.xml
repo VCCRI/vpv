@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<centreProcedureSet xmlns="http://www.mousephenotype.org/dcc/exportlibrary/datastructure/core/procedure">
+  <centre centreID="H" pipeline="HRWL_001" project="MRC">
+    <experiment dateOfExperiment="Thu Apr 19 2018" experimentID="Neil">
+      <specimenID>test_specimen_id</specimenID>
+      <procedure procedureID="IMPC_EMO_001">
+        <simpleParameter parameterID="IMPC_EMO_124_003">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_124_002">
+          <value>imageOnly</value>
+        </simpleParameter>
+        <simpleParameter parameterID="IMPC_EMO_124_001">
+          <value>yes</value>
+        </simpleParameter>
+        <procedureMetadata parameterID="IMPC_EMO_002_001">
+          <value>3641614</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_003_001">
+          <value>11M01182</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_004_001">
+          <value>Bruker</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_005_001">
+          <value>Skyscan1172</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_006_001">
+          <value>F</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_007_001">
+          <value>2.96</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_008_001">
+          <value>HAR_E14.5_microCT_SOP.pdf</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_009_001">
+          <value>70.95</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_010_001">
+          <value>216.161</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_011_001">
+          <value>2016-03-08</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_012_001">
+          <value>2015-08-12</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_013_001">
+          <value>2016-03-08</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_014_001">
+          <value>2016-03-08</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_015_001">
+          <value>80</value>
+        </procedureMetadata>
+        <procedureMetadata parameterID="IMPC_EMO_016_001">
+          <value>124</value>
+        </procedureMetadata>
+      </procedure>
+    </experiment>
+  </centre>
+</centreProcedureSet>

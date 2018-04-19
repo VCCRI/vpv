@@ -277,101 +277,67 @@
       <attribute name="title">
        <string/>
       </attribute>
-      <widget class="QComboBox" name="comboBoxCentre">
+      <widget class="QWidget" name="">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>40</y>
-         <width>86</width>
-         <height>25</height>
+         <x>41</x>
+         <y>31</y>
+         <width>197</width>
+         <height>58</height>
         </rect>
        </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Centre</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="lineEditCentre"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Stage</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="lineEditStage"/>
+        </item>
+       </layout>
       </widget>
-      <widget class="QLabel" name="label_4">
+      <widget class="QWidget" name="">
        <property name="geometry">
         <rect>
-         <x>150</x>
-         <y>40</y>
-         <width>67</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Centre</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="comboBoxStage">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>80</y>
-         <width>86</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_5">
-       <property name="geometry">
-        <rect>
-         <x>150</x>
-         <y>80</y>
-         <width>67</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Stage</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEditCentre">
-       <property name="geometry">
-        <rect>
-         <x>210</x>
-         <y>40</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEditStage">
-       <property name="geometry">
-        <rect>
-         <x>210</x>
-         <y>80</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>31</x>
-         <y>131</y>
+         <x>40</x>
+         <y>120</y>
          <width>280</width>
-         <height>82</height>
+         <height>59</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="1">
+        <item row="0" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
            <string>Annotator ID</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QDateEdit" name="dateEdit"/>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="lineEditAnnotatorId"/>
         </item>
-        <item row="1" column="1">
+        <item row="1" column="0">
          <widget class="QLabel" name="label_3">
           <property name="text">
            <string>Date of annotation</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="0">
-         <widget class="QLineEdit" name="lineEditAnnotatorId"/>
+        <item row="1" column="1">
+         <widget class="QDateEdit" name="dateEdit"/>
         </item>
        </layout>
       </widget>

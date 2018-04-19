@@ -19,6 +19,29 @@ style_sheet_path = join(resources_dir, 'stylesheet.qss')
 generic_anatomy_label_map_path = join(resources_dir, 'generic_anatomy.csv')
 
 
+def get_stage_from_proc_id(proc_id: str, center_id: dict):
+    """
+    There is nowhere in the IMPC xml to log what stage we are using.
+    We must infer that from the procedures we are using.
+    If centre is Harwell return e14.5 instead of e15.5
+
+    Parameters
+    ----------
+    proc_id: the IMPC procedure ID
+    center_id: the one letter centre code.
+
+    Returns
+    -------
+    str: stage identifier
+    """
+
+    if 'EMO' in proc_id:
+        if center_id.lower() == 'h':
+            return 'e14.5'
+        return 'e15.5'
+    elif 'EMP' in proc_id:
+        return 'e18.5'  # Not sure this is correct. Look up. For now only using E15.5
+
 def load_yaml(path):
     with open(path, 'r') as fh:
         yaml_data = yaml.load(fh)
