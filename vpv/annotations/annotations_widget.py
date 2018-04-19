@@ -363,12 +363,12 @@ class AnnotationsWidget(QWidget):
         vol = self.controller.current_annotation_volume()
         if vol:
             if (stage and not stage.isspace()) and (center and not center.isspace()):
-                if len(vol.annotations) == 0:
+                if (len(vol.annotations) == 0) or not all((vol.annotations.center, vol.annotations.stage)):
                     # Setting the stage and center will force the loading of default annotations
                     vol.annotations.center = center
                     vol.annotations.stage = stage
-            if not vol.annotations:
-                vol.annotations._load_annotations()
+            # if not vol.annotations:
+            #     vol.annotations._load_annotations()
         self.update()
         self.populate_available_terms()
 

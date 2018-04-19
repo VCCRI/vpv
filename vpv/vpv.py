@@ -634,14 +634,18 @@ class Vpv(QtCore.QObject):
             self.annotations_manager.update()
 
     def load_annotations(self, annotation_file_list):
+        non_loaded = []
         for path in annotation_file_list:
             error = self.model.load_annotation(path)
             if error:
+                non_loaded.append(path)
                 common.error_dialog(self.mainwindow, 'Annotations not loaded', error)
             else:
-                common.info_dialog(self.mainwindow, 'Load success', 'Annotations loaded')
                 # Load annotations
                 self.annotations_manager.populate_available_terms()
+        if not non_loaded:
+            common.info_dialog(self.mainwindow, 'Load success', 'Annotations loaded')
+
 
     def load_volumes(self, file_list, data_type, memory_map=False, fdr_thresholds=False):
         """
