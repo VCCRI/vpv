@@ -75,9 +75,6 @@ class AnnotationsWidget(QWidget):
 
         self.ui.treeWidgetAvailableTerms.itemClicked.connect(self.on_tree_clicked)
 
-        # Make sure the tree is resized to fit contents
-        self.ui.treeWidgetAvailableTerms.itemExpanded.connect(self.resize_table)
-
         self.ui.treeWidgetAvailableTerms.clear()
 
         self.reset_roi()
@@ -349,11 +346,11 @@ class AnnotationsWidget(QWidget):
             else:
                 saved_file_paths.append(xml_path)
 
+        if saved_file_paths:
             sf_str = '\n'.join(saved_file_paths)
             info_dialog(self, 'Success', 'Annotation files saved:{}'.format(sf_str))
 
         self.annotation_recent_dir_signal.emit(out_dir)
-        self.resize_table()
 
     def volume_changed(self, vol_id: str):
         stage = self.ui.lineEditStage.text()
@@ -448,21 +445,13 @@ class AnnotationsWidget(QWidget):
             self.ui.labelYPos.setText(str(y))
             self.ui.labelZPos.setText(str(z))
 
-    def resize_table(self):
-        self.ui.treeWidgetAvailableTerms.resizeColumnToContents(0)
-        self.ui.treeWidgetAvailableTerms.resizeColumnToContents(1)
-
     def update(self):
-
+        """
+        Update the annotations comboboxes
+        """
         vol = self.controller.current_view.layers[Layers.vol1].vol
         if vol:
             self.ui.comboBoxAnnotationsVolumes.clear()
             self.ui.comboBoxAnnotationsVolumes.addItems(self.controller.model.volume_id_list())
             self.ui.comboBoxAnnotationsVolumes.addItem("None")
             self.ui.comboBoxAnnotationsVolumes.setCurrentIndex(self.ui.comboBoxAnnotationsVolumes.findText(vol.name))
-            self.resize_table()
-
-
-
-# class CentreStage_selector(QtCore.QObject):
-#     def __init__(self):
