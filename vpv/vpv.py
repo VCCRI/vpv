@@ -92,8 +92,8 @@ class Vpv(QtCore.QObject):
     data_processing_finished_signal = QtCore.pyqtSignal()
     crosshair_visible_signal = QtCore.pyqtSignal()
     crosshair_invisible_signal = QtCore.pyqtSignal()
-    volume_pixel_signal = QtCore.pyqtSignal(int)
-    heatmap_pixel_signal = QtCore.pyqtSignal(int)
+    volume_pixel_signal = QtCore.pyqtSignal(float)
+    heatmap_pixel_signal = QtCore.pyqtSignal(float)
     volume_position_signal = QtCore.pyqtSignal(int, int, int)
 
     def __init__(self):
