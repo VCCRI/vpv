@@ -83,7 +83,8 @@ class VolumeAnnotations(object):
         Parameters
         ----------
         dims: The dimensions of the image being annotated
-        vol_path: The original path of hte volume being annotated
+        vol_path: The original path of the volume being annotated
+            The vol_path is used in order to look for associated procedure metadata file
         """
         self.vol_path = vol_path
         self.annotation_dir = splitext(self.vol_path)[0]

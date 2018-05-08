@@ -278,7 +278,6 @@ class SliceWidget(QWidget, Ui_SliceWidget):
             3: heatmap (heatmaplayer.Heatmaplayer)
             4: vectors (vectorlayer.Vectorlayer)
     """
-    # mouse_shift = QtCore.pyqtSignal(int, int, int, object,  name='mouse_shift')
     mouse_pressed_annotation_signal = QtCore.pyqtSignal(int, int, int, object, name='mouse_pressed')
     crosshair_visible_signal = QtCore.pyqtSignal(bool)
     volume_position_signal = QtCore.pyqtSignal(int, int, int, object)

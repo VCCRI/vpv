@@ -4,8 +4,9 @@ Volume Phenotype viewer. A desktop 3D volume viewer, for analysing results of au
 Developed in Python using QT, and the amazing [PyQtGraph](http://www.pyqtgraph.org/)
 
 ## Dependencies
+* python3
 * numpy
-* PyQt4
+* PyQt5
 * PyQtGraph
 
 
