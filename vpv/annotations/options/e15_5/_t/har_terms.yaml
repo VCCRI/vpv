@@ -2,14 +2,14 @@
 parameters:
   param0:
     name: Limb digit
-    order: 0
+    order: 1
     impc_id: IMPC_EMO_041_001
     options: 0 
     default_option: imageOnly 
     mandatory: no 
   param1:
     name: Tail
-    order: 1
+    order: 0
     impc_id: IMPC_EMO_150_001
     options: 0 
     default_option: imageOnly 
@@ -25,7 +25,7 @@ parameters:
     name: Oedema
     order: 3
     impc_id: IMPC_EMO_172_001
-    options: 1 
+    options: 0 
     default_option: imageOnly 
     mandatory: no 
   param4:
@@ -279,6 +279,7 @@ parameters:
     impc_id: IMPC_EMO_159_001
     options: 0 
     default_option: present 
+    order: 0
     mandatory: yes 
   param40:
     name: Submandibular gland

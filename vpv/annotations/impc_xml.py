@@ -15,6 +15,15 @@ class ExportXML(object):
                  experiment_id,
                  metadata
                  ):
+        """
+
+        Parameters
+        ----------
+        date_of_annotation
+        experiment_id
+        metadata: str
+            path to procedure_metadata.yaml
+        """
 
         self.metadata = load_metadata(metadata)
         md = self.metadata
@@ -26,17 +35,17 @@ class ExportXML(object):
                                   centreID=md['centre_id'])
 
         # Create an experiment element
-        self.experiment = etree.SubElement(centre, 'experiment', dateOfExperiment=date_of_annotation.toString(),
+        self.experiment = etree.SubElement(centre, 'experiment', dateOfExperiment=date_of_annotation,
                                       experimentID=experiment_id)
 
         # Append specimen
         specimen = etree.SubElement(self.experiment, 'specimenID')
-        specimen.text = md['specimen_id']
+        specimen.text = md['specimenid']
 
         self.procedure_element = etree.SubElement(self.experiment, 'procedure', procedureID=md['procedure_id'])
 
     def add_metadata(self):
-        for id_, param_value in self.metadata['procedureMetadata'].items():
+        for id_, param_value in self.metadata['metadata'].items():
             parameter = etree.SubElement(self.procedure_element, 'procedureMetadata', parameterID=id_)
             # Create value element
             value = etree.SubElement(parameter, 'value')
@@ -75,7 +84,7 @@ class ExportXML(object):
         value = etree.SubElement(point_smp,
                          'value',
                          {"incrementValue": "1",
-                          "url": self.metadata['reconstruction_uri']})
+                          "url": self.metadata['reconstruction_url']})
 
         p_assoc = etree.SubElement(value,
                          'parameterAssociation',

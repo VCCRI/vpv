@@ -1,0 +1,18 @@
+---
+parameters:
+  pinna_b:
+    name: Pinna_b
+    order: 1
+    term: bad_face
+    impc_id: IMPC_EMO_124_001
+    options: 1
+    default_option: imageOnly
+    mandatory: yes
+  pinna_2_b:
+    name: Pinnafdp[godfp
+    order: 2
+    term: bad_face
+    impc_id: IMPC_EMO_124_002
+    options: 1
+    default_option: imageOnly
+    mandatory: yes

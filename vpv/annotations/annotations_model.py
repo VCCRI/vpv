@@ -10,14 +10,6 @@ OPTIONS_CONFIG_PATH = os.path.join(OPTIONS_DIR, 'annotation_conf.yaml')
 PROCEDURE_METADATA = 'procedure_metadata.yaml'
 
 
-cen_id_to_short = {
-     'J': 'jax',
-     'B': 'bcm',
-     'H': 'har',
-     'T': 'tcp'
-}
-
-
 class Annotation(object):
     """
     Records a single manual annotation
@@ -76,6 +68,7 @@ class VolumeAnnotations(object):
     
     For testing we're just doing the E15.5 stage. We will have to have multiple stages later and there will need
     to be some way of only allowing one stage of annotation per volume
+
     """
 
     def __init__(self, dims: tuple, vol_path: str):
@@ -124,27 +117,23 @@ class VolumeAnnotations(object):
         if not self.annotation_dir:
             return
 
-        metadata_parameter_file = join(self.annotation_dir, PROCEDURE_METADATA)
-        if not isfile(metadata_parameter_file):
+        self.metadata_parameter_file = join(self.annotation_dir, PROCEDURE_METADATA)
+        if not isfile(self.metadata_parameter_file):
             return
-
-        self.xml_path = join(self.annotation_dir, 'xml_export_not real_name.xml')
 
         cso = centre_stage_options.opts
 
-        with open(metadata_parameter_file, 'r') as fh:
+        with open(self.metadata_parameter_file, 'r') as fh:
             metadata_params = yaml.load(fh)
             proc_id = metadata_params['procedure_id']
             center_id = metadata_params['centre_id']
             stage_id = get_stage_from_proc_id(proc_id, center_id)
-            center_short_name = cen_id_to_short[center_id]
 
             self.stage = stage_id
-            self.center = center_short_name
-
+            self.center = center_id
 
         # Get the procedure parameters for the given center/stage
-        center_stage_default_params = cso['centers'][center_short_name]['stages'][stage_id]['parameters']
+        center_stage_default_params = cso['centers'][center_id]['stages'][stage_id]['parameters']
 
         for _, stage_params in center_stage_default_params.items():
 

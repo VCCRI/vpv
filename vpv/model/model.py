@@ -224,7 +224,7 @@ class DataModel(QtCore.QObject):
                                                             order, is_mandatory, dims)
 
         else:
-            return "Could not load annotation: {}. Not able to find loaded volume with same id".format(file_id)
+            return "Could not load annotation: {}. Not able to find loaded volume with same id".format(vol_id)
         return None
 
     def load_annotation_old_json_method(self, ann_path):

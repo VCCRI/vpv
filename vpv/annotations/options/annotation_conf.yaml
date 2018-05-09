@@ -10,24 +10,25 @@ options_requiring_points:
   - absent
 
 centers:
-  jax:
+  J:
     short_name: J
     stages:
       e15.5:
         file_: e15_5/jax_terms.yaml
-  bcm:
-    short_name: B
+  BCM:
+    short_name: BCM
     stages:
       e15.5:
         file_: e15_5/bcm_terms.yaml
-  har: 
+  H: 
     short_name: H
     stages:
       e14.5:
         file_: e15_5/har_terms.yaml
-#  tcp:
-#    e15.5
-#  jax:
-#    e15.5
-#  ucd:
-#    e15.5
+  UCD: 
+    short_name: UCD
+    stages:
+      e15.5:
+        file_: e15_5/ucd_terms.yaml
+
+#tcp short name: TCP

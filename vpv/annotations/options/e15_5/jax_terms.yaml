@@ -1,26 +1,436 @@
 ---
 parameters:
-  param2:
-    name: Pinna
-    order: 2
-    term: bad_face
-    impc_id: IMPC_EMO_124_002
-    options: 0
-    default_option: imageOnly
-    mandatory: yes
-  param3:
-    name: Pinnafdp[godfp
-    order: 3
-    term: bad_face
-    impc_id: IMPC_EMO_124_003
-    options: 0
-    default_option: imageOnly
-    mandatory: yes
+  param0:
+    name: Limb muscle
+    order: 0
+    impc_id: IMPC_EMO_085_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
   param1:
-    name: Pinnafdp[godfp
+    name: Brown fat
     order: 1
-    term: bad_face
-    impc_id: IMPC_EMO_124_001
-    options: 1
-    default_option: imageOnly
-    mandatory: yes
+    impc_id: IMPC_EMO_028_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param2:
+    name: Rib
+    order: 2
+    impc_id: IMPC_EMO_133_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param3:
+    name: Vertebra
+    order: 3
+    impc_id: IMPC_EMO_170_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param4:
+    name: Ulna
+    order: 4
+    impc_id: IMPC_EMO_163_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param5:
+    name: Tibia
+    order: 5
+    impc_id: IMPC_EMO_158_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param6:
+    name: Bladder
+    order: 6
+    impc_id: IMPC_EMO_026_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param7:
+    name: Spleen primordium
+    order: 7
+    impc_id: IMPC_EMO_141_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param8:
+    name: Adrenal gland
+    order: 8
+    impc_id: IMPC_EMO_021_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param9:
+    name: Kidney
+    order: 9
+    impc_id: IMPC_EMO_078_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param10:
+    name: Ovary
+    order: 10
+    impc_id: IMPC_EMO_115_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param11:
+    name: Testis
+    order: 11
+    impc_id: IMPC_EMO_153_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param12:
+    name: Pancreas
+    order: 12
+    impc_id: IMPC_EMO_117_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param13:
+    name: Diaphragm
+    order: 13
+    impc_id: IMPC_EMO_039_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param14:
+    name: Stomach
+    order: 14
+    impc_id: IMPC_EMO_143_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param15:
+    name: Liver
+    order: 15
+    impc_id: IMPC_EMO_086_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param16:
+    name: Peritoneal cavity
+    order: 16
+    impc_id: IMPC_EMO_122_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param17:
+    name: Right lung cranial lobe
+    order: 17
+    impc_id: IMPC_EMO_093_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param18:
+    name: Right lung accessory lobe
+    order: 18
+    impc_id: IMPC_EMO_094_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param19:
+    name: Right lung caudal lobe
+    order: 19
+    impc_id: IMPC_EMO_095_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param20:
+    name: Left lung
+    order: 20
+    impc_id: IMPC_EMO_096_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param21:
+    name: Right lung middle lobe
+    order: 21
+    impc_id: IMPC_EMO_097_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param22:
+    name: Bronchus
+    order: 22
+    impc_id: IMPC_EMO_027_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param23:
+    name: Thymus
+    order: 23
+    impc_id: IMPC_EMO_156_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param24:
+    name: Pericardial cavity
+    order: 24
+    impc_id: IMPC_EMO_120_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param25:
+    name: Pericardium
+    order: 25
+    impc_id: IMPC_EMO_121_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param26:
+    name: Ductus arteriosus
+    order: 26
+    impc_id: IMPC_EMO_038_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param27:
+    name: Aorta
+    order: 27
+    impc_id: IMPC_EMO_022_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param28:
+    name: Tricuspid valve
+    order: 28
+    impc_id: IMPC_EMO_161_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param29:
+    name: Mitral valve
+    order: 29
+    impc_id: IMPC_EMO_104_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param30:
+    name: Interventricular septum
+    order: 30
+    impc_id: IMPC_EMO_073_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param31:
+    name: Heart ventricle
+    order: 31
+    impc_id: IMPC_EMO_169_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param32:
+    name: Heart atrium
+    order: 32
+    impc_id: IMPC_EMO_024_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param33:
+    name: Thyroid gland
+    order: 33
+    impc_id: IMPC_EMO_157_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param34:
+    name: Submandibular gland
+    order: 34
+    impc_id: IMPC_EMO_149_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param35:
+    name: Mandible
+    order: 35
+    impc_id: IMPC_EMO_098_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param36:
+    name: Tongue
+    order: 36
+    impc_id: IMPC_EMO_159_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param37:
+    name: Palate
+    order: 37
+    impc_id: IMPC_EMO_055_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param38:
+    name: Epiglottis
+    order: 38
+    impc_id: IMPC_EMO_046_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param39:
+    name: Esophagus
+    order: 39
+    impc_id: IMPC_EMO_047_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param40:
+    name: Trachea
+    order: 40
+    impc_id: IMPC_EMO_160_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param41:
+    name: Vomeronasal organ
+    order: 41
+    impc_id: IMPC_EMO_075_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param42:
+    name: Nasal cavity
+    order: 42
+    impc_id: IMPC_EMO_106_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param43:
+    name: Nasal septum
+    order: 43
+    impc_id: IMPC_EMO_107_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param44:
+    name: Optic nerve
+    order: 44
+    impc_id: IMPC_EMO_112_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param45:
+    name: Lens
+    order: 45
+    impc_id: IMPC_EMO_084_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param46:
+    name: Hyaloid cavity
+    order: 46
+    impc_id: IMPC_EMO_066_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param47:
+    name: Intraretinal space
+    order: 47
+    impc_id: IMPC_EMO_074_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param48:
+    name: Trigeminal V ganglion
+    order: 48
+    impc_id: IMPC_EMO_162_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param49:
+    name: Dorsal root ganglia
+    order: 49
+    impc_id: IMPC_EMO_029_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param50:
+    name: Spinal cord
+    order: 50
+    impc_id: IMPC_EMO_139_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param51:
+    name: Pituitary gland
+    order: 51
+    impc_id: IMPC_EMO_070_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param52:
+    name: Cerebellum
+    order: 52
+    impc_id: IMPC_EMO_032_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param53:
+    name: Hindbrain
+    order: 53
+    impc_id: IMPC_EMO_061_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param54:
+    name: Midbrain
+    order: 54
+    impc_id: IMPC_EMO_102_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param55:
+    name: 4th ventricle choroid plexus
+    order: 55
+    impc_id: IMPC_EMO_033_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param56:
+    name: 4th ventricle
+    order: 56
+    impc_id: IMPC_EMO_020_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param57:
+    name: 3rd ventricle
+    order: 57
+    impc_id: IMPC_EMO_018_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param58:
+    name: Diencephalon
+    order: 58
+    impc_id: IMPC_EMO_040_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param59:
+    name: Lateral ventricle
+    order: 59
+    impc_id: IMPC_EMO_083_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param60:
+    name: Cerebral cortex
+    order: 60
+    impc_id: IMPC_EMO_037_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param61:
+    name: Olfactory lobe
+    order: 61
+    impc_id: IMPC_EMO_111_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
