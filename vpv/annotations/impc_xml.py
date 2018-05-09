@@ -45,7 +45,7 @@ class ExportXML(object):
         self.procedure_element = etree.SubElement(self.experiment, 'procedure', procedureID=md['procedure_id'])
 
         # Add the deafault imagages parameter
-        self.add_parameter("IMPC_EMO_001_001",  self.metadata['reconstruction_url'])
+        self.series_media_parameter = self._add_series_media_parameter()
 
     def add_metadata(self):
         for id_, param_value in self.metadata['metadata'].items():
@@ -59,6 +59,17 @@ class ExportXML(object):
         # print etree.tostring(root, pretty_print=True, xml_declaration=True, encoding='UTF-8', standalone='yes')
         etree.ElementTree(self.root).write(file_path, pretty_print=True, xml_declaration=True, encoding='UTF-8',
                                       standalone='yes')
+
+    def _add_series_media_parameter(self):
+        # Get parameter info and append to procedure
+        smp = etree.SubElement(self.procedure_element,
+                               'seriesMediaParameter',
+                               parameterID="IMPC_EMO_001_001")
+        etree.SubElement(smp,
+                         'value',
+                         {"incrementValue": "1",
+                          "url": self.metadata['reconstruction_url']})
+        return smp
 
     def add_point(self, param_id, xyz):
         """
@@ -80,21 +91,12 @@ class ExportXML(object):
         IMPC_EMO_001_001 is the parameter ID for embryo reconstructions
         """
 
-        # Get parameter info and append to procedure
-        point_smp = etree.SubElement(self.procedure_element,
-                                     'seriesMediaParameter',
-                                     parameterID="IMPC_EMO_001_001")
-        value = etree.SubElement(point_smp,
-                         'value',
-                         {"incrementValue": "1",
-                          "url": self.metadata['reconstruction_url']})
-
-        p_assoc = etree.SubElement(value,
-                         'parameterAssociation',
-                         {'parameterID': param_id})
+        param_assoc = etree.SubElement(self.series_media_parameter,
+                                       'parameterAssociation',
+                                       {'parameterID': param_id})
 
         def put_in_point(id_, idx):
-            etree.SubElement(p_assoc,
+            etree.SubElement(param_assoc,
                              'dim',
                              {'origin': 'RAS',
                               'id': id_}).text = str(xyz[idx])
@@ -129,6 +131,7 @@ class ExportXML(object):
         # Create value element
         value = etree.SubElement(parameter, 'value')
         value.text = param_value
+        return parameter
 
 
 def load_metadata(yaml_path):

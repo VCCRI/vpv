@@ -120,6 +120,8 @@ class VolumeAnnotations(object):
                 return
             with open(done_file, 'r') as fh:
                 done_status = yaml.load(fh)
+                if not done_status:
+                    return
             for ann in self:
                 done = done_status.get(ann.term, 'notpresent')
                 if done is 'notpresent':
