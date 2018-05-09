@@ -7,7 +7,7 @@ Works something like this:
 
 """
 import os
-from os.path import dirname, abspath, join
+from os.path import dirname, abspath, join, isdir
 import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QFileDialog, QComboBox
@@ -16,10 +16,10 @@ from vpv.common import Layers, AnnotationOption, info_dialog, error_dialog, ques
 from vpv.annotations.annotations_model import centre_stage_options
 from vpv.annotations import impc_xml
 from functools import partial
+import re
 
 
 SCRIPT_DIR = dirname(abspath(__file__))
-PROC_METADATA_PATH = join(SCRIPT_DIR, 'options', 'procedure_metadata.yaml')  # TODO: read this from the analysis zip. Just testing
 
 ROW_INDICES = {'term': 0,
                'name': 1,
@@ -247,7 +247,7 @@ class AnnotationsWidget(QWidget):
 
     def save_annotations(self):
 
-        date_of_annotation = self.ui.dateEdit.date()
+        date_of_annotation = self.ui.dateEdit.date().toString('yyyy-MM-dd')
 
         experimenter_id = self.ui.lineEditAnnotatorId.text()
         if experimenter_id.isspace() or not experimenter_id:
@@ -258,7 +258,9 @@ class AnnotationsWidget(QWidget):
 
         for vol in self.controller.model.all_volumes():
 
-            xml_exporter = impc_xml.ExportXML(date_of_annotation, experimenter_id, PROC_METADATA_PATH)
+            xml_exporter = impc_xml.ExportXML(date_of_annotation,
+                                              experimenter_id,
+                                              vol.annotations.metadata_parameter_file)
 
             ann = vol.annotations
 
@@ -268,20 +270,25 @@ class AnnotationsWidget(QWidget):
                 if all((a.x, a.y, a.z)):
                     xml_exporter.add_point(a.term, (a.x, a.y, a.z))
 
-            xml_path = vol.annotations.xml_path
+            xml_dir = vol.annotations.annotation_dir
+
+            increment = get_increment(xml_dir)
+
+            xml_file_name = "{}.{}.{}.experiment.impc.xml".format(vol.annotations.center,
+                                                             date_of_annotation,
+                                                             increment)
+            xml_path = join(xml_dir, xml_file_name)
 
             try:
                 xml_exporter.write(xml_path)
             except OSError as e:
-                error_dialog(self, 'Save file failure', 'Annotation file not saved:{}'.format(sf_str))
+                error_dialog(self, 'Save file failure', 'Annotation file not saved:{}'.format(e))
             else:
                 saved_file_paths.append(xml_path)
 
         if saved_file_paths:
             sf_str = '\n'.join(saved_file_paths)
             info_dialog(self, 'Success', 'Annotation files saved:{}'.format(sf_str))
-
-        self.annotation_recent_dir_signal.emit(out_dir)
 
     def volume_changed(self, vol_id: str):
         stage = self.ui.lineEditStage.text()
@@ -386,3 +393,65 @@ class AnnotationsWidget(QWidget):
             self.ui.comboBoxAnnotationsVolumes.addItems(self.controller.model.volume_id_list())
             self.ui.comboBoxAnnotationsVolumes.addItem("None")
             self.ui.comboBoxAnnotationsVolumes.setCurrentIndex(self.ui.comboBoxAnnotationsVolumes.findText(vol.name))
+
+
+def get_increment(dir_):
+    """
+    Bedore saving xml annotation, look through the folder that we are saving to to see if there are already
+    annoatations present. If there is, we presume it's from the same line, so we should increment the
+    value
+
+    Parameters
+    ----------
+    dir_: the directory to save the xml to
+
+    Returns
+    -------
+    int: increment value
+
+    """
+
+    def inc_regegex(fname):
+        res = re.search('(\d)+.experiment.impc.xml', fname)
+        if res:
+            try:
+                int(res.group(1))
+            except ValueError:
+                print('Cannot get increment value from fname')
+                return None
+            else:
+                return int(res.group(1))
+
+    increments = []
+
+    dir_ = abspath(dir_)
+
+    dirs = os.listdir(join(dir_, '..'))
+    for d in dirs:
+
+        ann_folder = abspath(os.path.join(dir_, '..', d))
+
+        if not os.path.isdir(ann_folder):
+            continue
+
+        files = os.listdir(ann_folder)
+
+        for f in files:
+            inc = inc_regegex(f)
+            if ann_folder == dir_ and inc is not None:
+                # If the current folder already contains an annotaiton file, just return it's present increment
+                return inc
+            if inc is not None:
+                increments.append(inc)
+
+    if len(increments) > 0:
+        increments.sort(reverse=True)
+        new_increment = increments[0] + 1
+    else:
+        new_increment = 0
+    return new_increment
+
+
+if __name__ == '__main__':
+    inc = get_increment('/home/neil/Desktop/t/foriev/1261203_KO')
+    print(inc)
