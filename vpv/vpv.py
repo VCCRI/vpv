@@ -816,6 +816,7 @@ class Vpv(QtCore.QObject):
     def close(self):
         print('saving settings to {}'.format(self.appdata.app_data_file))
         self.appdata.write_app_data()
+        self.model.write_temporary_annotations_metadata()
         print('exiting')
 
     def on_view_new_screen(self):

@@ -10,13 +10,14 @@ import os
 from os.path import dirname, abspath, join, isdir
 import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QFileDialog, QComboBox
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QFileDialog, QComboBox, QCheckBox
 from vpv.ui.views.ui_annotations import Ui_Annotations
 from vpv.common import Layers, AnnotationOption, info_dialog, error_dialog, question_dialog
 from vpv.annotations.annotations_model import centre_stage_options
 from vpv.annotations import impc_xml
 from functools import partial
 import re
+import yaml
 
 
 SCRIPT_DIR = dirname(abspath(__file__))
@@ -186,9 +187,9 @@ class AnnotationsWidget(QWidget):
         self.ui.lineEditCentre.setText(vol.annotations.center)
         self.ui.lineEditStage.setText(vol.annotations.stage)
 
-        def setup_signal(box_: QComboBox, child_: QTreeWidgetItem, row: int):
+        def setup_option_box_signal(box_: QComboBox, child_: QTreeWidgetItem):
             """
-            Connect the Qcombobox
+            Connect the Qcombobox to a slot
             """
             box.activated.connect(partial(self.update_annotation, child_, box_))
             # Setup signal so when combobox is only opened, it sets the selection to that column
@@ -228,10 +229,13 @@ class AnnotationsWidget(QWidget):
 
             box.setCurrentIndex(box.findText(option))
             # Setup combobox selection signal
-            setup_signal(box, child, i)
+            setup_option_box_signal(box, child)
             self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)
-            self.ui.treeWidgetAvailableTerms.setItemWidget(child, 4, QtWidgets.QCheckBox())
-            # child.setBackground(1, QtGui.QBrush(QtGui.QColor(*color)))  # Unpack the tuple of colors and opacity
+
+            done_checkbox = QtWidgets.QCheckBox()
+            done_checkbox.setChecked(ann.looked_at)
+            done_checkbox.stateChanged.connect(partial(self.parameter_done_signal, child, done_checkbox))
+            self.ui.treeWidgetAvailableTerms.setItemWidget(child, 4, done_checkbox)
 
         # Set the roi coords to None
         self.roi_highlight_off_signal.emit()
@@ -306,6 +310,17 @@ class AnnotationsWidget(QWidget):
             #     vol.annotations._load_annotations()
         self.update()
         self.populate_available_terms()
+
+    def parameter_done_signal(self, child: QTreeWidgetItem, check_box: QCheckBox):
+        vol = self.controller.current_annotation_volume()
+        if not vol:
+            error_dialog(self, "Error", "No volume selected")
+            return
+
+        base_node = child
+        term = base_node.text(1)
+        ann = vol.annotations.get_by_term(term)
+        ann.looked_at = bool(check_box.isChecked())
 
     def update_annotation(self, child: QTreeWidgetItem, cbox: QComboBox):
         """

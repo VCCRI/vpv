@@ -9,10 +9,16 @@ OPTIONS_DIR = join(SCRIPT_DIR, 'options')
 OPTIONS_CONFIG_PATH = os.path.join(OPTIONS_DIR, 'annotation_conf.yaml')
 PROCEDURE_METADATA = 'procedure_metadata.yaml'
 
+ANNOTATION_DONE_METADATA_FILE = 'doneList.yaml'
 
 class Annotation(object):
     """
     Records a single manual annotation
+
+    Attributes
+    ----------
+    looked_at: bool
+        Whether an annotator has looked at this term and checked the done box
     """
     def __init__(self, x, y, z, dims, stage):
         self.x = x
@@ -24,6 +30,7 @@ class Annotation(object):
         self.dims = dims  # x,y,z
         # self.set_xyz(x, y, z)
         self.stage = stage
+        self.looked_at = False
 
     def __getitem__(self, index):
         if index == 0:  # First row of column (dimensions)
@@ -95,6 +102,7 @@ class VolumeAnnotations(object):
         self._stage = None
 
         self._load_annotations()
+        self._load_done_status()
 
     @property
     def stage(self):
@@ -104,6 +112,20 @@ class VolumeAnnotations(object):
     def stage(self, stage):
         # After setting stage we can then set the avaialble annotiton objects
         self._stage = stage
+
+    def _load_done_status(self):
+        if self.annotation_dir:
+            done_file = join(self.annotation_dir, ANNOTATION_DONE_METADATA_FILE)
+            if not isfile(done_file):
+                return
+            with open(done_file, 'r') as fh:
+                done_status = yaml.load(fh)
+            for ann in self:
+                done = done_status.get(ann.term, 'notpresent')
+                if done is 'notpresent':
+                    print('Cannot find term in done metadata\n{}'.format(done_file))
+                else:
+                    ann.looked_at = done
 
     def _load_annotations(self):
         """

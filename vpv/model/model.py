@@ -34,6 +34,10 @@ from .HeatmapVolume import HeatmapVolume
 from .VectorVolume import VectorVolume
 from .ImageSeriesVolume import ImageSeriesVolume
 from .VirtualStackVolume import VirtualStackVolume
+import yaml
+
+ANNOTATION_DONE_METADATA_FILE = 'doneList.yaml'
+
 
 
 class LoadVirtualStackWorker(QtCore.QThread):
@@ -329,5 +333,24 @@ class DataModel(QtCore.QObject):
                 if new_name not in self._volumes and new_name not in self._data:
                     return new_name
 
+    def write_temporary_annotations_metadata(self):
+        """
 
+        Returns
+        -------
 
+        """
+        from os.path import join
+        for id_, vol in self._volumes.items():
+
+            if vol.annotations.annotation_dir:
+
+                # Check for previous done list
+                done_file = join(vol.annotations.annotation_dir, ANNOTATION_DONE_METADATA_FILE)
+                done_status = {}
+
+                for ann in vol.annotations:
+                    done_status[ann.term] = ann.looked_at
+
+                with open(done_file, 'w') as fh:
+                    fh.write(yaml.dump(done_status))
