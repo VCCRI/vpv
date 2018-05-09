@@ -44,6 +44,9 @@ class ExportXML(object):
 
         self.procedure_element = etree.SubElement(self.experiment, 'procedure', procedureID=md['procedure_id'])
 
+        # Add the deafault imagages parameter
+        self.add_parameter("IMPC_EMO_001_001",  self.metadata['reconstruction_url'])
+
     def add_metadata(self):
         for id_, param_value in self.metadata['metadata'].items():
             parameter = etree.SubElement(self.procedure_element, 'procedureMetadata', parameterID=id_)
