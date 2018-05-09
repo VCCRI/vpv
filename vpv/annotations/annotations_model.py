@@ -141,6 +141,7 @@ class VolumeAnnotations(object):
 
         self.metadata_parameter_file = join(self.annotation_dir, PROCEDURE_METADATA)
         if not isfile(self.metadata_parameter_file):
+            self.metadata_parameter_file = None
             return
 
         cso = centre_stage_options.opts

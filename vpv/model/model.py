@@ -27,7 +27,7 @@ import json
 from vpv.lib.addict import Dict
 from vpv.common import Stage, AnnotationOption, read_image, get_stage_from_proc_id, load_yaml
 from vpv.annotations.impc_xml import load_xml
-from vpv.annotations.annotations_model import centre_stage_options, PROCEDURE_METADATA
+from vpv.annotations.annotations_model import centre_stage_options, PROCEDURE_METADATA, ANNOTATION_DONE_METADATA_FILE
 
 from .ImageVolume import ImageVolume
 from .HeatmapVolume import HeatmapVolume
@@ -35,9 +35,6 @@ from .VectorVolume import VectorVolume
 from .ImageSeriesVolume import ImageSeriesVolume
 from .VirtualStackVolume import VirtualStackVolume
 import yaml
-
-ANNOTATION_DONE_METADATA_FILE = 'doneList.yaml'
-
 
 
 class LoadVirtualStackWorker(QtCore.QThread):
