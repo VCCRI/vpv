@@ -50,8 +50,8 @@ class ExportXML(object):
         self.series_media_parameter = self._add_series_media_parameter()
 
         # Add metadata parameters that are not supplied in the procedure_metadata.yaml
-        self.metadata['IMPC_EMO_178_001'] = annotator_id
-        self.metadata['IMPC_EMO_179_001'] = date_of_annotation
+        self.metadata['metadata']['IMPC_EMO_178_001'] = annotator_id
+        self.metadata['metadata']['IMPC_EMO_179_001'] = date_of_annotation
 
     def add_metadata(self):
         for id_, param_value in self.metadata['metadata'].items():
