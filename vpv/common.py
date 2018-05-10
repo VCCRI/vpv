@@ -125,7 +125,7 @@ class ImageReader(object):
         # PyqtGraph displays the views on their sides.
         # This transormation puts them the right way up and effectively flips the views so that
         # Axial is the last dimension and sagittal the first
-        self.vol = np.rot90(self.vol, axes=(0, 2), k=1)
+        # self.vol = np.rot90(self.vol, axes=(0, 2), k=1)
 
 
 def read_image(img_path, convert_to_ras=False):

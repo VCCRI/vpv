@@ -6,7 +6,6 @@ from scipy import ndimage
 from scipy.misc import imresize
 from ..common import Orientation, ImageReader
 from vpv.utils.read_minc import minc_to_numpy
-from vpv.model.coordinate_mapper import convert_volume
 
 
 class Volume(Qt.QObject):
@@ -43,10 +42,10 @@ class Volume(Qt.QObject):
         # The coordinate spacing of the input volume
         self.space = None
 
-    def shape_zyx(self):
+    def shape_xyz(self):
         return tuple(reversed(self._arr_data.shape))
 
-    def shape_xyz(self):
+    def shape(self):
         return self._arr_data.shape
 
     def get_axial_slot(self):
@@ -94,7 +93,7 @@ class Volume(Qt.QObject):
         vol = ir.vol
         self.space = ir.space
         #
-        vol = convert_volume(vol, ir.space)
+        # vol = convert_volume(vol, ir.space)
 
         if memmap:
             temp = tempfile.TemporaryFile()
@@ -140,11 +139,11 @@ class Volume(Qt.QObject):
         :return:
         """
         if orientation == Orientation.sagittal:
-            return self._arr_data.shape[0]
+            return self._arr_data.shape[2]
         if orientation == Orientation.coronal:
             return self._arr_data.shape[1]
         if orientation == Orientation.axial:
-            return self._arr_data.shape[2]
+            return self._arr_data.shape[0]
 
     def set_voxel_size(self, size):
         """
@@ -159,39 +158,39 @@ class Volume(Qt.QObject):
             index = self.shape_xyz()[1] - index
         slice_ = self._arr_data[:, index, :]
         if flipy:
-            slice_ = np.fliplr(slice_)
-        if flipx:
             slice_ = np.flipud(slice_)
+        if flipx:
+            slice_ = np.fliplr(slice_)
         if xy:
             y, x = xy
             slice_ = slice_[y, x]
-        return slice_
+        return slice_.T
 
     def _get_sagittal(self, index, flipx, flipz, flipy, xy=None):
         if flipz:
             index = self.shape_xyz()[0] - index
-        slice_ = self._arr_data[index, :, :]
+        slice_ = self._arr_data[:, :, index]
         if flipy:
-            slice_ = np.fliplr(slice_)
-        if flipx:
             slice_ = np.flipud(slice_)
+        if flipx:
+            slice_ = np.fliplr(slice_)
         if xy:
             y, x = xy
             slice_ = slice_[y, x]
-        return slice_
+        return slice_.T
 
     def _get_axial(self, index, flipx, flipz, flipy, xy=None):
         if flipz:
             index = self.shape_xyz()[2] - index
-        slice_ = self._arr_data[:, :, index]
+        slice_ = self._arr_data[index, :, :]
         if flipy:
-            slice_ = np.fliplr(slice_)
-        if flipx:
             slice_ = np.flipud(slice_)
+        if flipx:
+            slice_ = np.fliplr(slice_)
         if xy:
             y, x = xy
             slice_ = slice_[y, x]
-        return slice_
+        return slice_.T
 
     def set_lower_level(self, level):
         #print 'l', level
