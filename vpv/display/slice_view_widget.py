@@ -152,6 +152,7 @@ class InformationOverlay(QtGui.QWidget):
 
 
 class RoiOverlay(object):
+    # This controls the blob finder bounding box roi?? rename
     def __init__(self, parent):
         self.parent = parent
         self.roi_item = None
@@ -210,6 +211,7 @@ class AnnotationOverlay(object):
     def clear(self):
         if self.annotation_item:
             self.parent.viewbox.removeItem(self.annotation_item)
+        self.annotation_item = None
 
 
 class ScaleBar(pg.ScaleBar):
@@ -682,6 +684,8 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
         """
         self.roi.clear()
+
+        # If we change slices, we don't want to see the annotation marker
         self.annotation_marker.clear()
         self.ui.labelSliceNumber.setText(str(index))
 
