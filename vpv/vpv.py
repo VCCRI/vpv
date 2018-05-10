@@ -547,14 +547,30 @@ class Vpv(QtCore.QObject):
 
     def load_data_slot(self, dragged_files=None):
         """
-        Gets signal from main window
-        :return:
+
+        Parameters
+        ----------
+        dragged_files
+
+        Returns
+        -------
+
         """
         last_dir = self.appdata.get_last_dir_browsed()
         # Convert QStrings to unicode in case they contain special characters
         files = [x for x in dragged_files]
         importer.Import(self.mainwindow, self.importer_callback, self.virtual_stack_callback, last_dir, self.appdata,
                         files)
+
+    def browse_files(self):
+        last_dir = self.appdata.get_last_dir_browsed()
+        if last_dir:
+            last_dir = last_dir[0]
+            if not os.path.isdir(last_dir):
+                files = QtWidgets.QFileDialog.getOpenFileNames(self.mainwindow, "Select files to load")
+            else:
+                files = QtWidgets.QFileDialog.getOpenFileNames(self.mainwindow, "Select files to load", last_dir)
+        self.load_data_slot(files[0])
 
     def clear_views(self):
         self.model.clear_data()
