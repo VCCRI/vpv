@@ -12,15 +12,17 @@ class ExportXML(object):
     """
     def __init__(self,
                  date_of_annotation,
-                 experiment_id,
+                 annotator_id,
                  metadata
                  ):
         """
 
         Parameters
         ----------
-        date_of_annotation
-        experiment_id
+        date_of_annotation: str
+            yyy-mm-dd
+        annotator_id: str
+            annonymized annotator id
         metadata: str
             path to procedure_metadata.yaml
         """
@@ -35,8 +37,8 @@ class ExportXML(object):
                                   centreID=md['centre_id'])
 
         # Create an experiment element
-        self.experiment = etree.SubElement(centre, 'experiment', dateOfExperiment=date_of_annotation,
-                                      experimentID=experiment_id)
+        self.experiment = etree.SubElement(centre, 'experiment', dateOfExperiment=md['dateofexperiment'],
+                                      experimentID=md['experiment_id'])
 
         # Append specimen
         specimen = etree.SubElement(self.experiment, 'specimenID')
@@ -46,6 +48,10 @@ class ExportXML(object):
 
         # Add the deafault imagages parameter
         self.series_media_parameter = self._add_series_media_parameter()
+
+        # Add metadata parameters that are not supplied in the procedure_metadata.yaml
+        self.metadata['IMPC_EMO_178_001'] = annotator_id
+        self.metadata['IMPC_EMO_179_001'] = date_of_annotation
 
     def add_metadata(self):
         for id_, param_value in self.metadata['metadata'].items():
@@ -151,7 +157,6 @@ def load_xml(xml_file):
     simple_params = Dict()
     procedure_metadata = []
 
-
     for a in root.iter():
         if a.tag == 'centre':
             centreID = a.attrib['centreID']
@@ -180,17 +185,17 @@ def load_xml(xml_file):
 
         elif a.tag == 'seriesMediaParameter':
             for b in a.iter():
-                param_assoc = b.find('parameterAssociation')
-                param_id = param_assoc.attrib['parameterID']
-                for dim in param_assoc.findall('dim'):
-                    if dim.attrib['id'] == 'x':
-                        x = dim.text
-                    elif dim.attrib['id'] == 'y':
-                        y = dim.text
-                    elif dim.attrib['id'] == 'z':
-                        z = dim.text
-                simple_params[param_id].xyz = (x, y, z)
-            # associate the dimensions to the simpleParameter
+                param_assocs = b.findall('parameterAssociation')
+                for assoc in param_assocs:
+                    param_id = assoc.attrib['parameterID']
+                    for dim in assoc.findall('dim'):
+                        if dim.attrib['id'] == 'x':
+                            x = dim.text
+                        elif dim.attrib['id'] == 'y':
+                            y = dim.text
+                        elif dim.attrib['id'] == 'z':
+                            z = dim.text
+                    simple_params[param_id].xyz = (x, y, z)
 
     return centreID, pipeline, project, doe, ex_id, spec_id, proc_id, simple_params, procedure_metadata
 

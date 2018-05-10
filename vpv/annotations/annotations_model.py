@@ -101,6 +101,8 @@ class VolumeAnnotations(object):
         # The developmental stage of the embryo being annotated
         self._stage = None
 
+        self.date_of_annotation = None  # Will be set from the annotation gui
+
         self._load_annotations()
         self._load_done_status()
 
@@ -153,6 +155,7 @@ class VolumeAnnotations(object):
             proc_id = metadata_params['procedure_id']
             center_id = metadata_params['centre_id']
             stage_id = get_stage_from_proc_id(proc_id, center_id)
+
 
             self.stage = stage_id
             self.center = center_id

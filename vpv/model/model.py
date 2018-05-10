@@ -228,49 +228,6 @@ class DataModel(QtCore.QObject):
             return "Could not load annotation: {}. Not able to find loaded volume with same id".format(vol_id)
         return None
 
-    def load_annotation_old_json_method(self, ann_path):
-        """
-        Load an annotation from a json file. Apply annotations to volumes with the corresponding basename minus
-        extension
-
-        Parameters
-        ----------
-        ann_path: str
-            path to annotation file
-        Returns
-        -------
-        None: if successful,
-        str: Error message if not succesfull
-        """
-        file_id = os.path.splitext(os.path.basename(ann_path))[0]
-        vol = self._volumes.get(file_id)
-        if vol:
-            with open(ann_path) as fh:
-                ann_dict = Dict(json.load(fh))
-                for a in ann_dict.values():
-                    if a['option'] == 'imageOnly':
-                        continue  # just leave the defult in there
-                    # check that diemsions stored in annotation file are same os the loaded volume
-                    xyz_in_file = tuple(a.volume_dimensions_xyz)
-                    # reverese as numpy works in zyx
-                    vol_dims = vol.shape_xyz()
-                    if vol_dims != xyz_in_file:
-                        return """Error loading annotations\nAnnotations dimensions are {}.
-                        Loaded volume dimensions are {}""".format(
-                            ",".join([str(x) for x in xyz_in_file]),
-                            ",".join([str(x) for x in vol_dims]))
-
-                    option = AnnotationOption(a.option)
-                    stage = Stage(a.stage)
-
-                    if a.annotation_type == 'mp': # can get rif of ths?
-                        vol.annotations.add_mp(a.x, a.y, a.z, a.mp_term, stage)
-                    elif a.annotation_type == 'emapa':
-                        vol.annotations.add_impc_annotation(a.x, a.y, a.z, a.emapa_term, option, stage)
-        else:
-            return "Could not load annotation: {}. Not able to find loaded volume with same id".format(file_id)
-        return None
-
     def add_volume(self, volpath, data_type, memory_map, fdr_thresholds=False):
         """
         Load a volume into a subclass of a Volume object

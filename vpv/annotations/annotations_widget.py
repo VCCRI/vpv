@@ -262,10 +262,8 @@ class AnnotationsWidget(QWidget):
 
         """
 
-        date_of_annotation = self.ui.dateEdit.date().toString('yyyy-MM-dd')
-
-        experimenter_id = self.ui.lineEditAnnotatorId.text()
-        if experimenter_id.isspace() or not experimenter_id:
+        annotator_id = self.ui.lineEditAnnotatorId.text()
+        if annotator_id.isspace() or not annotator_id:
             error_dialog(self, 'Experimenter ID missing', "An annotator ID is required")
             return
 
@@ -273,8 +271,16 @@ class AnnotationsWidget(QWidget):
 
         for vol in self.controller.model.all_volumes():
 
+            # The first time an annotation is saved, get the date of annotation and set on volume
+            # Next time it's loaded load the original date of annotation
+            if vol.annotations.date_of_annotation:
+                date_of_annotation = vol.annotations.date_of_annotation
+            else:
+                date_of_annotation = self.ui.dateEdit.date().toString('yyyy-MM-dd')
+                vol.annotations.date_of_annotation = date_of_annotation
+
             xml_exporter = impc_xml.ExportXML(date_of_annotation,
-                                              experimenter_id,
+                                              annotator_id,
                                               vol.annotations.metadata_parameter_file)
 
             ann = vol.annotations
