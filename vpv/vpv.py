@@ -534,7 +534,7 @@ class Vpv(QtCore.QObject):
             dest_x, dest_y, dest_z = self.mapper.view_to_view(x, y, z, Orientation.axial, dest_view.orientation,
                                                               dims, from_saved=True)
             dest_view.set_slice(dest_z)
-            dest_view.show_annotation_marker(dest_x, dest_y, color, radius)
+            dest_view.show_annotation_marker(dest_x, dest_y, color)
 
     def control_visiblity(self, visible):
         for slice_ in self.slice_widgets.values():
