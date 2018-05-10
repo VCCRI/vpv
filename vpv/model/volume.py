@@ -6,7 +6,6 @@ from scipy import ndimage
 from scipy.misc import imresize
 from ..common import Orientation, ImageReader
 from vpv.utils.read_minc import minc_to_numpy
-from vpv.model.coordinate_mapper import convert_volume
 
 
 class Volume(Qt.QObject):
@@ -43,10 +42,10 @@ class Volume(Qt.QObject):
         # The coordinate spacing of the input volume
         self.space = None
 
-    def shape_zyx(self):
+    def shape_xyz(self):
         return tuple(reversed(self._arr_data.shape))
 
-    def shape_xyz(self):
+    def shape(self):
         return self._arr_data.shape
 
     def get_axial_slot(self):
@@ -94,7 +93,7 @@ class Volume(Qt.QObject):
         vol = ir.vol
         self.space = ir.space
         #
-        vol = convert_volume(vol, ir.space)
+        # vol = convert_volume(vol, ir.space)
 
         if memmap:
             temp = tempfile.TemporaryFile()
@@ -169,7 +168,7 @@ class Volume(Qt.QObject):
 
     def _get_sagittal(self, index, flipx, flipz, flipy, xy=None):
         if flipz:
-            index = self.shape_xyz()[2] - index
+            index = self.shape_xyz()[0] - index
         slice_ = self._arr_data[:, :, index]
         if flipy:
             slice_ = np.flipud(slice_)
@@ -182,7 +181,7 @@ class Volume(Qt.QObject):
 
     def _get_axial(self, index, flipx, flipz, flipy, xy=None):
         if flipz:
-            index = self.shape_xyz()[0] - index
+            index = self.shape_xyz()[2] - index
         slice_ = self._arr_data[index, :, :]
         if flipy:
             slice_ = np.flipud(slice_)

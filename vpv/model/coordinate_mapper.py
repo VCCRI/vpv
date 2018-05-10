@@ -4,10 +4,11 @@ from vpv.display.slice_view_widget import SliceWidget
 
 flip_to_axial_order = {
     # The order of the source dimensions after mapping to axial space
-    # For example [2, 1, 0] reverses the dimesnion ordering as we are using
-    Orientation.axial:    [0, 1, 2], # keep same
-    Orientation.coronal:  [1, 0, 2],
-    Orientation.sagittal: [2, 0, 1]
+    # For example [2, 1, 0] reverses the dimension ordering as we are using
+
+    Orientation.axial:    [0, 1, 2],  # keep same
+    Orientation.coronal:  [0, 2, 1],
+    Orientation.sagittal: [1, 2, 0]
 }
 
 flip_from_axial_order = {
@@ -41,6 +42,8 @@ class Coordinate_mapper(object):
         reverse: bool
             True: map from volume space to image space
             False: map from image space to volume sapce
+        dims: list
+            dimensions of source volume xyz
 
         Returns
         -------
@@ -60,16 +63,18 @@ class Coordinate_mapper(object):
         # Flip the source view points if needed
         if not from_saved:
             # Flip the dimensions so thay match the view
+
             dims_order = flip_from_axial_order[src_ori]
             new_dims = [j for _, j in sorted(zip(dims_order, dims), key=lambda pair: pair[0])]
+
             if self.flip_info[src_ori.name]['y']:
                 y = new_dims[1] - y
 
             if self.flip_info[src_ori.name]['x']:
-                x = new_dims[2] - x
+                x = new_dims[0] - x
 
             if self.flip_info[src_ori.name]['z']:
-                z = new_dims[0] - z
+                z = new_dims[2] - z
 
         order = flip_to_axial_order[src_ori]
         xa, ya, za = [j for _, j in sorted(zip(order, [x, y, z]), key=lambda pair: pair[0])]
@@ -115,10 +120,10 @@ class Coordinate_mapper(object):
             dest_points[1] = new_dims[1] - dest_points[1]
 
         if self.flip_info[dest_ori.name]['x']:
-            dest_points[2] = new_dims[2] - dest_points[2]
+            dest_points[0] = new_dims[0] - dest_points[0]
 
         if self.flip_info[dest_ori.name]['z']:
-            dest_points[0] = new_dims[0] - dest_points[0]
+            dest_points[2] = new_dims[2] - dest_points[2]
 
         return dest_points
 
@@ -160,13 +165,13 @@ class Coordinate_mapper(object):
             dest_view.set_roi(new_x, new_y, w, h)
 
 
-def convert_volume(vol, direction):
-    return vol
-    if direction == (1, 0, 0, 0, 1, 0, 0, 0, 1): # LPS
-        vol = vol[:, ::-1, :]
-    if direction == (-1, 0, 0, 0, -1, 0, 0, 0, 1): # RAS
-        print("ras?")
-        vol = vol
-        # vol = vol[:, :, ::-1]
-
-    return vol
+# def convert_volume(vol, direction):
+#     return vol
+#     if direction == (1, 0, 0, 0, 1, 0, 0, 0, 1): # LPS
+#         vol = vol[:, ::-1, :]
+#     if direction == (-1, 0, 0, 0, -1, 0, 0, 0, 1): # RAS
+#         print("ras?")
+#         vol = vol
+#         # vol = vol[:, :, ::-1]
+#
+#     return vol
