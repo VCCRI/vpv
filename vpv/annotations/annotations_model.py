@@ -9,7 +9,7 @@ OPTIONS_DIR = join(SCRIPT_DIR, 'options')
 OPTIONS_CONFIG_PATH = os.path.join(OPTIONS_DIR, 'annotation_conf.yaml')
 PROCEDURE_METADATA = 'procedure_metadata.yaml'
 
-ANNOTATION_DONE_METADATA_FILE = 'doneList.yaml'
+ANNOTATION_DONE_METADATA_FILE = '.doneList.yaml'
 
 class Annotation(object):
     """

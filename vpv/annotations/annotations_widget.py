@@ -248,7 +248,19 @@ class AnnotationsWidget(QWidget):
         self.appdata.annotation_circle_radius = radius
         self.annotation_radius_signal.emit(radius)
 
-    def save_annotations(self):
+    def save_annotations(self, suppress_msg=False):
+        """
+
+        Parameters
+        ----------
+        suppress_msg: bool
+            When doing autosave do not give a dialog informing od save (True)
+            When doing manual save, give dialog with saved file path
+
+        Returns
+        -------
+
+        """
 
         date_of_annotation = self.ui.dateEdit.date().toString('yyyy-MM-dd')
 
@@ -289,7 +301,7 @@ class AnnotationsWidget(QWidget):
             else:
                 saved_file_paths.append(xml_path)
 
-        if saved_file_paths:
+        if saved_file_paths and not suppress_msg:
             sf_str = '\n'.join(saved_file_paths)
             info_dialog(self, 'Success', 'Annotation files saved:{}'.format(sf_str))
 
@@ -366,11 +378,11 @@ class AnnotationsWidget(QWidget):
             error_dialog(self, "Error", "No term is selected!")
             return
 
-        # color = OPTION_COLOR_MAP[option]
-        # base_node.setBackground(1, QtGui.QBrush(QtGui.QColor(*color)))
-
         vol.annotations.update_annotation(term, x, y, z, option)
         self.on_tree_clicked(base_node)
+
+        # We are now autosaving. so save on each annotation term changed
+        self.save_annotations(suppress_msg=True)
 
     def reset_roi(self):
         self.ui.labelXPos.setText(None)
