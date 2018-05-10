@@ -183,6 +183,8 @@ class Vpv(QtCore.QObject):
         if any(i < 0 for i in (x, y, z)):
             return
 
+        print(x,y,z)
+
         # map to the volume space
         vol_points = self.mapper.view_to_volume(x, y, z, src_view.orientation, src_view.main_volume.shape_xyz())
 
@@ -271,8 +273,6 @@ class Vpv(QtCore.QObject):
             dest_x, dest_y, dest_z = self.mapper.view_to_view(x, y, z, src_view.orientation, dest_view.orientation, dims)
 
             try:
-                if dest_view.orientation == Orientation.sagittal:
-                    print(dest_x, dest_y)
                 dest_view.set_slice(dest_z, crosshair_xy=(dest_x, dest_y))
             except IndexError:
                 pass

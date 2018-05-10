@@ -140,11 +140,11 @@ class Volume(Qt.QObject):
         :return:
         """
         if orientation == Orientation.sagittal:
-            return self._arr_data.shape[0]
+            return self._arr_data.shape[2]
         if orientation == Orientation.coronal:
             return self._arr_data.shape[1]
         if orientation == Orientation.axial:
-            return self._arr_data.shape[2]
+            return self._arr_data.shape[0]
 
     def set_voxel_size(self, size):
         """
@@ -159,39 +159,39 @@ class Volume(Qt.QObject):
             index = self.shape_xyz()[1] - index
         slice_ = self._arr_data[:, index, :]
         if flipy:
-            slice_ = np.fliplr(slice_)
-        if flipx:
             slice_ = np.flipud(slice_)
+        if flipx:
+            slice_ = np.fliplr(slice_)
         if xy:
             y, x = xy
             slice_ = slice_[y, x]
-        return slice_
+        return slice_.T
 
     def _get_sagittal(self, index, flipx, flipz, flipy, xy=None):
-        if flipz:
-            index = self.shape_xyz()[0] - index
-        slice_ = self._arr_data[index, :, :]
-        if flipy:
-            slice_ = np.fliplr(slice_)
-        if flipx:
-            slice_ = np.flipud(slice_)
-        if xy:
-            y, x = xy
-            slice_ = slice_[y, x]
-        return slice_
-
-    def _get_axial(self, index, flipx, flipz, flipy, xy=None):
         if flipz:
             index = self.shape_xyz()[2] - index
         slice_ = self._arr_data[:, :, index]
         if flipy:
-            slice_ = np.fliplr(slice_)
-        if flipx:
             slice_ = np.flipud(slice_)
+        if flipx:
+            slice_ = np.fliplr(slice_)
         if xy:
             y, x = xy
             slice_ = slice_[y, x]
-        return slice_
+        return slice_.T
+
+    def _get_axial(self, index, flipx, flipz, flipy, xy=None):
+        if flipz:
+            index = self.shape_xyz()[0] - index
+        slice_ = self._arr_data[index, :, :]
+        if flipy:
+            slice_ = np.flipud(slice_)
+        if flipx:
+            slice_ = np.fliplr(slice_)
+        if xy:
+            y, x = xy
+            slice_ = slice_[y, x]
+        return slice_.T
 
     def set_lower_level(self, level):
         #print 'l', level
