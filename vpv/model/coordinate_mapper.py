@@ -63,7 +63,7 @@ class Coordinate_mapper(object):
             if self.flip_info[src_ori.name]['y']:
                 y = new_dims[1] - y
 
-            if self.flip_info[src_ori.name]['x']:
+            if not self.flip_info[src_ori.name]['x']:
                 x = new_dims[0] - x
 
             if self.flip_info[src_ori.name]['z']:
