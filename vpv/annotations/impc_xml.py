@@ -179,17 +179,17 @@ def load_xml(xml_file):
             procedure_metadata.append((param_id, value))
 
         elif a.tag == 'seriesMediaParameter':
-            value_tag = a.find('value')
-            param_assoc = value_tag.find('parameterAssociation')
-            param_id = param_assoc.attrib['parameterID']
-            for dim in param_assoc.findall('dim'):
-                if dim.attrib['id'] == 'x':
-                    x = dim.text
-                elif dim.attrib['id'] == 'y':
-                    y = dim.text
-                elif dim.attrib['id'] == 'z':
-                    z = dim.text
-            simple_params[param_id].xyz = (x, y, z)
+            for b in a.iter():
+                param_assoc = b.find('parameterAssociation')
+                param_id = param_assoc.attrib['parameterID']
+                for dim in param_assoc.findall('dim'):
+                    if dim.attrib['id'] == 'x':
+                        x = dim.text
+                    elif dim.attrib['id'] == 'y':
+                        y = dim.text
+                    elif dim.attrib['id'] == 'z':
+                        z = dim.text
+                simple_params[param_id].xyz = (x, y, z)
             # associate the dimensions to the simpleParameter
 
     return centreID, pipeline, project, doe, ex_id, spec_id, proc_id, simple_params, procedure_metadata
