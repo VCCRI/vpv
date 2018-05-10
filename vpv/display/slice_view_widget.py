@@ -184,28 +184,26 @@ class AnnotationOverlay(object):
         self.size = None
 
     def set_size(self, radius):
+        self.size = radius
+        # If we have a point selected, increase the size
         if self.index:
-            self.size = radius
-            self.set(self.x, self.y, self.index, self.color, self.size)
+            self.set(self.x, self.y, self.index, self.color)
 
     def update(self, index):
         if self.index:
             if index == self.index:
-                self.set(self.x, self.y, self.index, self.color, self.size)
+                self.set(self.x, self.y, self.index, self.color)
 
-    def set(self, x, y, index, color, size=None):
-        if not size:
-            size = self.size
+    def set(self, x, y, index, color):
         self.index = index
         self.color = color
-        self.size = size
         self.x = x
         self.y = y
-        x1 = x - (size / 2)
-        y1 = y - (size / 2)
+        x1 = x - (self.size / 2)
+        y1 = y - (self.size / 2)
         if self.annotation_item:
             self.parent.viewbox.removeItem(self.annotation_item)
-        self.annotation_item = QtGui.QGraphicsEllipseItem(x1, y1, size, size)
+        self.annotation_item = QtGui.QGraphicsEllipseItem(x1, y1, self.size, self.size)
         self.annotation_item.setPen(pg.mkPen({'color': color, 'width': 1}))
         self.parent.viewbox.addItem(self.annotation_item)
 
@@ -446,8 +444,8 @@ class SliceWidget(QWidget, Ui_SliceWidget):
     def set_roi(self, x, y, w, h):
         self.roi.set(x, y, w, h)
 
-    def show_annotation_marker(self, x, y, color, size=None): # Where would this come from normally?
-        self.annotation_marker.set(x, y, self.current_slice_idx, color, size)
+    def show_annotation_marker(self, x, y, color): # Where would this come from normally?
+        self.annotation_marker.set(x, y, self.current_slice_idx, color)
 
     def switch_off_annotation(self):
         self.annotation_marker.clear()

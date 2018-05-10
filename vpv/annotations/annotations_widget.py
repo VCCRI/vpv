@@ -17,7 +17,6 @@ from vpv.annotations.annotations_model import centre_stage_options
 from vpv.annotations import impc_xml
 from functools import partial
 import re
-import yaml
 
 
 SCRIPT_DIR = dirname(abspath(__file__))

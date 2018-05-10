@@ -164,6 +164,9 @@ class Vpv(QtCore.QObject):
 
         self.options_tab.set_orientations()
 
+        self.annotation_radius_changed(self.appdata.annotation_circle_radius)
+
+
     def on_slice_view_mouse_move(self, x: int, y: int, z: int, src_view: SliceWidget):
         """
         Given coordinates of mouse hover position, do ....
@@ -236,7 +239,7 @@ class Vpv(QtCore.QObject):
 
             dest_view.set_slice(dest_index)
             # Set the annotation marker. Red for pre-annoation, green indicates annotation save
-            dest_view.show_annotation_marker(dest_x, dest_y, color, radius)
+            dest_view.show_annotation_marker(dest_x, dest_y, color)
 
             # Add the coordinates to the AnnotationsWidget
             # The coordinates need to be in axial space do map back to them if necessary
@@ -646,7 +649,6 @@ class Vpv(QtCore.QObject):
                 self.annotations_manager.update()
         if not non_loaded:
             common.info_dialog(self.mainwindow, 'Load success', 'Annotations loaded')
-
 
     def load_volumes(self, file_list, data_type, memory_map=False, fdr_thresholds=False):
         """
