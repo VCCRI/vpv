@@ -46,9 +46,6 @@ class ExportXML(object):
 
         self.procedure_element = etree.SubElement(self.experiment, 'procedure', procedureID=md['procedure_id'])
 
-        # Add the deafault imagages parameter
-        self.series_media_parameter = self._add_series_media_parameter()
-
         # Add metadata parameters that are not supplied in the procedure_metadata.yaml
         self.metadata['metadata']['IMPC_EMO_178_001'] = annotator_id
         self.metadata['metadata']['IMPC_EMO_179_001'] = date_of_annotation
@@ -61,12 +58,11 @@ class ExportXML(object):
             value.text = str(param_value)
 
     def write(self, file_path):
-        self.add_metadata()
         # print etree.tostring(root, pretty_print=True, xml_declaration=True, encoding='UTF-8', standalone='yes')
         etree.ElementTree(self.root).write(file_path, pretty_print=True, xml_declaration=True, encoding='UTF-8',
                                       standalone='yes')
 
-    def _add_series_media_parameter(self):
+    def add_series_media_parameter(self):
         # Get parameter info and append to procedure
         smp = etree.SubElement(self.procedure_element,
                                'seriesMediaParameter',
@@ -74,7 +70,9 @@ class ExportXML(object):
 
         smp_value = etree.SubElement(smp, 'value',
                                      {"incrementValue": "1",  "URI": self.metadata['reconstruction_url']})
-        return smp_value
+
+        # Add the deafault imagages parameter
+        self.series_media_parameter = smp_value
 
     def add_point(self, param_id, xyz):
         """

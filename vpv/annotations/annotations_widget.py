@@ -270,6 +270,7 @@ class AnnotationsWidget(QWidget):
         saved_file_paths = []
 
         for vol in self.controller.model.all_volumes():
+            points_for_series_media = []
 
             # The first time an annotation is saved, get the date of annotation and set on volume
             # Next time it's loaded load the original date of annotation
@@ -289,7 +290,7 @@ class AnnotationsWidget(QWidget):
                 xml_exporter.add_parameter(a.term, a.selected_option)
 
                 if all((a.x, a.y, a.z)):
-                    xml_exporter.add_point(a.term, (a.x, a.y, a.z))
+                    points_for_series_media.append(a) # save as need to add points after simpleParameters
 
             xml_dir = vol.annotations.annotation_dir
 
@@ -299,6 +300,15 @@ class AnnotationsWidget(QWidget):
                                                              date_of_annotation,
                                                              increment)
             xml_path = join(xml_dir, xml_file_name)
+
+
+            # Add the series media parameter now we have SimpleParameters loaded, so we can add points to it
+            xml_exporter.add_series_media_parameter()
+            for a in points_for_series_media:
+                xml_exporter.add_point(a.term, (a.x, a.y, a.z))
+
+            # Now we can add metadata at the bottom
+            xml_exporter.add_metadata()
 
             try:
                 xml_exporter.write(xml_path)
