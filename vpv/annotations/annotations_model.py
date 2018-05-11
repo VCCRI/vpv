@@ -3,16 +3,23 @@ from os.path import join, dirname, abspath
 import yaml
 from vpv.common import get_stage_from_proc_id, load_yaml, info_dialog
 from os.path import splitext, isfile, isdir
+import fnmatch
 
 SCRIPT_DIR = dirname(abspath(__file__))
 OPTIONS_DIR = join(SCRIPT_DIR, 'options')
 OPTIONS_CONFIG_PATH = os.path.join(OPTIONS_DIR, 'annotation_conf.yaml')
 PROCEDURE_METADATA = 'procedure_metadata.yaml'
 
+ANNOTATION_DONE_METADATA_FILE = '.doneList.yaml'
 
 class Annotation(object):
     """
     Records a single manual annotation
+
+    Attributes
+    ----------
+    looked_at: bool
+        Whether an annotator has looked at this term and checked the done box
     """
     def __init__(self, x, y, z, dims, stage):
         self.x = x
@@ -24,6 +31,7 @@ class Annotation(object):
         self.dims = dims  # x,y,z
         # self.set_xyz(x, y, z)
         self.stage = stage
+        self.looked_at = False
 
     def __getitem__(self, index):
         if index == 0:  # First row of column (dimensions)
@@ -94,7 +102,10 @@ class VolumeAnnotations(object):
         # The developmental stage of the embryo being annotated
         self._stage = None
 
-        self._load_annotations()
+        self.date_of_annotation = None  # Will be set from the annotation gui
+
+        self._load_options_and_metadata()
+        self._load_done_status()
 
     @property
     def stage(self):
@@ -105,10 +116,26 @@ class VolumeAnnotations(object):
         # After setting stage we can then set the avaialble annotiton objects
         self._stage = stage
 
-    def _load_annotations(self):
+    def _load_done_status(self):
+        if self.annotation_dir:
+            done_file = join(self.annotation_dir, ANNOTATION_DONE_METADATA_FILE)
+            if not isfile(done_file):
+                return
+            with open(done_file, 'r') as fh:
+                done_status = yaml.load(fh)
+                if not done_status:
+                    return
+            for ann in self:
+                done = done_status.get(ann.term, 'notpresent')
+                if done is 'notpresent':
+                    print('Cannot find term in done metadata\n{}'.format(done_file))
+                else:
+                    ann.looked_at = done
+
+    def _load_options_and_metadata(self):
         """
         The volume has been loaded. Now see if there is an associated annotation folder that will contain the IMPC
-        metadata parameter file
+        metadata parameter file. Also load in any partially completed xml fannotation files
 
         Returns
         -------
@@ -119,6 +146,7 @@ class VolumeAnnotations(object):
 
         self.metadata_parameter_file = join(self.annotation_dir, PROCEDURE_METADATA)
         if not isfile(self.metadata_parameter_file):
+            self.metadata_parameter_file = None
             return
 
         cso = centre_stage_options.opts
@@ -128,6 +156,7 @@ class VolumeAnnotations(object):
             proc_id = metadata_params['procedure_id']
             center_id = metadata_params['centre_id']
             stage_id = get_stage_from_proc_id(proc_id, center_id)
+
 
             self.stage = stage_id
             self.center = center_id

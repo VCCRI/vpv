@@ -95,7 +95,7 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         view_menu.addAction(self.view_perm_crosshair_action)
 
         self.load_data_action = QtGui.QAction('Load data', data_menu, checkable=False)
-        self.load_data_action.triggered.connect(self.controller.load_data_slot)
+        self.load_data_action.triggered.connect(self.controller.browse_files)
         data_menu.addAction(self.load_data_action)
 
         self.clear_data_action = QtGui.QAction('Clear data', data_menu, checkable=False)

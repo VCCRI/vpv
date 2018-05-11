@@ -12,15 +12,17 @@ class ExportXML(object):
     """
     def __init__(self,
                  date_of_annotation,
-                 experiment_id,
+                 annotator_id,
                  metadata
                  ):
         """
 
         Parameters
         ----------
-        date_of_annotation
-        experiment_id
+        date_of_annotation: str
+            yyy-mm-dd
+        annotator_id: str
+            annonymized annotator id
         metadata: str
             path to procedure_metadata.yaml
         """
@@ -35,14 +37,21 @@ class ExportXML(object):
                                   centreID=md['centre_id'])
 
         # Create an experiment element
-        self.experiment = etree.SubElement(centre, 'experiment', dateOfExperiment=date_of_annotation,
-                                      experimentID=experiment_id)
+        self.experiment = etree.SubElement(centre, 'experiment', dateOfExperiment=md['dateofexperiment'],
+                                      experimentID=md['experiment_id'])
 
         # Append specimen
         specimen = etree.SubElement(self.experiment, 'specimenID')
         specimen.text = md['specimenid']
 
         self.procedure_element = etree.SubElement(self.experiment, 'procedure', procedureID=md['procedure_id'])
+
+        # Add the deafault imagages parameter
+        self.series_media_parameter = self._add_series_media_parameter()
+
+        # Add metadata parameters that are not supplied in the procedure_metadata.yaml
+        self.metadata['metadata']['IMPC_EMO_178_001'] = annotator_id
+        self.metadata['metadata']['IMPC_EMO_179_001'] = date_of_annotation
 
     def add_metadata(self):
         for id_, param_value in self.metadata['metadata'].items():
@@ -56,6 +65,17 @@ class ExportXML(object):
         # print etree.tostring(root, pretty_print=True, xml_declaration=True, encoding='UTF-8', standalone='yes')
         etree.ElementTree(self.root).write(file_path, pretty_print=True, xml_declaration=True, encoding='UTF-8',
                                       standalone='yes')
+
+    def _add_series_media_parameter(self):
+        # Get parameter info and append to procedure
+        smp = etree.SubElement(self.procedure_element,
+                               'seriesMediaParameter',
+                               parameterID="IMPC_EMO_001_001")
+        etree.SubElement(smp,
+                         'value',
+                         {"incrementValue": "1",
+                          "url": self.metadata['reconstruction_url']})
+        return smp
 
     def add_point(self, param_id, xyz):
         """
@@ -77,21 +97,12 @@ class ExportXML(object):
         IMPC_EMO_001_001 is the parameter ID for embryo reconstructions
         """
 
-        # Get parameter info and append to procedure
-        point_smp = etree.SubElement(self.procedure_element,
-                                     'seriesMediaParameter',
-                                     parameterID="IMPC_EMO_001_001")
-        value = etree.SubElement(point_smp,
-                         'value',
-                         {"incrementValue": "1",
-                          "url": self.metadata['reconstruction_url']})
-
-        p_assoc = etree.SubElement(value,
-                         'parameterAssociation',
-                         {'parameterID': param_id})
+        param_assoc = etree.SubElement(self.series_media_parameter,
+                                       'parameterAssociation',
+                                       {'parameterID': param_id})
 
         def put_in_point(id_, idx):
-            etree.SubElement(p_assoc,
+            etree.SubElement(param_assoc,
                              'dim',
                              {'origin': 'RAS',
                               'id': id_}).text = str(xyz[idx])
@@ -126,6 +137,7 @@ class ExportXML(object):
         # Create value element
         value = etree.SubElement(parameter, 'value')
         value.text = param_value
+        return parameter
 
 
 def load_metadata(yaml_path):
@@ -144,7 +156,6 @@ def load_xml(xml_file):
 
     simple_params = Dict()
     procedure_metadata = []
-
 
     for a in root.iter():
         if a.tag == 'centre':
@@ -173,18 +184,18 @@ def load_xml(xml_file):
             procedure_metadata.append((param_id, value))
 
         elif a.tag == 'seriesMediaParameter':
-            value_tag = a.find('value')
-            param_assoc = value_tag.find('parameterAssociation')
-            param_id = param_assoc.attrib['parameterID']
-            for dim in param_assoc.findall('dim'):
-                if dim.attrib['id'] == 'x':
-                    x = dim.text
-                elif dim.attrib['id'] == 'y':
-                    y = dim.text
-                elif dim.attrib['id'] == 'z':
-                    z = dim.text
-            simple_params[param_id].xyz = (x, y, z)
-            # associate the dimensions to the simpleParameter
+            for b in a.iter():
+                param_assocs = b.findall('parameterAssociation')
+                for assoc in param_assocs:
+                    param_id = assoc.attrib['parameterID']
+                    for dim in assoc.findall('dim'):
+                        if dim.attrib['id'] == 'x':
+                            x = dim.text
+                        elif dim.attrib['id'] == 'y':
+                            y = dim.text
+                        elif dim.attrib['id'] == 'z':
+                            z = dim.text
+                    simple_params[param_id].xyz = (x, y, z)
 
     return centreID, pipeline, project, doe, ex_id, spec_id, proc_id, simple_params, procedure_metadata
 

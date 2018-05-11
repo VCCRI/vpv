@@ -7,7 +7,6 @@ from vpv.common import timing, ImageReader
 
 from vpv.utils.lookup_tables import Lut
 from vpv.utils.read_minc import mincstats_to_numpy
-from vpv.model.coordinate_mapper import convert_volume
 
 
 class HeatmapVolume(Volume):
@@ -91,7 +90,7 @@ class HeatmapVolume(Volume):
         else:
             ir = ImageReader(path)
             arr = ir.vol.astype(np.float16)
-            arr = convert_volume(arr, ir.space)
+
         return arr
 
     @timing

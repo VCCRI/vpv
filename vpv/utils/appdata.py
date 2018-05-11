@@ -20,7 +20,6 @@ import yaml
 from os.path import expanduser
 import os
 import collections
-from vpv.common import Orientation
 
 VPV_APPDATA_VERSION = 2.2
 ANNOTATION_CRICLE_RADIUS_DEFAULT = 40

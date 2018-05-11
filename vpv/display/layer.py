@@ -95,8 +95,12 @@ class Layer(Qt.QObject):
         opacity = self.opacity if self.isvisible else 0.0
         flip_x, flip_y, flip_z = self.parent.get_flips()
         if self.vol:
-            self.image_item.setImage(self.vol.get_data(self.parent.orientation, index - 1,
+
+            try:
+                self.image_item.setImage(self.vol.get_data(self.parent.orientation, index - 1,
                                                        flip_x, flip_z, flip_y), autoLevels=False, opacity=opacity)
+            except IndexError as e:
+                print(e)
 
     def set_series_slider(self):
         if self.vol.data_type == 'series':

@@ -10,7 +10,7 @@ import os
 from os.path import dirname, abspath, join, isdir
 import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QFileDialog, QComboBox
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QFileDialog, QComboBox, QCheckBox
 from vpv.ui.views.ui_annotations import Ui_Annotations
 from vpv.common import Layers, AnnotationOption, info_dialog, error_dialog, question_dialog
 from vpv.annotations.annotations_model import centre_stage_options
@@ -186,9 +186,9 @@ class AnnotationsWidget(QWidget):
         self.ui.lineEditCentre.setText(vol.annotations.center)
         self.ui.lineEditStage.setText(vol.annotations.stage)
 
-        def setup_signal(box_: QComboBox, child_: QTreeWidgetItem, row: int):
+        def setup_option_box_signal(box_: QComboBox, child_: QTreeWidgetItem):
             """
-            Connect the Qcombobox
+            Connect the Qcombobox to a slot
             """
             box.activated.connect(partial(self.update_annotation, child_, box_))
             # Setup signal so when combobox is only opened, it sets the selection to that column
@@ -228,10 +228,13 @@ class AnnotationsWidget(QWidget):
 
             box.setCurrentIndex(box.findText(option))
             # Setup combobox selection signal
-            setup_signal(box, child, i)
+            setup_option_box_signal(box, child)
             self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)
-            self.ui.treeWidgetAvailableTerms.setItemWidget(child, 4, QtWidgets.QCheckBox())
-            # child.setBackground(1, QtGui.QBrush(QtGui.QColor(*color)))  # Unpack the tuple of colors and opacity
+
+            done_checkbox = QtWidgets.QCheckBox()
+            done_checkbox.setChecked(ann.looked_at)
+            done_checkbox.stateChanged.connect(partial(self.parameter_done_signal, child, done_checkbox))
+            self.ui.treeWidgetAvailableTerms.setItemWidget(child, 4, done_checkbox)
 
         # Set the roi coords to None
         self.roi_highlight_off_signal.emit()
@@ -245,12 +248,22 @@ class AnnotationsWidget(QWidget):
         self.appdata.annotation_circle_radius = radius
         self.annotation_radius_signal.emit(radius)
 
-    def save_annotations(self):
+    def save_annotations(self, suppress_msg=False):
+        """
 
-        date_of_annotation = self.ui.dateEdit.date().toString('yyyy-MM-dd')
+        Parameters
+        ----------
+        suppress_msg: bool
+            When doing autosave do not give a dialog informing od save (True)
+            When doing manual save, give dialog with saved file path
 
-        experimenter_id = self.ui.lineEditAnnotatorId.text()
-        if experimenter_id.isspace() or not experimenter_id:
+        Returns
+        -------
+
+        """
+
+        annotator_id = self.ui.lineEditAnnotatorId.text()
+        if annotator_id.isspace() or not annotator_id:
             error_dialog(self, 'Experimenter ID missing', "An annotator ID is required")
             return
 
@@ -258,8 +271,16 @@ class AnnotationsWidget(QWidget):
 
         for vol in self.controller.model.all_volumes():
 
+            # The first time an annotation is saved, get the date of annotation and set on volume
+            # Next time it's loaded load the original date of annotation
+            if vol.annotations.date_of_annotation:
+                date_of_annotation = vol.annotations.date_of_annotation
+            else:
+                date_of_annotation = self.ui.dateEdit.date().toString('yyyy-MM-dd')
+                vol.annotations.date_of_annotation = date_of_annotation
+
             xml_exporter = impc_xml.ExportXML(date_of_annotation,
-                                              experimenter_id,
+                                              annotator_id,
                                               vol.annotations.metadata_parameter_file)
 
             ann = vol.annotations
@@ -286,7 +307,7 @@ class AnnotationsWidget(QWidget):
             else:
                 saved_file_paths.append(xml_path)
 
-        if saved_file_paths:
+        if saved_file_paths and not suppress_msg:
             sf_str = '\n'.join(saved_file_paths)
             info_dialog(self, 'Success', 'Annotation files saved:{}'.format(sf_str))
 
@@ -306,6 +327,17 @@ class AnnotationsWidget(QWidget):
             #     vol.annotations._load_annotations()
         self.update()
         self.populate_available_terms()
+
+    def parameter_done_signal(self, child: QTreeWidgetItem, check_box: QCheckBox):
+        vol = self.controller.current_annotation_volume()
+        if not vol:
+            error_dialog(self, "Error", "No volume selected")
+            return
+
+        base_node = child
+        term = base_node.text(1)
+        ann = vol.annotations.get_by_term(term)
+        ann.looked_at = bool(check_box.isChecked())
 
     def update_annotation(self, child: QTreeWidgetItem, cbox: QComboBox):
         """
@@ -352,11 +384,11 @@ class AnnotationsWidget(QWidget):
             error_dialog(self, "Error", "No term is selected!")
             return
 
-        # color = OPTION_COLOR_MAP[option]
-        # base_node.setBackground(1, QtGui.QBrush(QtGui.QColor(*color)))
-
         vol.annotations.update_annotation(term, x, y, z, option)
         self.on_tree_clicked(base_node)
+
+        # We are now autosaving. so save on each annotation term changed
+        self.save_annotations(suppress_msg=True)
 
     def reset_roi(self):
         self.ui.labelXPos.setText(None)

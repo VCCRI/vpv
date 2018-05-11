@@ -107,7 +107,7 @@ class InformationOverlay(QtGui.QWidget):
         self.update()
 
     def set_volume2_label(self, text):
-        print(text)
+
         if text == 'None':
             self.labels_active['vol2'] = False
         else:
@@ -152,6 +152,7 @@ class InformationOverlay(QtGui.QWidget):
 
 
 class RoiOverlay(object):
+    # This controls the blob finder bounding box roi?? rename
     def __init__(self, parent):
         self.parent = parent
         self.roi_item = None
@@ -184,34 +185,33 @@ class AnnotationOverlay(object):
         self.size = None
 
     def set_size(self, radius):
+        self.size = radius
+        # If we have a point selected, increase the size
         if self.index:
-            self.size = radius
-            self.set(self.x, self.y, self.index, self.color, self.size)
+            self.set(self.x, self.y, self.index, self.color)
 
     def update(self, index):
         if self.index:
             if index == self.index:
-                self.set(self.x, self.y, self.index, self.color, self.size)
+                self.set(self.x, self.y, self.index, self.color)
 
-    def set(self, x, y, index, color, size=None):
-        if not size:
-            size = self.size
+    def set(self, x, y, index, color):
         self.index = index
         self.color = color
-        self.size = size
         self.x = x
         self.y = y
-        x1 = x - (size / 2)
-        y1 = y - (size / 2)
+        x1 = x - (self.size / 2)
+        y1 = y - (self.size / 2)
         if self.annotation_item:
             self.parent.viewbox.removeItem(self.annotation_item)
-        self.annotation_item = QtGui.QGraphicsEllipseItem(x1, y1, size, size)
+        self.annotation_item = QtGui.QGraphicsEllipseItem(x1, y1, self.size, self.size)
         self.annotation_item.setPen(pg.mkPen({'color': color, 'width': 1}))
         self.parent.viewbox.addItem(self.annotation_item)
 
     def clear(self):
         if self.annotation_item:
             self.parent.viewbox.removeItem(self.annotation_item)
+        self.annotation_item = None
 
 
 class ScaleBar(pg.ScaleBar):
@@ -446,8 +446,8 @@ class SliceWidget(QWidget, Ui_SliceWidget):
     def set_roi(self, x, y, w, h):
         self.roi.set(x, y, w, h)
 
-    def show_annotation_marker(self, x, y, color, size=None): # Where would this come from normally?
-        self.annotation_marker.set(x, y, self.current_slice_idx, color, size)
+    def show_annotation_marker(self, x, y, color): # Where would this come from normally?
+        self.annotation_marker.set(x, y, self.current_slice_idx, color)
 
     def switch_off_annotation(self):
         self.annotation_marker.clear()
@@ -508,7 +508,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         ----------
         layer_index: int
             the key for the layer in Layers
-        z: int
+        z: int: NOT USED
             z
         y: int
             y
@@ -684,6 +684,8 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
         """
         self.roi.clear()
+
+        # If we change slices, we don't want to see the annotation marker
         self.annotation_marker.clear()
         self.ui.labelSliceNumber.setText(str(index))
 
