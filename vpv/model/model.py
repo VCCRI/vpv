@@ -194,6 +194,8 @@ class DataModel(QtCore.QObject):
             vol = self._volumes.get(vol_id)
 
         if vol:
+
+            vol.annotations.clear()
             # Get the dict that contains the available options for a given center/stage
             default_opts = centre_stage_options.opts
             stage = get_stage_from_proc_id(proc_id, centerID)

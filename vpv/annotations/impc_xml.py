@@ -74,7 +74,7 @@ class ExportXML(object):
         etree.SubElement(smp,
                          'value',
                          {"incrementValue": "1",
-                          "url": self.metadata['reconstruction_url']})
+                          "URL": self.metadata['reconstruction_url']})
         return smp
 
     def add_point(self, param_id, xyz):
