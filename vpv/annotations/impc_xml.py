@@ -71,11 +71,10 @@ class ExportXML(object):
         smp = etree.SubElement(self.procedure_element,
                                'seriesMediaParameter',
                                parameterID="IMPC_EMO_001_001")
-        etree.SubElement(smp,
-                         'value',
-                         {"incrementValue": "1",
-                          "URL": self.metadata['reconstruction_url']})
-        return smp
+
+        smp_value = etree.SubElement(smp, 'value',
+                                     {"incrementValue": "1",  "URI": self.metadata['reconstruction_url']})
+        return smp_value
 
     def add_point(self, param_id, xyz):
         """
