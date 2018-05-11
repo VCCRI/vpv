@@ -162,6 +162,7 @@ class RoiOverlay(object):
     def set(self, x, y, w, h):
         if self.roi_item:
             self.parent.viewbox.removeItem(self.roi_item)
+            self.roi_item = None
         self.roi_item = QtGui.QGraphicsRectItem(x, y, w, h)
         self.roi_item.setPen(pg.mkPen({'color': [255, 255, 0], 'width': 1}))
         self.parent.viewbox.addItem(self.roi_item)
@@ -169,6 +170,7 @@ class RoiOverlay(object):
     def clear(self):
         if self.roi_item:
             self.parent.viewbox.removeItem(self.roi_item)
+            self.roi_item = None
 
 
 class AnnotationOverlay(object):

@@ -639,7 +639,7 @@ class Vpv(QtCore.QObject):
             if not self.any_data_loaded:
                 self.add_initial_volume()
 
-        # Now load the annotations. Only load if there is a corresponding volume with the same id
+        # Now load the annotations from the Importer. Only load if there is a corresponding volume with the same id
         if len(annotations) > 0:
             self.load_annotations(annotations)
 
@@ -682,6 +682,17 @@ class Vpv(QtCore.QObject):
             self.load_annotations(annotation_xml_files)
 
     def load_annotations(self, annotation_file_list):
+        """
+        Load annotations that were previosly saved as xml
+
+        Parameters
+        ----------
+        annotation_file_list
+
+        Returns
+        -------
+
+        """
         non_loaded = []
         for path in annotation_file_list:
             error = self.model.load_annotation(path)

@@ -38,12 +38,12 @@ class Coordinate_mapper(object):
         x: int
         y: int
         z: int
-        src_view: SliceWidget
-        reverse: bool
-            True: map from volume space to image space
-            False: map from image space to volume sapce
+        src_ori: Orientation
+            The orieantation of the source view
         dims: list
             dimensions of source volume xyz
+        from_saved: bool
+
 
         Returns
         -------
@@ -60,8 +60,8 @@ class Coordinate_mapper(object):
         position labels
 
         """
-        # Flip the source view points if needed
-        if not from_saved:
+
+        if not from_saved:  # If from saved list we don't need to do any flipping on the points
             # Flip the dimensions so thay match the view
 
             dims_order = flip_from_axial_order[src_ori]
@@ -142,17 +142,20 @@ class Coordinate_mapper(object):
         tuple
             Mapped coordinates ((x,x), (y,y), (z,z)
         """
-        z = [int(x) for x in zz]
-        y = [int(x) for x in yy]
-        x = [int(x) for x in xx]
+        z = [int(i) for i in zz]
+        y = [int(i) for i in yy]
+        x = [int(i) for i in xx]
 
         for dest_view in self.views.values():
             # First map the annotation marker between views
             dest_dims = dest_view.main_volume.shape_xyz()
+
             points_1 = self.view_to_view(x[0], y[0], z[0], Orientation.axial, dest_view.orientation,
                                          dest_dims, from_saved=True)
+
             points_2 = self.view_to_view(x[1], y[1], z[1], Orientation.axial, dest_view.orientation,
                                          dest_dims, from_saved=True)
+
             midslice = int(np.mean([points_1[2], points_2[2]]))
 
             w = abs(points_1[0] - points_2[0])

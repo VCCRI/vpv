@@ -188,9 +188,9 @@ class DataModel(QtCore.QObject):
         ann_dir = os.path.split(ann_path)[0]
         procedure_metadata_file = os.path.join(ann_dir, PROCEDURE_METADATA)
         if not os.path.isfile(procedure_metadata_file):
-            vol = None
+            vol = None  # Should also check if annotation options have been loaded
         else:
-            vol_id = os.path.basename(ann_dir) # The annotation directory is the same name as the annotated volume
+            vol_id = os.path.basename(ann_dir)  # The annotation directory is the same name as the annotated volume
             vol = self._volumes.get(vol_id)
 
         if vol:
@@ -208,7 +208,7 @@ class DataModel(QtCore.QObject):
                     x = y = z = None
                 dims = vol.shape_xyz()
 
-                # Some of the data neded to crate an annotation object is not recorded in the XML output
+                # Some of the data needed to create an annotation object is not recorded in the XML output
                 # So we need to load that from the center annotation options file
                 for center, default_data in default_opts['centers'].items():
                     if default_data['short_name'] == centerID:
@@ -217,16 +217,79 @@ class DataModel(QtCore.QObject):
                         for param_id, default_param_info in params.items():
                             if param_id == xml_param:
                                 name = default_param_info['name']
-                                options = default_opts['available_options'][default_param_info['options']]# available options for this parameter
-                                order = default_param_info['options']
+                                options = default_opts['available_options'][
+                                    default_param_info['options']]  # available options for this parameter
+                                order = default_param_info['order']
                                 is_mandatory = default_param_info['mandatory']
 
-                                vol.annotations.add_impc_annotation(x, y, z, xml_param, name, options, option, stage,
-                                                            order, is_mandatory, dims)
+                                vol.annotations.add_impc_annotation(x, y, z, xml_param, name, options, option,
+                                                                    stage,
+                                                                    order, is_mandatory, dims)
 
         else:
             return "Could not load annotation: {}. Not able to find loaded volume with same id".format(vol_id)
         return None
+
+    # def load_annotation(self, ann_path):
+    #     """
+    #     Load annotations from an IMPC xml file.
+    #
+    #     Parameters
+    #     ----------
+    #     ann_path: str
+    #         path to xml annotation file
+    #
+    #     Returns
+    #     -------
+    #
+    #     """
+    #     # Load in data from xml
+    #     centerID, pipeline, project, doe, ex_id, spec_id, proc_id, \
+    #     simple_and_series_params, procedure_metadata = load_xml(ann_path)
+    #
+    #     # try to find a corresponding procedure_metadata.yaml file
+    #     ann_dir = os.path.split(ann_path)[0]
+    #     procedure_metadata_file = os.path.join(ann_dir, PROCEDURE_METADATA)
+    #     if not os.path.isfile(procedure_metadata_file):
+    #         vol = None  # Should also check if annotation options have been loaded
+    #     else:
+    #         vol_id = os.path.basename(ann_dir) # The annotation directory is the same name as the annotated volume
+    #         vol = self._volumes.get(vol_id)
+    #
+    #     if vol:
+    #         # Get the dict that contains the available options for a given center/stage
+    #         default_opts = centre_stage_options.opts
+    #         stage = get_stage_from_proc_id(proc_id, centerID)
+    #
+    #         # Get all the simpleParameter entries form the xml file
+    #         for xml_param, xml_data in simple_and_series_params.items():
+    #             option = xml_data['option']
+    #             xyz = xml_data.get('xyz')
+    #             if xyz:
+    #                 x, y, z = [int(i) for i in xyz]
+    #             else:
+    #                 x = y = z = None
+    #             dims = vol.shape_xyz()
+    #
+    #             # Some of the data neded to crate an annotation object is not recorded in the XML output
+    #             # So we need to load that from the center annotation options file
+    #             for center, default_data in default_opts['centers'].items():
+    #                 if default_data['short_name'] == centerID:
+    #                     params = default_data['stages'][stage]['parameters']
+    #
+    #                     for param_id, default_param_info in params.items():
+    #                         if param_id == xml_param:
+    #                             name = default_param_info['name']
+    #                             options = default_opts['available_options'][default_param_info['options']]# available options for this parameter
+    #                             order = default_param_info['options']
+    #                             is_mandatory = default_param_info['mandatory']
+    #
+    #                             vol.annotations.add_impc_annotation(x, y, z, xml_param, name, options, option, stage,
+    #                                                         order, is_mandatory, dims)
+    #
+    #     else:
+    #         return "Could not load annotation: {}. Not able to find loaded volume with same id".format(vol_id)
+    #     return None
 
     def add_volume(self, volpath, data_type, memory_map, fdr_thresholds=False):
         """
