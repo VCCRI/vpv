@@ -662,6 +662,8 @@ class Vpv(QtCore.QObject):
         for vol in self.model.all_volumes():
 
             ann_dir = vol.annotations.annotation_dir
+            if not ann_dir:
+                return
             if not isdir(ann_dir):
                 print("{}, is not a valid annotaiton directory")
                 continue
