@@ -119,7 +119,7 @@ class HeatmapVolume(Volume):
                 break
             mean = ls.GetMean(i)
 
-            bbox_xyz = [bbox[4], bbox[5],  bbox[2], bbox[3], bbox[0], bbox[1]]
+            bbox_xyz = [bbox[0], bbox[1], bbox[2], bbox[3], bbox[4], bbox[5]]
             self.connected_components[size, mean] = bbox_xyz
 
     def set_lut(self, lut_name):

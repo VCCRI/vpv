@@ -157,7 +157,6 @@ class VolumeAnnotations(object):
             center_id = metadata_params['centre_id']
             stage_id = get_stage_from_proc_id(proc_id, center_id)
 
-
             self.stage = stage_id
             self.center = center_id
 

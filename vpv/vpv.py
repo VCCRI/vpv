@@ -641,16 +641,16 @@ class Vpv(QtCore.QObject):
 
         # Now load the annotations from the Importer. Only load if there is a corresponding volume with the same id
         if len(annotations) > 0:
-            self.load_annotations(annotations)
+            self.load_annotations(annotations) # From importer
 
         self.appdata.set_last_dir_browsed(last_dir)
-        self._auto_load_annotations()
+        self._auto_load_annotations(volumes)  # infered from directory structure
 
         if self.dock_widget.isVisible():
             self.data_manager.update()
             self.annotations_manager.update()
 
-    def _auto_load_annotations(self):
+    def _auto_load_annotations(self, volumes):
         """
         Look for previously-written annotation files in  the annotation directory (folder with same name as loaded img)
         If present try to load
@@ -659,9 +659,9 @@ class Vpv(QtCore.QObject):
 
         annotation_xml_files = []
 
-        for vol in self.model.all_volumes():
+        for vol_path in volumes:
 
-            ann_dir = vol.annotations.annotation_dir
+            ann_dir = os.path.splitext(vol_path)[0]
             if not ann_dir:
                 return
             if not isdir(ann_dir):
