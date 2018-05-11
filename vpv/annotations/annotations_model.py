@@ -3,6 +3,7 @@ from os.path import join, dirname, abspath
 import yaml
 from vpv.common import get_stage_from_proc_id, load_yaml, info_dialog
 from os.path import splitext, isfile, isdir
+import fnmatch
 
 SCRIPT_DIR = dirname(abspath(__file__))
 OPTIONS_DIR = join(SCRIPT_DIR, 'options')
@@ -103,7 +104,7 @@ class VolumeAnnotations(object):
 
         self.date_of_annotation = None  # Will be set from the annotation gui
 
-        self._load_annotations()
+        self._load_options_and_metadata()
         self._load_done_status()
 
     @property
@@ -131,10 +132,10 @@ class VolumeAnnotations(object):
                 else:
                     ann.looked_at = done
 
-    def _load_annotations(self):
+    def _load_options_and_metadata(self):
         """
         The volume has been loaded. Now see if there is an associated annotation folder that will contain the IMPC
-        metadata parameter file
+        metadata parameter file. Also load in any partially completed xml fannotation files
 
         Returns
         -------

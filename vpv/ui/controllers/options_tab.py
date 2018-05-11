@@ -109,39 +109,39 @@ class OptionsTab(QtGui.QWidget):
 
         self.flip_signal.emit()
 
-    def on_axial_flipx(self, checked: bool):
-        self.flips['axial']['x'] = checked
+    def on_axial_flipx(self, checked: int):
+        self.flips['axial']['x'] = bool(checked)
         self.flip_signal.emit()
 
-    def on_axial_flipy(self, checked: bool):
-        self.flips['axial']['y'] = checked
+    def on_axial_flipy(self, checked: int):
+        self.flips['axial']['y'] = bool(checked)
         self.flip_signal.emit()
 
-    def on_axial_flipz(self, checked: bool):
-        self.flips['axial']['z'] = checked
+    def on_axial_flipz(self, checked: int):
+        self.flips['axial']['z'] = bool(checked)
         self.flip_signal.emit()
 
-    def on_coronal_flipx(self, checked: bool):
-        self.flips['coronal']['x'] = checked
+    def on_coronal_flipx(self, checked: int):
+        self.flips['coronal']['x'] = bool(checked)
         self.flip_signal.emit()
 
-    def on_coronal_flipy(self, checked: bool):
-        self.flips['coronal']['y'] = checked
+    def on_coronal_flipy(self, checked: int):
+        self.flips['coronal']['y'] = bool(checked)
         self.flip_signal.emit()
 
-    def on_coronal_flipz(self, checked: bool):
-        self.flips['coronal']['z'] = checked
+    def on_coronal_flipz(self, checked: int):
+        self.flips['coronal']['z'] = bool(checked)
         self.flip_signal.emit()
 
-    def on_sagittal_flipx(self, checked: bool):
-        self.flips['sagittal']['x'] = checked
+    def on_sagittal_flipx(self, checked: int):
+        self.flips['sagittal']['x'] = bool(checked)
         self.flip_signal.emit()
 
-    def on_sagittal_flipy(self, checked: bool):
-        self.flips['sagittal']['y'] = checked
+    def on_sagittal_flipy(self, checked: int):
+        self.flips['sagittal']['y'] = bool(checked)
         self.flip_signal.emit()
 
-    def on_sagittal_flipz(self, checked: bool):
-        self.flips['sagittal']['z'] = checked
+    def on_sagittal_flipz(self, checked: int):
+        self.flips['sagittal']['z'] = bool(checked)
         self.flip_signal.emit()
 

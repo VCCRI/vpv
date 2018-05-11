@@ -27,7 +27,7 @@ PYTHON_DIR = 'python-3.6.3.amd64'
 
 import os
 import sys
-from os.path import join
+from os.path import join, isdir
 p = sys.path
 
 from PyQt5 import QtGui, QtCore, QtWidgets
@@ -183,8 +183,6 @@ class Vpv(QtCore.QObject):
         if any(i < 0 for i in (x, y, z)):
             return
 
-        print(x,y,z)
-
         # map to the volume space
         vol_points = self.mapper.view_to_volume(x, y, z, src_view.orientation, src_view.main_volume.shape_xyz())
 
@@ -199,7 +197,6 @@ class Vpv(QtCore.QObject):
                 if hm:
                     hm_hover_voxel_value = hm.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
                     self.heatmap_pixel_signal.emit((round(float(hm_hover_voxel_value), 4)))
-
 
         # # If shift is pressed emit signal to get other views to get to the same or interscting slice
         modifiers = QtGui.QApplication.keyboardModifiers()
@@ -647,10 +644,40 @@ class Vpv(QtCore.QObject):
             self.load_annotations(annotations)
 
         self.appdata.set_last_dir_browsed(last_dir)
+        self._auto_load_annotations()
 
         if self.dock_widget.isVisible():
             self.data_manager.update()
             self.annotations_manager.update()
+
+    def _auto_load_annotations(self):
+        """
+        Look for previously-written annotation files in  the annotation directory (folder with same name as loaded img)
+        If present try to load
+        """
+        import fnmatch
+
+        annotation_xml_files = []
+
+        for vol in self.model.all_volumes():
+
+            ann_dir = vol.annotations.annotation_dir
+            if not isdir(ann_dir):
+                print("{}, is not a valid annotaiton directory")
+                continue
+
+            ann_files = os.listdir(ann_dir)
+            xml_annotation_file = None
+
+            for af in ann_files:
+                if fnmatch.fnmatch(af, '*experiment.impc.xml'):
+                    xml_annotation_file = join(ann_dir, af)
+                    break
+            if xml_annotation_file:
+                annotation_xml_files.append(xml_annotation_file)
+
+        if annotation_xml_files:
+            self.load_annotations(annotation_xml_files)
 
     def load_annotations(self, annotation_file_list):
         non_loaded = []
@@ -660,7 +687,7 @@ class Vpv(QtCore.QObject):
                 non_loaded.append(path)
                 common.error_dialog(self.mainwindow, 'Annotations not loaded', error)
             else:
-                # Load annotations
+                # Load annotations - these should be called within self.model.load_annotation
                 self.annotations_manager.populate_available_terms()
                 self.annotations_manager.update()
         if not non_loaded:

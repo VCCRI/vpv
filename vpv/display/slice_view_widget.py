@@ -107,7 +107,7 @@ class InformationOverlay(QtGui.QWidget):
         self.update()
 
     def set_volume2_label(self, text):
-        print(text)
+
         if text == 'None':
             self.labels_active['vol2'] = False
         else:
@@ -508,7 +508,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         ----------
         layer_index: int
             the key for the layer in Layers
-        z: int
+        z: int: NOT USED
             z
         y: int
             y
