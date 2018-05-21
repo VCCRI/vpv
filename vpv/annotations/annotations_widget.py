@@ -233,6 +233,7 @@ class AnnotationsWidget(QWidget):
 
             done_checkbox = QtWidgets.QCheckBox()
             done_checkbox.setChecked(ann.looked_at)
+
             done_checkbox.stateChanged.connect(partial(self.parameter_done_signal, child, done_checkbox))
             self.ui.treeWidgetAvailableTerms.setItemWidget(child, 4, done_checkbox)
 
