@@ -1,6 +1,7 @@
 from lxml import etree
 import yaml
 from vpv.lib import addict
+from vpv.common import ANNOTATIONS_PROC_VERSION
 
 """
 Generate an IMPC xml submsiion form for the manual annotation procedure
@@ -158,7 +159,7 @@ def load_metadata(yaml_path):
         data = yaml.load(fh)
 
     # override the procedure ID
-    data['procedure_id'] = common.ANNOTATIONS_PROC_VERSION
+    data['procedure_id'] = ANNOTATIONS_PROC_VERSION
     return data
 
 
@@ -187,7 +188,7 @@ def load_xml(xml_file):
 
         elif a.tag == 'procedure':
             # proc_id = a.attrib['procedureID']  hard code to v2
-            proc_id = common.ANNOTATIONS_PROC_VERSION
+            proc_id = ANNOTATIONS_PROC_VERSION
 
         elif a.tag == 'simpleParameter':
             param_id = a.attrib['parameterID']
