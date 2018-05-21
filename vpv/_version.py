@@ -1,4 +1,5 @@
-__version__ = '2.0.0' #Lots of annotations changes
+__version__ = '2.0.1' # Fixed done checkboxes loading and addict import issue
+# __version__ = '2.0.0' #Lots of annotations changes
 #__version__ = '1.9.2'  # Some bug fixes
 #__version__ = '1.9.1' # Added arbitrary flips and fgixed a bunch of bugs
 #__version__ = '1.9.0' # Added impc flip button made some bodges to get vews annotations etc in correct orientation
