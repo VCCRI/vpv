@@ -12,6 +12,7 @@ PROCEDURE_METADATA = 'procedure_metadata.yaml'
 
 ANNOTATION_DONE_METADATA_FILE = '.doneList.yaml'
 
+
 class Annotation(object):
     """
     Records a single manual annotation
@@ -31,7 +32,15 @@ class Annotation(object):
         self.dims = dims  # x,y,z
         # self.set_xyz(x, y, z)
         self.stage = stage
-        self.looked_at = False
+        self._looked_at = False
+
+    @property
+    def looked_at(self):
+        return self._looked_at
+
+    @looked_at.setter
+    def looked_at(self, done):
+        self._looked_at = done
 
     def __getitem__(self, index):
         if index == 0:  # First row of column (dimensions)
@@ -102,10 +111,10 @@ class VolumeAnnotations(object):
         # The developmental stage of the embryo being annotated
         self._stage = None
 
-        self.date_of_annotation = None  # Will be set from the annotation gui
+        self.date_of_annotation = None  # Will be set from the annotation gui_load_done_status
 
         self._load_options_and_metadata()
-        self._load_done_status()
+        # self._load_done_status()
 
     @property
     def stage(self):
@@ -125,12 +134,16 @@ class VolumeAnnotations(object):
                 done_status = yaml.load(fh)
                 if not done_status:
                     return
+            self.index = len(self.annotations)  # bodge
             for ann in self:
                 done = done_status.get(ann.term, 'notpresent')
                 if done is 'notpresent':
                     print('Cannot find term in done metadata\n{}'.format(done_file))
+                if done is False:
+                    print('p')
                 else:
                     ann.looked_at = done
+        print('f')
 
     def _load_options_and_metadata(self):
         """

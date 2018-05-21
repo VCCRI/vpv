@@ -227,6 +227,7 @@ class DataModel(QtCore.QObject):
                                 vol.annotations.add_impc_annotation(x, y, z, xml_param, name, options, option,
                                                                     stage,
                                                                     order, is_mandatory, dims)
+            vol.annotations._load_done_status()
 
         else:
             return "Could not load annotation: {}. Not able to find loaded volume with same id".format(vol_id)

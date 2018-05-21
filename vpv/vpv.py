@@ -694,7 +694,7 @@ class Vpv(QtCore.QObject):
 
         """
         non_loaded = []
-        for path in annotation_file_list:
+        for path in annotation_file_list: # At this point looked_at set to True
             error = self.model.load_annotation(path)
             if error:
                 non_loaded.append(path)
