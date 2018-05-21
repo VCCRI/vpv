@@ -1,5 +1,6 @@
 from lxml import etree
 import yaml
+from vpv import common
 
 """
 Generate an IMPC xml submsiion form for the manual annotation procedure
@@ -138,8 +139,26 @@ class ExportXML(object):
 
 
 def load_metadata(yaml_path):
+    """
+    Load in the procedure_metadata yaml file
+    Override the procedureID as this needs to be version 2
+
+    Parameters
+    ----------
+    yaml_path: str
+        path to config file
+
+    Returns
+    -------
+    dict
+
+    """
+
     with open(yaml_path, 'r') as fh:
         data = yaml.load(fh)
+
+    # override the procedure ID
+    data['procedure_id'] = common.ANNOTATIONS_PROC_VERSION
     return data
 
 
@@ -168,7 +187,8 @@ def load_xml(xml_file):
             spec_id = a.text
 
         elif a.tag == 'procedure':
-            proc_id = a.attrib['procedureID']
+            # proc_id = a.attrib['procedureID']  hard code to v2
+            proc_id = common.ANNOTATIONS_PROC_VERSION
 
         elif a.tag == 'simpleParameter':
             param_id = a.attrib['parameterID']

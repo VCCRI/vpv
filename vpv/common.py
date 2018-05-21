@@ -18,6 +18,8 @@ resources_dir = join(_this_dir, 'resources')
 style_sheet_path = join(resources_dir, 'stylesheet.qss')
 generic_anatomy_label_map_path = join(resources_dir, 'generic_anatomy.csv')
 
+ANNOTATIONS_PROC_VERSION = "IMPC_EMO_002"
+
 
 def get_stage_from_proc_id(proc_id: str, center_id: dict):
     """

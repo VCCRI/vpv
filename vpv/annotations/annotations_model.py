@@ -1,9 +1,8 @@
 import os
 from os.path import join, dirname, abspath
 import yaml
-from vpv.common import get_stage_from_proc_id, load_yaml, info_dialog
+from vpv.common import get_stage_from_proc_id, load_yaml, ANNOTATIONS_PROC_VERSION
 from os.path import splitext, isfile, isdir
-import fnmatch
 
 SCRIPT_DIR = dirname(abspath(__file__))
 OPTIONS_DIR = join(SCRIPT_DIR, 'options')
@@ -126,6 +125,10 @@ class VolumeAnnotations(object):
         self._stage = stage
 
     def _load_done_status(self):
+        """
+        Load in the doneList.yaml which specifies which parameters have been loked at. This is used to populate the
+        'done' checkboxes, which is just a guide for the user. Has no other effect
+        """
         if self.annotation_dir:
             done_file = join(self.annotation_dir, ANNOTATION_DONE_METADATA_FILE)
             if not isfile(done_file):
@@ -134,16 +137,17 @@ class VolumeAnnotations(object):
                 done_status = yaml.load(fh)
                 if not done_status:
                     return
-            self.index = len(self.annotations)  # bodge
+
+            self.index = len(self.annotations)  # bodge. Need to reset the annotations iterator
+
             for ann in self:
                 done = done_status.get(ann.term, 'notpresent')
+
                 if done is 'notpresent':
                     print('Cannot find term in done metadata\n{}'.format(done_file))
-                if done is False:
-                    print('p')
+
                 else:
                     ann.looked_at = done
-        print('f')
 
     def _load_options_and_metadata(self):
         """
@@ -166,7 +170,8 @@ class VolumeAnnotations(object):
 
         with open(self.metadata_parameter_file, 'r') as fh:
             metadata_params = yaml.load(fh)
-            proc_id = metadata_params['procedure_id']
+            # proc_id = metadata_params['procedure_id']
+            proc_id = metadata_params['procedure_id'] = ANNOTATIONS_PROC_VERSION
             center_id = metadata_params['centre_id']
             stage_id = get_stage_from_proc_id(proc_id, center_id)
 
