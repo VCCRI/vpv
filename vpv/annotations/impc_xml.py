@@ -1,6 +1,6 @@
 from lxml import etree
 import yaml
-from vpv import common
+from vpv.lib import addict
 
 """
 Generate an IMPC xml submsiion form for the manual annotation procedure
@@ -166,11 +166,10 @@ def load_xml(xml_file):
     """
     Reads in a manual annotation xml file
     """
-    from addict import Dict
     root = etree.parse(xml_file)
     root = strip_ns_prefix(root)
 
-    simple_params = Dict()
+    simple_params = addict.Dict()
     procedure_metadata = []
 
     for a in root.iter():
