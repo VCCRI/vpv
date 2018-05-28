@@ -306,7 +306,7 @@ class AnnotationsWidget(QWidget):
             # Add the series media parameter now we have SimpleParameters loaded, so we can add points to it
             xml_exporter.add_series_media_parameter()
             for a in points_for_series_media:
-                xml_exporter.add_point(a.term, (a.x, a.y, a.z))
+                xml_exporter.add_point(a.term, (a.x, a.y, a.z), (a.x_percent, a.y_percent, a.z_percent))
 
             # Now we can add metadata at the bottom
             xml_exporter.add_metadata()

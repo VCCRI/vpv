@@ -22,13 +22,14 @@ class Annotation(object):
         Whether an annotator has looked at this term and checked the done box
     """
     def __init__(self, x, y, z, dims, stage):
-        self.x = x
-        self.y = y
-        self.z = z
+        self.x = None
+        self.y = None
+        self.z = None
         self.x_percent = None
         self.y_percent = None
         self.z_percent = None
         self.dims = dims  # x,y,z
+        self.set_xyz(x, y, z)
         # self.set_xyz(x, y, z)
         self.stage = stage
         self._looked_at = False
@@ -210,7 +211,8 @@ class VolumeAnnotations(object):
 
         """
         ann = self.get_by_term(term)
-        ann.x, ann.y, ann.z = x, y, z
+        ann.set_xyz(x, y, z)
+        # ann.x, ann.y, ann.z = x, y, z
         ann.selected_option = selected_option
 
     def add_impc_annotation(self, x: int, y:int, z:int, impc_param, name, options, default_option, stage, order, is_mandatory, dims):

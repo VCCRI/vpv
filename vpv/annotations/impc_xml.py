@@ -76,38 +76,53 @@ class ExportXML(object):
         # Add the deafault imagages parameter
         self.series_media_parameter = smp_value
 
-    def add_point(self, param_id, xyz):
+    def add_point(self, param_id, xyz, xyz_percents):
         """
-        Annotation ppoints cannot be added to the manual annotation call as it is a simpleParameter
-        Instead, we have to create a seriesMediaParameter and add it there with a link to the manual annotaiton
+        Annotation points cannot be added to the manual annotation call as it is a simpleParameter
+        Instead, we have to create a seriesMediaParameter and add it there with a link to the manual annotation
         parameter
 
         Parameters
         ----------
         param_id: str
             The parameter ID to link the point to
-        reconstruction_param_and_id: tuple
-            The parameter
+        param_and_id: tuple
+            The annotation parameter
         xyz: tuple (int)
             the location of the annotation mark
+        xyz_percents: tuple
+            the percentage distances of the annotation mark from the origin
 
         Notes
         -----
         IMPC_EMO_001_001 is the parameter ID for embryo reconstructions
+
+
+        The final series media parameter for an annotation point should look like this
+
+            <parameterAssociation  parameterID="IMPC_EMO_022_001“>
+            <dim origin="topLeft" id="x">700</dim>
+            <dim origin="topLeft" id="y">350</dim>
+            <dim origin="topLeft" id="z">500</dim>
+            <dim origin="topLeft" id="x_percent">24.6</dim>
+            <dim origin="topLeft" id="y_percent">34.7</dim>
+            <dim origin="topLeft" id="z_percent">15.4</dim>
         """
 
         param_assoc = etree.SubElement(self.series_media_parameter,
                                        'parameterAssociation',
                                        {'parameterID': param_id})
 
-        def put_in_point(id_, idx):
-            etree.SubElement(param_assoc,
-                             'dim',
-                             {'origin': 'RAS',
-                              'id': id_}).text = str(xyz[idx])
+        def put_in_points(ids, values):
+            for id_, value in zip(ids, values):
+                etree.SubElement(param_assoc,
+                                 'dim',
+                                 {'origin': 'RAS',
+                                  'id': id_}).text = str(value)
 
-        for idx, id_ in enumerate(['x', 'y', 'z']):
-            put_in_point(id_, idx)
+        put_in_points(['x', 'y', 'z'], xyz)
+        put_in_points(['x_percent', 'y_percent', 'z_percent'], xyz_percents)
+
 
     def add_parameter(self, param_id, param_value):
         """
