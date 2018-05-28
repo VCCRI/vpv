@@ -806,6 +806,7 @@ class Vpv(QtCore.QObject):
             # Load any other volumes in the zip. Probably will be mutants
             mutants = [join(td.name, x) for x in files_remaining if x.endswith('nrrd')]
             self.load_volumes(mutants, 'vol', memory_map=False)
+
             if not intensity_fdr_thresh:
                 common.info_dialog(self.mainwindow, "No hits",
                                    "There are no hits in the intensity heatmap. The threshold is set to max")
