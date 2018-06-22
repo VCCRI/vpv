@@ -189,7 +189,7 @@ class Vpv(QtCore.QObject):
         try:
             vol_hover_voxel_value = vol.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
             if vol_hover_voxel_value > 10:
-                print(10)
+                pass
         except IndexError:
             pass
         else:
