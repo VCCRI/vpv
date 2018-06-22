@@ -153,7 +153,7 @@ class VolumeAnnotations(object):
     def _load_options_and_metadata(self):
         """
         The volume has been loaded. Now see if there is an associated annotation folder that will contain the IMPC
-        metadata parameter file. Also load in any partially completed xml fannotation files
+        metadata parameter file. Also load in any partially completed xml annotation files
 
         Returns
         -------
@@ -163,6 +163,7 @@ class VolumeAnnotations(object):
             return
 
         self.metadata_parameter_file = join(self.annotation_dir, PROCEDURE_METADATA)
+        
         if not isfile(self.metadata_parameter_file):
             self.metadata_parameter_file = None
             return
@@ -182,21 +183,25 @@ class VolumeAnnotations(object):
         # Get the procedure parameters for the given center/stage
         center_stage_default_params = cso['centers'][center_id]['stages'][stage_id]['parameters']
 
-        for _, stage_params in center_stage_default_params.items():
+        for _, param_info in center_stage_default_params.items():
 
-            options = centre_stage_options.opts['available_options'][stage_params['options']]
-            default = stage_params['default_option']
+            try:
+                options = centre_stage_options.opts['available_options'][param_info['options']]
+            except TypeError as e:
+                print('Falied to laod annotation parameter file {}'.format(e))
+                return
+            default = param_info['default_option']
 
             self.add_impc_annotation(None,
                                      None,
                                      None,
-                                     stage_params['impc_id'],
-                                     stage_params['name'],
+                                     param_info['impc_id'],
+                                     param_info['name'],
                                      options,
                                      default,
                                      self.stage,
-                                     stage_params['order'],
-                                     stage_params['mandatory'],
+                                     param_info['order'],
+                                     param_info['mandatory'],
                                      self.dims
                                      )
         # Sort the list and set the interator index
@@ -272,13 +277,30 @@ class CenterStageOptions(object):
                 opts['centers'][center]['stages'][stage_id]['parameters'] = self.load_centre_stage_file(stage_file)
 
     def load_centre_stage_file(self, yaml_name):
+        """
+        Load in centrer-specific annotation parameter list
+        Parameters
+        ----------
+        yaml_name: str
+            basename of annotation parameter file
+
+        Returns
+        -------
+        dict
+
+
+        """
         path = join(OPTIONS_DIR, yaml_name)
         opts = load_yaml(path)
-        # Now add the IMPC as key insterad of useless param_1, param_2 etc
+
+        # Rename the param_1, param_2 keys with IMPC parameter key
         renamed = {}
+
         for k in list(opts['parameters']):
-            new_key =  opts['parameters'][k]['impc_id']
+
+            new_key = opts['parameters'][k]['impc_id']
             renamed[new_key] = opts['parameters'][k]
+
         opts['parameters'] = renamed
         return opts['parameters']
 

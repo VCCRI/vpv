@@ -150,6 +150,11 @@ class InformationOverlay(QtGui.QWidget):
                 indx += 1
         self.adjustSize()
 
+    def clear(self):
+        for k, v in self.labels_active.items():
+            self.labels_active[k] = ""
+        self.update()
+
 
 class RoiOverlay(object):
     # This controls the blob finder bounding box roi?? rename
@@ -546,6 +551,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         return flip_x, flip_y, flip_z
 
     def clear_layers(self):
+        self.overlay.clear()
         for layer in self.layers.items():
             layer[1].clear()
             #layer[1].clear()

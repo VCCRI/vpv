@@ -114,8 +114,9 @@ class DataModel(QtCore.QObject):
             vol.set_interpolation(onoff)
 
     def clear_data(self):
-        for key in self._volumes.keys():
-            self._volumes[key].destroy()
+        keys = list(self._volumes.keys())
+        for k in keys:
+            del self._volumes[k]
         self._volumes = {}
         self._data = {}
 
@@ -136,21 +137,24 @@ class DataModel(QtCore.QObject):
 
     def getvol(self, id_):
         # bodge. should merge vols and data, as they have unique ids
-
+        vol = None
         if id_ == 'None':
             return 'None'
         try:
             vol = self._volumes[id_]
         except KeyError:
             pass
-        try:
-            vol = self._data[id_]
-        except KeyError:
-            pass
-        try:
-            vol = self._vectors[id_]
-        except KeyError:
-            pass  # Need to do something else here, like logging
+
+        if not vol:
+            try:
+                vol = self._data[id_]
+            except KeyError:
+                pass
+        if not vol:
+            try:
+                vol = self._vectors[id_]
+            except KeyError:
+                return "None"  # Need to do something else here, like logging
         return vol
 
     def getdata(self, id_):

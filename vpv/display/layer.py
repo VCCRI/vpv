@@ -35,8 +35,17 @@ class Layer(Qt.QObject):
         self.opacity = 1.0
 
     def clear(self):
+        """
+        To clear the pg.imageitem set the slice to all zeros
+        Returns
+        -------
+
+        """
         slice_ = np.copy(self.image_item.image)
-        slice_[:] = 0
+        try:
+            slice_[:] = 0
+        except IndexError:
+            return
         self.image_item.setImage(slice_)
 
     def update(self, auto_levels=False):
@@ -62,7 +71,7 @@ class Layer(Qt.QObject):
         :param vol, Volume object from model.py
         """
 
-        if volname == "None":
+        if volname == "None" or volname is None:
             self.volume_label_signal.emit("None")
             self.clear()  # This clears the image
             self.vol = None
@@ -103,6 +112,8 @@ class Layer(Qt.QObject):
                 print(e)
 
     def set_series_slider(self):
+        if not self.vol or self. vol == 'None':
+            return
         if self.vol.data_type == 'series':
             num_vols_in_series = len(self.vol.images)
             self.parent.ui.seriesSlider.setRange(0, num_vols_in_series - 1)

@@ -434,10 +434,3 @@ parameters:
     options: 0 
     default_option: present 
     mandatory: yes 
-  param62:
-    name: Oedema
-    order: 62
-    impc_id: IMPC_EMO_172_001
-    options: 1 
-    default_option: "no" 
-    mandatory: no 

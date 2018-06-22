@@ -166,10 +166,10 @@ class Vpv(QtCore.QObject):
 
         self.annotation_radius_changed(self.appdata.annotation_circle_radius)
 
-
     def on_slice_view_mouse_move(self, x: int, y: int, z: int, src_view: SliceWidget):
         """
-        Given coordinates of mouse hover position, do ....
+        Given coordinates of mouse hover position, emit signals to update the voxel value indicators.
+        If shitf key is pressed, activaye sunchronised viewing
         Parameters
         ----------
         src_view: the emitting slice widget
@@ -188,6 +188,8 @@ class Vpv(QtCore.QObject):
 
         try:
             vol_hover_voxel_value = vol.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
+            if vol_hover_voxel_value > 10:
+                print(10)
         except IndexError:
             pass
         else:
@@ -573,10 +575,10 @@ class Vpv(QtCore.QObject):
         self.model.clear_data()
         for view in self.views.values():
             view.clear_layers()
-        self.data.clear()
+        self.data_manager.clear()
         self.annotations_manager.clear()
         self.any_data_loaded = False
-        self.update()
+        # self.update()
 
     def virtual_stack_callback(self, file_paths, last_dir):
         if len(file_paths) > 0:
