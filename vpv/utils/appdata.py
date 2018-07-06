@@ -54,8 +54,13 @@ class AppData(object):
 
         # Appdata versioning was not always in place. If a we find some appdata without a version, reset the data
         # Also reset the data if we find a previous version
-        if self.app_data.get('version') is None or self.app_data['version'] < VPV_APPDATA_VERSION:
-            print("resetting appdata")
+
+        # This breaks for JIm on v2.02. Complains about NoneType not having a get(). Catch attribute error
+        try:
+            if self.app_data.get('version') is None or self.app_data['version'] < VPV_APPDATA_VERSION:
+                print("resetting appdata")
+                self.app_data = {}
+        except AttributeError:
             self.app_data = {}
 
         if self.app_data == {}:
