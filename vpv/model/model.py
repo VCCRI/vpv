@@ -23,9 +23,7 @@ import os
 import tempfile
 from PIL import Image
 from PyQt5 import QtCore
-import json
-from vpv.lib.addict import Dict
-from vpv.common import Stage, AnnotationOption, read_image, get_stage_from_proc_id, load_yaml
+from vpv.common import read_image, get_stage_from_proc_id, error_dialog
 from vpv.annotations.impc_xml import load_xml
 from vpv.annotations.annotations_model import centre_stage_options, PROCEDURE_METADATA, ANNOTATION_DONE_METADATA_FILE
 
@@ -185,12 +183,18 @@ class DataModel(QtCore.QObject):
 
         """
         # Load in data from xml
-        centerID, pipeline, project, doe, ex_id, spec_id, proc_id, \
-        simple_and_series_params, procedure_metadata = load_xml(ann_path)
+        try:
+            centerID, pipeline, project, doe, ex_id, spec_id, proc_id, \
+            simple_and_series_params, procedure_metadata = load_xml(ann_path)
+        except IOError as e:
+            print("Cannot read xml file {}\n".format(ann_path, e))
+            error_dialog(None, 'File read error', "Problem reading annotaitons file\n{}".format(ann_path))
+            return
 
         # try to find a corresponding procedure_metadata.yaml file
         ann_dir = os.path.split(ann_path)[0]
         procedure_metadata_file = os.path.join(ann_dir, PROCEDURE_METADATA)
+
         if not os.path.isfile(procedure_metadata_file):
             vol = None  # Should also check if annotation options have been loaded
         else:

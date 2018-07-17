@@ -182,7 +182,12 @@ def load_xml(xml_file):
     """
     Reads in a manual annotation xml file
     """
-    root = etree.parse(xml_file)
+
+    try:
+        root = etree.parse(xml_file)
+    except (etree.XMLSyntaxError, IOError) as e:
+        raise IOError(e.msg)
+
     root = strip_ns_prefix(root)
 
     simple_params = addict.Dict()

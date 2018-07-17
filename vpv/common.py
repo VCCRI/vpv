@@ -1,10 +1,12 @@
 from PyQt5.QtWidgets import QMessageBox
 from enum import Enum
+from inspect import getframeinfo, stack
 import SimpleITK as sitk
 import tempfile
 import gzip
 from os.path import splitext, dirname, realpath, join
 import yaml
+import appdirs
 
 
 
@@ -20,6 +22,12 @@ generic_anatomy_label_map_path = join(resources_dir, 'generic_anatomy.csv')
 
 ANNOTATIONS_PROC_VERSION = "IMPC_EMO_002"
 
+log_path = join(appdirs.user_data_dir(), 'vpv', 'vpv.log')
+
+
+def get_fname_and_line_number():
+    caller = getframeinfo(stack()[1][0])
+    return caller.filename, caller.lineno
 
 def get_stage_from_proc_id(proc_id: str, center_id: dict):
     """

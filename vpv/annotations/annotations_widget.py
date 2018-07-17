@@ -17,6 +17,7 @@ from vpv.annotations.annotations_model import centre_stage_options
 from vpv.annotations import impc_xml
 from functools import partial
 import re
+import logging
 
 
 SCRIPT_DIR = dirname(abspath(__file__))
@@ -440,9 +441,13 @@ class AnnotationsWidget(QWidget):
 
 def get_increment(dir_):
     """
-    Bedore saving xml annotation, look through the folder that we are saving to to see if there are already
+    Bedore saving xml annotation, look through the folder that we are saving to, and see if there are already
     annoatations present. If there is, we presume it's from the same line, so we should increment the
-    value
+    value.
+
+    Notes
+    -----
+    I don't think this will be needed as each specimen has it's annotation in a seperate folder
 
     Parameters
     ----------
@@ -460,7 +465,7 @@ def get_increment(dir_):
             try:
                 int(res.group(1))
             except ValueError:
-                print('Cannot get increment value from fname')
+                logging.error('Cannot get increment value from fname')
                 return None
             else:
                 return int(res.group(1))

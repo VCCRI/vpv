@@ -29,6 +29,13 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
     key_up_down_signal= QtCore.pyqtSignal(bool)
 
     def __init__(self, controller, appdata):
+        """
+
+        Parameters
+        ----------
+        controller: vpv.vpv
+        appdata
+        """
 
         super(Mainwindow, self).__init__()
         self.ui = Ui_MainWindow()
@@ -58,11 +65,6 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.view_fullscreen_action.setChecked(False)
         self.view_fullscreen_action.triggered.connect(self.on_view_full_screen)
         view_menu.addAction(self.view_fullscreen_action)
-
-        # self.view_newcreen_action = QtGui.QAction('New screen', view_menu, checkable=False)
-        # self.view_newcreen_action.setChecked(False)
-        # self.view_newcreen_action.triggered.connect(self.controller.second_window_visibility)
-        # view_menu.addAction(self.view_newcreen_action)
 
         self.view_slider_action = QtGui.QAction('Sliders', view_menu, checkable=True)
         self.view_slider_action.setChecked(True)
@@ -102,9 +104,9 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.clear_data_action.triggered.connect(self.controller.clear_views)
         data_menu.addAction(self.clear_data_action)
 
-        # self.stats_action = QtGui.QAction('Statistics', data_menu, checkable=False)
-        # self.stats_action.triggered.connect(self.controller.stats)
-        # data_menu.addAction(self.stats_action)
+        self.show_log_action = QtGui.QAction('Show log', data_menu, checkable=False)
+        self.show_log_action.triggered.connect(self.controller.show_log)
+        data_menu.addAction(self.show_log_action)
 
         self.recent_menu.addAction('Clear')
         for r in self.appdata.get_recent_files():

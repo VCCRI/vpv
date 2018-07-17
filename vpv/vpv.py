@@ -27,6 +27,7 @@ PYTHON_DIR = 'python-3.6.3.amd64'
 
 import os
 import sys
+import logging
 from os.path import join, isdir
 p = sys.path
 
@@ -35,11 +36,13 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 from vpv import common
 from vpv.ui.controllers import importer
 
+from vpv.ui.controllers import log_viewer
+
 try:
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
 except AttributeError:
-    print("High DPI scling not available. QT >=5.6 is needed for this ")
+    logging.info("High DPI scling not available. QT >=5.6 is needed for this ")
 
 if os.name == 'nt':
     # check where vpv has been installed
@@ -53,12 +56,12 @@ if os.name == 'nt':
         sys.path.insert(0, lib_path)
         sys.path.insert(0, site_packages_path)
     else:
-        print('cannot find winpython folder: {}'.format(winpython_path))
+        logging('cannot find winpython folder: {}'.format(winpython_path))
 
 from vpv.ui.controllers.dock_widget_manager import ManagerDockWidget
 from vpv.model.model import DataModel
 from vpv.utils.appdata import AppData
-from vpv.common import Orientation, Layers
+from vpv.common import Orientation, Layers, log_path, error_dialog
 from vpv.display.slice_view_widget import SliceWidget
 from vpv.ui.controllers.data_manager import ManageData
 from vpv.ui.controllers.options_tab import OptionsTab
@@ -70,10 +73,10 @@ try:
     from vpv.ui.controllers.console import Console
     console_imported = True
 except ImportError:
-    print('cannot import qtconsole, so diabling console widget tab')
+    logging.info('cannot import qtconsole, so diabling console widget tab')
     console_imported = False
 except Exception:  # I thnk it might not be an ImportError? look into it
-    print('cannot import qtconsole, so diabling console widget tab')
+    logging.info('cannot import qtconsole, so diabling console widget tab')
     console_imported = False
 
 
@@ -165,6 +168,13 @@ class Vpv(QtCore.QObject):
         self.options_tab.set_orientations()
 
         self.annotation_radius_changed(self.appdata.annotation_circle_radius)
+
+    def show_log(self):
+        """
+        Show the log in a scrossable window
+        """
+
+        log_viewer.Logview(self.mainwindow, log_path)
 
     def on_slice_view_mouse_move(self, x: int, y: int, z: int, src_view: SliceWidget):
         """
@@ -289,7 +299,6 @@ class Vpv(QtCore.QObject):
         return self.current_view.layers[Layers.vol1].vol
 
     def on_console_enter_pressesd(self):
-        print('command update')
         self.update_slice_views()
 
     def take_screen_shot(self):
@@ -376,7 +385,6 @@ class Vpv(QtCore.QObject):
         self.ge = GradientEditor(self)
         self.ge.sigFinished.connect(self.set_heatmap_luts)
         self.ge.show()
-        print('gradient in vpv')
 
     def set_heatmap_luts(self, luts):
         for view in self.views.values():
@@ -608,7 +616,7 @@ class Vpv(QtCore.QObject):
                 # view.display[Layer.vol1].update()  # This should make sure 16bit images are scaled correctly at loading?
                 view.update_view()
         except IndexError:  # No Volume objects have been loaded
-            print('No volumes loaded')
+            logging.warn('No volumes loaded')
 
         try:  # See if we have any Data objects loaded
             init_vol = self.model.data_id_list()[0]

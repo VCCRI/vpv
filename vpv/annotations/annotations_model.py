@@ -1,4 +1,5 @@
 import os
+import logging
 from os.path import join, dirname, abspath
 import yaml
 from vpv.common import get_stage_from_proc_id, load_yaml, ANNOTATIONS_PROC_VERSION
@@ -145,7 +146,7 @@ class VolumeAnnotations(object):
                 done = done_status.get(ann.term, 'notpresent')
 
                 if done is 'notpresent':
-                    print('Cannot find term in done metadata\n{}'.format(done_file))
+                    logging.warning('Cannot find term in done metadata\n{}'.format(done_file))
 
                 else:
                     ann.looked_at = done
@@ -188,7 +189,7 @@ class VolumeAnnotations(object):
             try:
                 options = centre_stage_options.opts['available_options'][param_info['options']]
             except TypeError as e:
-                print('Falied to laod annotation parameter file {}'.format(e))
+                logging.error('Falied to load annotation parameter file {}'.format(e))
                 return
             default = param_info['default_option']
 
@@ -265,7 +266,7 @@ class CenterStageOptions(object):
         try:
             opts = load_yaml(OPTIONS_CONFIG_PATH)
         except OSError:
-            print('could not open the annotations yaml file {}'.format(OPTIONS_CONFIG_PATH))
+            logging.warning('could not open the annotations yaml file {}'.format(OPTIONS_CONFIG_PATH))
             raise
         self.opts = opts
         self.available_options = self.opts['available_options']
