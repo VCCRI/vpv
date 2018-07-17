@@ -15,8 +15,8 @@ class Logview(QDialog):
         try:
             with open(log_file, 'r') as fh:
                 lines = fh.readlines()
-        except IOError as e:
-            error_dialog(self.mainwindow, "Cannot open logfile")
+        except (IOError, FileNotFoundError) as e:
+            error_dialog(parent, "Cannot open logfile", log_file)
             return
 
         self.log_text = ''.join(lines)

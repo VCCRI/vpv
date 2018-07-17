@@ -104,10 +104,6 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.clear_data_action.triggered.connect(self.controller.clear_views)
         data_menu.addAction(self.clear_data_action)
 
-        self.show_log_action = QtGui.QAction('Show log', data_menu, checkable=False)
-        self.show_log_action.triggered.connect(self.controller.show_log)
-        data_menu.addAction(self.show_log_action)
-
         self.recent_menu.addAction('Clear')
         for r in self.appdata.get_recent_files():
             self.recent_menu.addAction(r)
@@ -121,6 +117,10 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.window_title_action = QtGui.QAction('Edit Window title', info_menu, checkable=False)
         self.window_title_action.triggered.connect(self.edit_window_title)
         info_menu.addAction(self.window_title_action)
+
+        self.show_log_action = QtGui.QAction('Show log', data_menu, checkable=False)
+        self.show_log_action.triggered.connect(self.controller.show_log)
+        info_menu.addAction(self.show_log_action)
 
         menubar.addMenu(info_menu)
         menubar.addMenu(view_menu)
