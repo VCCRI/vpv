@@ -6,6 +6,7 @@ import sys
 from vpv.common import log_path
 
 if sys.version_info[0] < 3:
+    logging.warning("VPV must me run with Python3. Exiting")
     sys.exit("VPV must me run with Python3. Exiting")
 
 from PyQt5 import QtGui

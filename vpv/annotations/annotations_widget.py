@@ -212,6 +212,7 @@ class AnnotationsWidget(QWidget):
         header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
 
+        # For each annotation set a an info row in the annotations table
         for i, ann in enumerate(sorted(vol.annotations, key=lambda an_: an_.order)):
 
             child = QTreeWidgetItem(parent)
@@ -221,13 +222,16 @@ class AnnotationsWidget(QWidget):
             # color = OPTION_COLOR_MAP[option]
             parent.addChild(child)
 
-            # Set up the combobox and highlight the currently selected one
+            # Set up the parameter option combobox and highlight the currently selected one
             box = QComboBox()
             box.setSizeAdjustPolicy(QComboBox.AdjustToContents)
             for opt in ann.options:
                 box.addItem(opt)
 
-            box.setCurrentIndex(box.findText(option))
+            try:
+                box.setCurrentIndex(box.findText(option))
+            except TypeError:
+                print('oogh')
             # Setup combobox selection signal
             setup_option_box_signal(box, child)
             self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)

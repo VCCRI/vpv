@@ -654,7 +654,7 @@ class Vpv(QtCore.QObject):
             self.load_annotations(annotations) # From importer
 
         self.appdata.set_last_dir_browsed(last_dir)
-        self._auto_load_annotations(volumes)  # infered from directory structure
+        self._auto_load_annotations(volumes)
 
         if self.dock_widget.isVisible():
             self.data_manager.update()
@@ -675,7 +675,7 @@ class Vpv(QtCore.QObject):
             if not ann_dir:
                 return
             if not isdir(ann_dir):
-                print("{}, is not a valid annotaiton directory")
+                logging.info("{}, is not a valid annotaiton directory".format(ann_dir))
                 continue
 
             ann_files = os.listdir(ann_dir)
