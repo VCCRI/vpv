@@ -4,7 +4,8 @@ from inspect import getframeinfo, stack
 import SimpleITK as sitk
 import tempfile
 import gzip
-from os.path import splitext, dirname, realpath, join
+from os.path import splitext, dirname, realpath, join, isdir
+from os import mkdir
 import yaml
 import appdirs
 
@@ -22,7 +23,11 @@ generic_anatomy_label_map_path = join(resources_dir, 'generic_anatomy.csv')
 
 ANNOTATIONS_PROC_VERSION = "IMPC_EMO_002"
 
-log_path = join(appdirs.user_data_dir(), 'vpv', 'vpv.log')
+log_dir = appdirs.user_data_dir(appname='vpv', appauthor="")
+if not isdir(log_dir):
+    mkdir(log_dir)
+
+log_path = join(log_dir, 'vpv.log')
 
 
 def get_fname_and_line_number():

@@ -56,7 +56,7 @@ if os.name == 'nt':
         sys.path.insert(0, lib_path)
         sys.path.insert(0, site_packages_path)
     else:
-        logging('cannot find winpython folder: {}'.format(winpython_path))
+        logging.info('cannot find winpython folder: {}'.format(winpython_path))
 
 from vpv.ui.controllers.dock_widget_manager import ManagerDockWidget
 from vpv.model.model import DataModel
