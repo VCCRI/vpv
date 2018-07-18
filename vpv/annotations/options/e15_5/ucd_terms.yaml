@@ -880,7 +880,7 @@ parameters:
     order: 125
     impc_id: IMPC_EMO_172_001
     options: 1 
-    default_option: no 
+    default_option: no
     mandatory: no 
   param126:
     name: physiological umbilical hernia morphology

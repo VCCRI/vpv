@@ -2,7 +2,7 @@ import os
 import logging
 from os.path import join, dirname, abspath
 import yaml
-from vpv.common import get_stage_from_proc_id, load_yaml, ANNOTATIONS_PROC_VERSION
+from vpv.common import get_stage_from_proc_id, load_yaml, ANNOTATIONS_PROC_VERSION, error_dialog
 from os.path import splitext, isfile, isdir
 
 SCRIPT_DIR = dirname(abspath(__file__))
@@ -79,10 +79,9 @@ class ImpcAnnotation(Annotation):
         # self.category = category
 
 
-class VolumeAnnotations(object):
+class SpecimenAnnotations(object):
     """
-    Associated with a single Volume instance
-    Holds coordinates, ontological term, and option associated with manual annotations
+    Associated with a single Volume (specimen)
     
     For testing we're just doing the E15.5 stage. We will have to have multiple stages later and there will need
     to be some way of only allowing one stage of annotation per volume
@@ -191,6 +190,18 @@ class VolumeAnnotations(object):
             except TypeError as e:
                 logging.error('Falied to load annotation parameter file {}'.format(e))
                 return
+
+            if param_info['default_option'] not in options:
+
+                logging.error(
+                    """Annotation parameter list load error
+                    default option: {} not in available options:{}
+                    Centre:, stage:{}""".format(param_info['default_option'], options, center_id, stage_id))
+
+                error_dialog(None, 'Annotation options load error', "See log file - 'info/show log'")
+                return
+
+
             default = param_info['default_option']
 
             self.add_impc_annotation(None,

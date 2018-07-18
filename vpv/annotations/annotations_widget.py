@@ -1,8 +1,7 @@
 """
 A widget to display the manual annotations in the annotations tab of the data manager.
 Works something like this:
-- When a model.Volume is loaded the available terms from model.Volume.Annotations is loaded. When first run, these 
-    should all be set to 'imageOnly'
+- When a model.Volume is loaded the available terms from model.Volume.Annotations is loaded.
 - ...
 
 """
@@ -228,10 +227,8 @@ class AnnotationsWidget(QWidget):
             for opt in ann.options:
                 box.addItem(opt)
 
-            try:
-                box.setCurrentIndex(box.findText(option))
-            except TypeError:
-                print('oogh')
+            box.setCurrentIndex(box.findText(option))
+
             # Setup combobox selection signal
             setup_option_box_signal(box, child)
             self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)
@@ -358,7 +355,7 @@ class AnnotationsWidget(QWidget):
     def update_annotation(self, child: QTreeWidgetItem, cbox: QComboBox):
         """
         On getting a change signal from the parameter option combobox, set options on the volume.annotations object
-        Also set the selected row to acrtive
+        Also set the selected row to active
 
         Parameters
         ----------

@@ -86,6 +86,8 @@ import zipfile
 from vpv.lib import addict
 import tempfile
 import csv
+import logging.config
+from vpv.common import log_path
 
 
 class Vpv(QtCore.QObject):
@@ -101,6 +103,9 @@ class Vpv(QtCore.QObject):
 
     def __init__(self):
         super(Vpv, self).__init__()
+
+        y = 7/'9'
+
         self.voxel_size = 28.0
         self.view_scale_basrs = False
         self.view_id_counter = 0
