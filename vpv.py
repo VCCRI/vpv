@@ -22,6 +22,7 @@ def excepthook_overide(exctype, value, traceback_):
     logging.exception("""{} VPV encountered an uncaught erorr {}\n. Please email this log file to bit@har.mrc.ac.uk
     {}\n{}\n{}""".format('#' * 10, '#' * 10, exctype, value,
                          ''.join(traceback.format_tb(traceback_))))
+    print(exctype, value, ''.join(traceback.format_tb(traceback_)))
 
 if __name__ == '__main__':
 

@@ -36,6 +36,9 @@ class Ui_Dialog(object):
         self.horizontalLayout_2.addWidget(self.pushButtonCopyText)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem)
+        self.pushButtonClearLog = QtWidgets.QPushButton(self.scrollAreaWidgetContents)
+        self.pushButtonClearLog.setObjectName("pushButtonClearLog")
+        self.horizontalLayout_2.addWidget(self.pushButtonClearLog)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.horizontalLayout.addWidget(self.scrollArea)
@@ -48,4 +51,5 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.pushButtonClose.setText(_translate("Dialog", "close"))
         self.pushButtonCopyText.setText(_translate("Dialog", "copy text"))
+        self.pushButtonClearLog.setText(_translate("Dialog", "clear log"))
 
