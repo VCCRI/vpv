@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_datatab.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -122,6 +122,10 @@ class Ui_data(object):
         self.verticalLayout_5.addLayout(self.verticalLayout_9)
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.labelNewVersion = QtWidgets.QLabel(data)
+        self.labelNewVersion.setText("")
+        self.labelNewVersion.setObjectName("labelNewVersion")
+        self.horizontalLayout_4.addWidget(self.labelNewVersion)
         self.verticalLayout_5.addLayout(self.horizontalLayout_4)
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
@@ -221,7 +225,6 @@ class Ui_data(object):
         self.vol2ControlsWidget.setMinimumSize(QtCore.QSize(300, 80))
         self.vol2ControlsWidget.setObjectName("vol2ControlsWidget")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.vol2ControlsWidget)
-        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.layoutVolume2 = QtWidgets.QVBoxLayout()
         self.layoutVolume2.setObjectName("layoutVolume2")
@@ -296,7 +299,6 @@ class Ui_data(object):
         self.dataWidget.setMinimumSize(QtCore.QSize(0, 170))
         self.dataWidget.setObjectName("dataWidget")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.dataWidget)
-        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
         self.verticalLayout_8 = QtWidgets.QVBoxLayout()
         self.verticalLayout_8.setObjectName("verticalLayout_8")
@@ -382,7 +384,6 @@ class Ui_data(object):
         self.vectorWidget.setMinimumSize(QtCore.QSize(0, 100))
         self.vectorWidget.setObjectName("vectorWidget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.vectorWidget)
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.comboBoxVectors = QtWidgets.QComboBox(self.vectorWidget)
         self.comboBoxVectors.setObjectName("comboBoxVectors")

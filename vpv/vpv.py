@@ -68,6 +68,8 @@ from vpv.ui.controllers.options_tab import OptionsTab
 from vpv.annotations.annotations_widget import AnnotationsWidget
 from vpv.model.coordinate_mapper import Coordinate_mapper
 from vpv.ui.controllers import main_window
+from vpv.utils import github
+
 
 try:
     from vpv.ui.controllers.console import Console
@@ -88,6 +90,7 @@ import tempfile
 import csv
 import logging.config
 from vpv.common import log_path
+
 
 
 class Vpv(QtCore.QObject):
@@ -171,6 +174,22 @@ class Vpv(QtCore.QObject):
         self.options_tab.set_orientations()
 
         self.annotation_radius_changed(self.appdata.annotation_circle_radius)
+
+        self.check_vpv_version()
+
+    def check_vpv_version(self):
+        """
+        Check the mpi2 github page for new versions
+        If newer version available, set the link in a label on the data manager tab
+        """
+        # Catch all exceptions as we don't want this to cause problems for the rest of the app
+        try:
+            new_version = github.get_latest_github_version()
+        except Exception:
+            return
+
+        if new_version:
+            self.data_manager.ui.labelNewVersion.setText('New verion available\n{}'.format(new_version))
 
     def show_log(self):
         """
