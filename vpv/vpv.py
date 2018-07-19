@@ -207,6 +207,10 @@ class Vpv(QtCore.QObject):
         src_view: the emitting slice widget
 
         """
+        # x = 217
+        # y = 323
+        # z = 775
+
 
         vol = src_view.main_volume
         hm = src_view.heatmap_volume
@@ -217,7 +221,9 @@ class Vpv(QtCore.QObject):
 
         # map to the volume space
         vol_points = self.mapper.view_to_volume(x, y, z, src_view.orientation, src_view.main_volume.shape_xyz())
-
+        print(vol_points)
+        self.mainwindow.set_mouse_position_indicator(*vol_points)
+        # Get the values of the voxels underneath the mouse pointer
         try:
             vol_hover_voxel_value = vol.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
             if vol_hover_voxel_value > 10:
@@ -227,7 +233,6 @@ class Vpv(QtCore.QObject):
         else:
             if x > 0 and x > 0:
                 self.volume_pixel_signal.emit(round(float(vol_hover_voxel_value), 2))
-                self.mainwindow.set_mouse_position(*vol_points)
                 if hm:
                     hm_hover_voxel_value = hm.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
                     self.heatmap_pixel_signal.emit((round(float(hm_hover_voxel_value), 4)))
@@ -468,7 +473,7 @@ class Vpv(QtCore.QObject):
         except TypeError:
             pass #Todo: Another bodge. If there are no views that are axial we have a problem
         else:
-            self.mainwindow.set_mouse_position(z1, y1, x1)
+            self.mainwindow.set_mouse_position_indicator(z1, y1, x1)
 
     def toggle_dock_widget_visibility(self):
         if self.dock_widget.isVisible():

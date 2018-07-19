@@ -19,7 +19,7 @@
 import os
 from vpv import _version
 from PyQt5 import QtGui, QtCore, QtWidgets
-from vpv.ui.views.ui_main import Ui_MainWindow
+from vpv.ui.views.ui_main_window import Ui_MainWindow
 from vpv.common import style_sheet_path
 
 
@@ -169,7 +169,7 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def on_action_show_scale_bars(self, checked):
         self.controller.show_scale_bars(checked)
 
-    def set_mouse_position(self, x, y, z):
+    def set_mouse_position_indicator(self, x, y, z):
         self.mouse_position_label.setText("x:{} y:{} z:{}".format(x, y, z))
 
     def set_volume_pix_intensity(self, value):
