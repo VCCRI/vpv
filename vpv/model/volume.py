@@ -105,7 +105,9 @@ class Volume(Qt.QObject):
 
     def get_data(self, orientation, index=0, flipx=False, flipz=False, flipy=False, xy=None):
         """
-        Get a 2D slice given the index and orthogonal orientation. Optioanlly return the slice flipped in x
+        Get a 2D slice given the index and orthogonal orientation. Optionally return the slice flipped in x
+        if xy specified, return just a single pixel value
+
         Parameters
         ----------
         orientation: Orientation
@@ -123,8 +125,6 @@ class Volume(Qt.QObject):
         np.ndarry 2D
 
         """
-        if xy:
-            pass # for debug
         if orientation == Orientation.sagittal:
             return self._get_sagittal(index, flipx, flipz, flipy, xy=xy)
         if orientation == Orientation.coronal:
@@ -162,7 +162,7 @@ class Volume(Qt.QObject):
         if flipx:
             slice_ = np.fliplr(slice_)
         if xy:
-            y, x = xy
+            x, y = xy
             slice_ = slice_[y, x]
         return slice_.T
 
@@ -175,7 +175,7 @@ class Volume(Qt.QObject):
         if flipx:
             slice_ = np.fliplr(slice_)
         if xy:
-            y, x = xy
+            x, y = xy
             slice_ = slice_[y, x]
         return slice_.T
 
@@ -188,7 +188,7 @@ class Volume(Qt.QObject):
         if flipx:
             slice_ = np.fliplr(slice_)
         if xy:
-            y, x = xy
+            x, y = xy
             slice_ = slice_[y, x]
         return slice_.T
 

@@ -137,7 +137,7 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.volume_pix_val_label = QtGui.QLabel(self)
         self.volume_pix_val_label.setStyleSheet("QLabel {color : white; }")
         self.volume_pix_val_label.setFixedWidth(100)
-        self.volume_pix_val_label.hide()  # for version 2.0.2, disable as it's showing incorrect value. put back to .show()
+        # self.volume_pix_val_label.hide()  # for version 2.0.2, disable as it's showing incorrect value. put back to .show()
         self.ui.toolBar.addWidget(self.volume_pix_val_label)
 
         self.data_pix_val_label = QtGui.QLabel(self)

@@ -207,13 +207,10 @@ class Vpv(QtCore.QObject):
         src_view: the emitting slice widget
 
         """
-        # x = 217
-        # y = 323
-        # z = 775
-
 
         vol = src_view.main_volume
         hm = src_view.heatmap_volume
+
         if not vol:
             return
         if any(i < 0 for i in (x, y, z)):
@@ -221,13 +218,11 @@ class Vpv(QtCore.QObject):
 
         # map to the volume space
         vol_points = self.mapper.view_to_volume(x, y, z, src_view.orientation, src_view.main_volume.shape_xyz())
-        print(vol_points)
+
         self.mainwindow.set_mouse_position_indicator(*vol_points)
         # Get the values of the voxels underneath the mouse pointer
         try:
             vol_hover_voxel_value = vol.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
-            if vol_hover_voxel_value > 10:
-                pass
         except IndexError:
             pass
         else:
