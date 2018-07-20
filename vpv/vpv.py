@@ -451,25 +451,6 @@ class Vpv(QtCore.QObject):
         self.views[id_] = view
         return view
 
-    def mouse_position_slot(self, z: int, y: int, x: int, src_view: SliceWidget):
-        """
-        On mouse hover get the coordinates of the cursor and map to normal (axial coordinates)
-        Set the coordinates on the mainwindow
-        Parameters
-        ----------
-        z: int
-        y: int
-        x: int
-        src_view: SliceWidget
-        """
-
-        try:
-            x1, y1, z1 = self.mapper.view_to_volume(x, y, z, src_view.orientation, src_view.main_volume.shape_xyz())
-        except TypeError:
-            pass #Todo: Another bodge. If there are no views that are axial we have a problem
-        else:
-            self.mainwindow.set_mouse_position_indicator(z1, y1, x1)
-
     def toggle_dock_widget_visibility(self):
         if self.dock_widget.isVisible():
             self.dock_widget.hide()
