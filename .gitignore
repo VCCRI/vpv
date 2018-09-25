@@ -3,3 +3,4 @@ tests/stats/*
 .idea/*
 *.pyc
 windows_build/*
+mypy_cache/**
