@@ -155,6 +155,15 @@ class AnnotationsWidget(QWidget):
         self.annotation_highlight_signal.emit(ann.x, ann.y, ann.z, [0, 255, 0], self.appdata.annotation_circle_radius)
 
     def activate_tab(self):  # Change function name
+        """
+        Called when the annotations tab is selcted.
+
+        Make sure all views are of the same specimen and poulate terms based on the metadata associated with the annotations object
+
+        Returns
+        -------
+
+        """
 
         vol = self.controller.current_annotation_volume()
 
@@ -190,9 +199,9 @@ class AnnotationsWidget(QWidget):
             """
             Connect the Qcombobox to a slot
             """
-            box.activated.connect(partial(self.update_annotation, child_, box_))
+            box_.activated.connect(partial(self.update_annotation, child_, box_))
             # Setup signal so when combobox is only opened, it sets the selection to that column
-            box.highlighted.connect(partial(self.on_box_highlight, child))
+            box_.highlighted.connect(partial(self.on_box_highlight, child))
 
         header_labels = QTreeWidgetItem(['', 'term', 'name', 'option', 'done?'])
 
@@ -211,7 +220,7 @@ class AnnotationsWidget(QWidget):
         header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
 
-        # For each annotation set a an info row in the annotations table
+        # For each annotation set an info row in the annotations table
         for i, ann in enumerate(sorted(vol.annotations, key=lambda an_: an_.order)):
 
             child = QTreeWidgetItem(parent)
@@ -222,16 +231,17 @@ class AnnotationsWidget(QWidget):
             parent.addChild(child)
 
             # Set up the parameter option combobox and highlight the currently selected one
-            box = QComboBox()
-            box.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-            for opt in ann.options:
-                box.addItem(opt)
+            options_box = QComboBox()
+            options_box.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-            box.setCurrentIndex(box.findText(option))
+            for opt in ann.options:
+                options_box.addItem(opt)
+
+            options_box.setCurrentIndex(options_box.findText(option))  # 060818  Louise's bug option is a bool not a str
 
             # Setup combobox selection signal
-            setup_option_box_signal(box, child)
-            self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, box)
+            setup_option_box_signal(options_box, child)
+            self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, options_box)
 
             done_checkbox = QtWidgets.QCheckBox()
             done_checkbox.setChecked(ann.looked_at)
@@ -325,19 +335,29 @@ class AnnotationsWidget(QWidget):
             info_dialog(self, 'Success', 'Annotation files saved:{}'.format(sf_str))
 
     def volume_changed(self, vol_id: str):
-        stage = self.ui.lineEditStage.text()
-        center = self.ui.lineEditCentre.text()
+        """
+        When a a new volume is selected within the annotations tab
+
+        Parameters
+        ----------
+        vol_id:
+            The volume id
+        """
+
+        # stage = self.ui.lineEditStage.text()
+        # center = self.ui.lineEditCentre.text()
 
         self.controller.volume_changed(vol_id)
         vol = self.controller.current_annotation_volume()
-        if vol:
-            if (stage and not stage.isspace()) and (center and not center.isspace()):
-                if (len(vol.annotations) == 0) or not all((vol.annotations.center, vol.annotations.stage)):
-                    # Setting the stage and center will force the loading of default annotations
-                    vol.annotations.center = center
-                    vol.annotations.stage = stage
-            # if not vol.annotations:
-            #     vol.annotations._load_annotations()
+
+        # if vol:
+        #     if (stage and not stage.isspace()) and (center and not center.isspace()):
+        #         if (len(vol.annotations) == 0) or not all((vol.annotations.center, vol.annotations.stage)):
+        #             # Setting the stage and center will force the loading of default annotations
+        #             vol.annotations.center = center
+        #             vol.annotations.stage = stage
+        #     # if not vol.annotations:
+        #     #     vol.annotations._load_annotations()
         self.update()
         self.populate_available_terms()
 

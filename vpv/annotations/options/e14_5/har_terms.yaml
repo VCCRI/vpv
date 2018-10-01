@@ -26,7 +26,7 @@ parameters:
     order: 3
     impc_id: IMPC_EMO_172_001
     options: 1 
-    default_option: imageOnly 
+    default_option: "no" 
     mandatory: no 
   param4:
     name: Vibrissa

@@ -584,32 +584,36 @@ class ManageData(QtGui.QWidget):
 
             self.ui.comboBoxData.setCurrentIndex(self.ui.comboBoxData.findText(vol.name))
 
-            if pos_upper > 0.0:
-                self.data_levels_positive_slider.setEnabled(True)
-                self.data_levels_positive_slider.setMin(pos_min_nonzero)
-                self.data_levels_positive_slider.setMax(max_)
-                self.data_levels_positive_slider.setStart(pos_lower)
-                self.data_levels_positive_slider.setEnd(pos_upper)
-                self.data_levels_positive_slider.update()
-                pos_bg = 'background: qlineargradient(x1: 0, x2: 1,stop: 0 #222222, stop: 0.5 #FF0000, stop: 1.0 #FFFFFF  );'
-                self.data_levels_positive_slider.handle.setStyleSheet(pos_bg)
-            else:  # no positive values, set to grey
-                self.data_levels_positive_slider.setEnabled(False)
-                pos_bg = 'background: qlineargradient(x1: 0.2, x2: 1,stop: 0 #ADADAD, stop: 1  #ADADAD);'
-                self.data_levels_positive_slider.handle.setStyleSheet(pos_bg)
-            if neg_lower < 0.0:
-                self.data_levels_negative_slider.setEnabled(True)
-                self.data_levels_negative_slider.setMin(min_)
-                self.data_levels_negative_slider.setMax(neg_min_nonzero)
-                self.data_levels_negative_slider.setStart(neg_lower)
-                self.data_levels_negative_slider.setEnd(neg_upper)
-                self.data_levels_negative_slider.update()
-                neg_bg = 'background: qlineargradient(x1: 0, x2: 1,stop: 0 #FFFFFF, stop: 0.5  #0000FF, stop: 1 #222222);'
-                self.data_levels_negative_slider.handle.setStyleSheet(neg_bg)
-            else:  # no negative values, set to grey
-                self.data_levels_negative_slider.setEnabled(False)
-                neg_bg = 'background: qlineargradient(x1: 0.2, x2: 1,stop: 0 #ADADAD, stop: 1  #ADADAD);'
-                self.data_levels_negative_slider.handle.setStyleSheet(neg_bg)
+            try:
+                if pos_upper > 0.0:
+                    self.data_levels_positive_slider.setEnabled(True)
+                    self.data_levels_positive_slider.setMin(pos_min_nonzero)
+                    self.data_levels_positive_slider.setMax(max_)
+                    self.data_levels_positive_slider.setStart(pos_lower)
+                    self.data_levels_positive_slider.setEnd(pos_upper)
+                    self.data_levels_positive_slider.update()
+                    pos_bg = 'background: qlineargradient(x1: 0, x2: 1,stop: 0 #222222, stop: 0.5 #FF0000, stop: 1.0 #FFFFFF  );'
+                    self.data_levels_positive_slider.handle.setStyleSheet(pos_bg)
+                else:  # no positive values, set to grey
+                    self.data_levels_positive_slider.setEnabled(False)
+                    pos_bg = 'background: qlineargradient(x1: 0.2, x2: 1,stop: 0 #ADADAD, stop: 1  #ADADAD);'
+                    self.data_levels_positive_slider.handle.setStyleSheet(pos_bg)
+                if neg_lower < 0.0:
+                    self.data_levels_negative_slider.setEnabled(True)
+                    self.data_levels_negative_slider.setMin(min_)
+                    self.data_levels_negative_slider.setMax(neg_min_nonzero)
+                    self.data_levels_negative_slider.setStart(neg_lower)
+                    self.data_levels_negative_slider.setEnd(neg_upper)
+                    self.data_levels_negative_slider.update()
+                    neg_bg = 'background: qlineargradient(x1: 0, x2: 1,stop: 0 #FFFFFF, stop: 0.5  #0000FF, stop: 1 #222222);'
+                    self.data_levels_negative_slider.handle.setStyleSheet(neg_bg)
+                else:  # no negative values, set to grey
+                    self.data_levels_negative_slider.setEnabled(False)
+                    neg_bg = 'background: qlineargradient(x1: 0.2, x2: 1,stop: 0 #ADADAD, stop: 1  #ADADAD);'
+                    self.data_levels_negative_slider.handle.setStyleSheet(neg_bg)
+            except TypeError:
+                # The slider is raising a type error. Not sure why at the moment
+                print('Slider error')
             self.update_color_scale_bar()
             self.ui.doubleSpinBoxNegThresh.setValue(neg_upper)
             self.ui.doubleSpinBoxPosThresh.setValue(pos_lower)

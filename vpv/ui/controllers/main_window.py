@@ -143,7 +143,6 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.data_pix_val_label = QtGui.QLabel(self)
         self.data_pix_val_label.setStyleSheet("QLabel {color : white; }")
         self.data_pix_val_label.setFixedWidth(100)
-        self.data_pix_val_label.hide()  # for version 2.0.2, disable as it's showing incorrect value
         self.ui.toolBar.addWidget(self.data_pix_val_label)
 
         self.ui.toolBar.setMinimumHeight(30)
