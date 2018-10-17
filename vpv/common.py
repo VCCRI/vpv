@@ -7,6 +7,7 @@ import gzip
 from os.path import splitext, dirname, realpath, join, isdir
 from os import mkdir
 import yaml
+import logging
 import appdirs
 
 
@@ -57,10 +58,26 @@ def get_stage_from_proc_id(proc_id: str, center_id: dict):
     elif 'EMP' in proc_id:
         return 'e18.5'  # Not sure this is correct. Look up. For now only using E15.5
 
+
 def load_yaml(path):
     with open(path, 'r') as fh:
-        yaml_data = yaml.load(fh)
+
+        try:
+            yaml_data = yaml.load(fh)
+
+        except yaml.YAMLError as e:
+            fh.seek(0)
+
+            err_str = "The yaml file {} seems to be in the incorrect format\n" \
+                      "###### Yaml file contents ######\n" \
+                      "{}\n" \
+                      "###### End of yaml file ######\n".format(path, "\n".join([x for x in fh.readlines()]))
+
+            logging.error(err_str)
+            return None
+
     return yaml_data
+
 
 def info_dialog(parent, title, msg):
     QMessageBox.information(parent, title, msg, QMessageBox.Ok)

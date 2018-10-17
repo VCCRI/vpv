@@ -20,6 +20,8 @@ import yaml
 from os.path import expanduser
 import os
 import collections
+from vpv import common
+import logging
 
 VPV_APPDATA_VERSION = 2.2
 ANNOTATION_CRICLE_RADIUS_DEFAULT = 40
@@ -43,11 +45,10 @@ class AppData(object):
         self.app_data_file = os.path.join(appdata_dir, 'vpv.yaml')
 
         if os.path.isfile(self.app_data_file):
-            try:
-                with open(self.app_data_file, 'r') as fh:
-                    self.app_data = yaml.load(fh)
-            except Exception as e:
-                print('Warning: could not load app data file')
+
+            self.app_data = common.load_yaml(self.app_data_file)
+            if not self.app_data:
+                logging('Warning: could not load app data file')
                 self.app_data = {}
         else:
             self.app_data = {}

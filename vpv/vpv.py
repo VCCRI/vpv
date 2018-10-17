@@ -101,6 +101,7 @@ class Vpv(QtCore.QObject):
     crosshair_visible_signal = QtCore.pyqtSignal()
     crosshair_invisible_signal = QtCore.pyqtSignal()
     volume_pixel_signal = QtCore.pyqtSignal(float)
+    volume2_pixel_signal = QtCore.pyqtSignal(float)
     heatmap_pixel_signal = QtCore.pyqtSignal(float)
     volume_position_signal = QtCore.pyqtSignal(int, int, int)
 
@@ -132,6 +133,7 @@ class Vpv(QtCore.QObject):
         self.mainwindow.key_up_down_signal.connect(self.annotations_manager.sroll_annotations)
 
         self.volume_pixel_signal.connect(self.mainwindow.set_volume_pix_intensity)
+        self.volume2_pixel_signal.connect(self.mainwindow.set_volume2_pix_intensity)
         self.heatmap_pixel_signal.connect(self.mainwindow.set_data_pix_intensity)
 
         self.options_tab = OptionsTab(self.mainwindow, self.appdata)
@@ -209,6 +211,7 @@ class Vpv(QtCore.QObject):
         """
 
         vol = src_view.main_volume
+        vol2 = src_view.secondary_volume
         hm = src_view.heatmap_volume
 
         if not vol:
@@ -228,6 +231,9 @@ class Vpv(QtCore.QObject):
         else:
             if x > 0 and x > 0:
                 self.volume_pixel_signal.emit(round(float(vol_hover_voxel_value), 2))
+                if vol2:
+                    vol2_hover_voxel_value = vol2.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
+                    self.volume2_pixel_signal.emit((round(float(vol2_hover_voxel_value), 4)))
                 if hm:
                     hm_hover_voxel_value = hm.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
                     self.heatmap_pixel_signal.emit((round(float(hm_hover_voxel_value), 4)))

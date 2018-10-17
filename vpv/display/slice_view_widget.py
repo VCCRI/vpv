@@ -400,6 +400,17 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         return self.layers[Layers.vol1].vol
 
     @property
+    def secondary_volume(self) -> ImageVolume:
+        """
+        Wrapper to get volume associated with the first layer
+        Returns
+        -------
+        Volume
+
+        """
+        return self.layers[Layers.vol2].vol
+
+    @property
     def heatmap_volume(self):
         """
         Wrapper to get volume associated with the second layer

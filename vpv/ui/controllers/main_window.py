@@ -137,8 +137,12 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.volume_pix_val_label = QtGui.QLabel(self)
         self.volume_pix_val_label.setStyleSheet("QLabel {color : white; }")
         self.volume_pix_val_label.setFixedWidth(100)
-        # self.volume_pix_val_label.hide()  # for version 2.0.2, disable as it's showing incorrect value. put back to .show()
         self.ui.toolBar.addWidget(self.volume_pix_val_label)
+
+        self.volume2_pix_val_label = QtGui.QLabel(self)
+        self.volume2_pix_val_label.setStyleSheet("QLabel {color : white; }")
+        self.volume2_pix_val_label.setFixedWidth(100)
+        self.ui.toolBar.addWidget(self.volume2_pix_val_label)
 
         self.data_pix_val_label = QtGui.QLabel(self)
         self.data_pix_val_label.setStyleSheet("QLabel {color : white; }")
@@ -172,10 +176,13 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.mouse_position_label.setText("x:{} y:{} z:{}".format(x, y, z))
 
     def set_volume_pix_intensity(self, value):
-        self.volume_pix_val_label.setText('vol:{}  '.format(value))
+        self.volume_pix_val_label.setText('vol: {}  '.format(value))
+
+    def set_volume2_pix_intensity(self, value):
+        self.volume2_pix_val_label.setText('vol2: {}  '.format(value))
 
     def set_data_pix_intensity(self, value):
-        self.data_pix_val_label.setText('data:{}  '.format(value))
+        self.data_pix_val_label.setText('data: {}  '.format(value))
 
     def on_recent_menu(self, action):
         if action.text() == 'Clear':

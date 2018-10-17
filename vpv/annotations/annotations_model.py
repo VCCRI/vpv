@@ -2,7 +2,7 @@ import os
 import logging
 from os.path import join, dirname, abspath
 import yaml
-from vpv.common import get_stage_from_proc_id, load_yaml, ANNOTATIONS_PROC_VERSION, error_dialog
+from vpv.common import get_stage_from_proc_id, load_yaml, ANNOTATIONS_PROC_VERSION, error_dialog, load_yaml
 from os.path import splitext, isfile, isdir
 
 SCRIPT_DIR = dirname(abspath(__file__))
@@ -134,10 +134,10 @@ class SpecimenAnnotations(object):
             done_file = join(self.annotation_dir, ANNOTATION_DONE_METADATA_FILE)
             if not isfile(done_file):
                 return
-            with open(done_file, 'r') as fh:
-                done_status = yaml.load(fh)
-                if not done_status:
-                    return
+
+            done_status = load_yaml(done_file)
+            if not done_status:
+                return
 
             self.index = len(self.annotations)  # bodge. Need to reset the annotations iterator
 
@@ -170,15 +170,17 @@ class SpecimenAnnotations(object):
 
         cso = centre_stage_options.opts
 
-        with open(self.metadata_parameter_file, 'r') as fh:
-            metadata_params = yaml.load(fh)
-            # proc_id = metadata_params['procedure_id']
-            proc_id = metadata_params['procedure_id'] = ANNOTATIONS_PROC_VERSION
-            center_id = metadata_params['centre_id']
-            stage_id = get_stage_from_proc_id(proc_id, center_id)
+        metadata_params = load_yaml(self.metadata_parameter_file)
+        if not metadata_params:
+            return
 
-            self.stage = stage_id
-            self.center = center_id
+        # proc_id = metadata_params['procedure_id']
+        proc_id = metadata_params['procedure_id'] = ANNOTATIONS_PROC_VERSION
+        center_id = metadata_params['centre_id']
+        stage_id = get_stage_from_proc_id(proc_id, center_id)
+
+        self.stage = stage_id
+        self.center = center_id
 
         # Get the procedure parameters for the given center/stage
         center_stage_default_params = cso['centers'][center_id]['stages'][stage_id]['parameters']
