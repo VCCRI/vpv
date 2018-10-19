@@ -219,7 +219,7 @@ class Import(QDialog):
                     impc_analysis.append(self.ui.table.item(row, 0).data(QtCore.Qt.UserRole))
 
         self.callback(volumes, datafiles, annotations, vector_files, image_series, impc_analysis,
-        self.last_dir, self.ui.checkBoxMemoryMap.isChecked())
+        self.last_dir, self.ui.checkBoxMemoryMap.isChecked(), self.ui.checkBoxDistrbute.isChecked())
 
         self.close()
 

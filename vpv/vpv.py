@@ -635,7 +635,7 @@ class Vpv(QtCore.QObject):
             pass
 
     def importer_callback(self, volumes, heatmaps, annotations, vector_files, image_series,
-                          impc_analysis, last_dir, memory_map=False):
+                          impc_analysis, last_dir, memory_map=False, distribute:bool=False):
         """
         Recieves a list of files to open from the Importer widget
 
@@ -668,6 +668,35 @@ class Vpv(QtCore.QObject):
         if self.dock_widget.isVisible():
             self.data_manager.update()
             self.annotations_manager.update()
+
+        if distribute:
+            self.distribute_volumes_across_views()
+
+    def distribute_volumes_across_views(self):
+        """
+        Wen loading a volume, the same volume is loaded into into Slice view .
+        This method tries to distribute amongs the views and set sets them to all the same orientation
+
+        """
+        # Get the available volumes
+        vol_list = self.model.volume_id_list()
+
+        if len(vol_list) < 2:
+            return
+
+        else:
+            for i, view in self.views.items():
+                view.layers[Layers.vol1].set_volume(vol_list[i])
+                view.set_orientation(Orientation.sagittal)
+                if len(vol_list) < 4:
+                    if i >= 2:
+                        return
+                else:
+                    if i >= 5:
+                        self.data_manager.show2Rows(True)
+                        return
+
+
 
     def _auto_load_annotations(self, volumes):
         """

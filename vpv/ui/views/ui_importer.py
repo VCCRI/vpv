@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_importer.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(854, 373)
+        Dialog.resize(997, 370)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -23,9 +23,19 @@ class Ui_Dialog(object):
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.pushButtonChooseFile = QtWidgets.QPushButton(Dialog)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pushButtonChooseFile.sizePolicy().hasHeightForWidth())
+        self.pushButtonChooseFile.setSizePolicy(sizePolicy)
         self.pushButtonChooseFile.setObjectName("pushButtonChooseFile")
         self.horizontalLayout.addWidget(self.pushButtonChooseFile)
         self.pushButtonChoseDir = QtWidgets.QPushButton(Dialog)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pushButtonChoseDir.sizePolicy().hasHeightForWidth())
+        self.pushButtonChoseDir.setSizePolicy(sizePolicy)
         self.pushButtonChoseDir.setObjectName("pushButtonChoseDir")
         self.horizontalLayout.addWidget(self.pushButtonChoseDir)
         self.checkBoxMemoryMap = QtWidgets.QCheckBox(Dialog)
@@ -35,6 +45,9 @@ class Ui_Dialog(object):
         self.checkBoxAllSameType = QtWidgets.QCheckBox(Dialog)
         self.checkBoxAllSameType.setObjectName("checkBoxAllSameType")
         self.horizontalLayout.addWidget(self.checkBoxAllSameType)
+        self.checkBoxDistrbute = QtWidgets.QCheckBox(Dialog)
+        self.checkBoxDistrbute.setObjectName("checkBoxDistrbute")
+        self.horizontalLayout.addWidget(self.checkBoxDistrbute)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -44,7 +57,6 @@ class Ui_Dialog(object):
         self.virtualStackWidget.setMinimumSize(QtCore.QSize(0, 130))
         self.virtualStackWidget.setObjectName("virtualStackWidget")
         self.gridLayout = QtWidgets.QGridLayout(self.virtualStackWidget)
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
         self.label = QtWidgets.QLabel(self.virtualStackWidget)
         self.label.setObjectName("label")
@@ -134,6 +146,7 @@ class Ui_Dialog(object):
         self.pushButtonChoseDir.setText(_translate("Dialog", "Load stack of 2D slices"))
         self.checkBoxMemoryMap.setText(_translate("Dialog", "memory map volumes"))
         self.checkBoxAllSameType.setText(_translate("Dialog", "All same type?"))
+        self.checkBoxDistrbute.setText(_translate("Dialog", "distribute across views"))
         self.label.setText(_translate("Dialog", "Filename contains (eg:.   .tiff)"))
         self.label_2.setText(_translate("Dialog", "Filename does not contain (eg: spr.tif, rec.tif)"))
         self.pushButtonFilter.setText(_translate("Dialog", "Filter"))

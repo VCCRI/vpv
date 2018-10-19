@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>854</width>
-    <height>373</height>
+    <width>997</width>
+    <height>370</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -30,6 +30,12 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="pushButtonChooseFile">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>Choose files</string>
        </property>
@@ -37,6 +43,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButtonChoseDir">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>Load stack of 2D slices</string>
        </property>
@@ -56,6 +68,13 @@
       <widget class="QCheckBox" name="checkBoxAllSameType">
        <property name="text">
         <string>All same type?</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkBoxDistrbute">
+       <property name="text">
+        <string>distribute across views</string>
        </property>
       </widget>
      </item>
