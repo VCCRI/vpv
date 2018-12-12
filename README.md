@@ -25,4 +25,4 @@ Make sure "Volume" is selected for the image and "Data" is selected for the over
 
 ![Import image](docs/import_volume.png)
 
-Take a look at the [vpv wiki](../wiki)
+Take a look at the [vpv wiki](../../wiki)
