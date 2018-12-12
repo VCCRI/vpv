@@ -32,7 +32,6 @@ from os.path import join, isdir
 p = sys.path
 
 from PyQt5 import QtGui, QtCore, QtWidgets
-
 from vpv import common
 from vpv.ui.controllers import importer
 
@@ -42,7 +41,7 @@ try:
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
 except AttributeError:
-    logging.info("High DPI scling not available. QT >=5.6 is needed for this ")
+    logging.info("High DPI scaling not available. QT >=5.6 is needed for this ")
 
 if os.name == 'nt':
     # check where vpv has been installed
@@ -74,8 +73,8 @@ from vpv.utils import github
 try:
     from vpv.ui.controllers.console import Console
     console_imported = True
-except ImportError:
-    logging.info('cannot import qtconsole, so diabling console widget tab')
+except ImportError as e:
+    logging.info('cannot import qtconsole, so diabling console widget tab\n{e}')
     console_imported = False
 except Exception:  # I thnk it might not be an ImportError? look into it
     logging.info('cannot import qtconsole, so diabling console widget tab')
@@ -674,7 +673,7 @@ class Vpv(QtCore.QObject):
 
     def distribute_volumes_across_views(self):
         """
-        Wen loading a volume, the same volume is loaded into into Slice view .
+        When loading a volume, the same volume is loaded into into Slice view .
         This method tries to distribute amongs the views and set sets them to all the same orientation
 
         """

@@ -1,7 +1,11 @@
 
-from ui.ui_consoletab import Ui_console
+from vpv.ui.views.ui_consoletab import Ui_console
 from PyQt5 import QtCore, QtGui
 # from pyqtgraph import console
+from vpv.common import Layers
+import skimage
+import scipy
+import SimpleITK as sitk
 
 
 
@@ -41,7 +45,7 @@ class Console(QWidget):
         pass
 
     def current_volume(self):
-        return self.vpv.current_view.layers[0].vol._arr_data
+        return self.vpv.current_view.layers[Layers.vol1]
 
     def volume_ids(self):
         return self.vpv.model.volume_id_list()
@@ -50,7 +54,6 @@ class Console(QWidget):
         return self.vpv.model.getvol(id_)._arr_data
 
     def keyPressEvent(self, event):
-        print
         if event.key() == QtCore.Qt.Key_Enter:
             print('event')
             self.vpv.on_console_enter_pressesd()
@@ -88,10 +91,11 @@ class QIPythonWidget(RichJupyterWidget):
         """ Prints some plain text to the console """
         self._append_plain_text(text)
 
-    def executeCommand(self, command):
-        """ Execute a command in the frame of the console widget """
-
-        self._execute(command, False)
+    # def executeCommand(self, command):
+    #     """ Execute a command in the frame of the console widget """
+    #
+    #     a = self._execute(command, False)
+    #     print(a)
 
 
 class ExampleWidget(QWidget):
@@ -112,8 +116,7 @@ class ExampleWidget(QWidget):
         """)
 
     def keyPressEvent(self, event):
-        print
-        if event.key() == QtCore.Qt.Key_Enter:
+        if event.key() == QtCore.Qt.Key_Return:
             print('event')
             self.parent.on_console_enter_pressesd
 
