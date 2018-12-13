@@ -45,7 +45,7 @@ Or get python3 ([For example Anaconda](https://www.anaconda.com/download/#window
 Drag and drop an image to overlay the stats onto (population average for example) and the t-statistics overlay
 Make sure "Volume" is selected for the image and "Data" is selected for the overlay in the import dialog
 
-![Import image](docs/import_volume.png)
+![Import image](/vpv/docs/import_volume.png)
 
 Take a look at the [vpv wiki](../../wiki)
 
