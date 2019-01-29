@@ -1,3 +1,4 @@
+from typing import Tuple
 from lxml import etree
 import yaml
 from vpv.lib import addict
@@ -178,7 +179,7 @@ def load_metadata(yaml_path):
     return data
 
 
-def load_xml(xml_file):
+def load_xml(xml_file) -> Tuple:
     """
     Reads in a manual annotation xml file
     """

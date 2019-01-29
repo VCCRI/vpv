@@ -2,7 +2,7 @@ import os
 import logging
 from os.path import join, dirname, abspath
 import yaml
-from vpv.common import get_stage_from_proc_id, load_yaml, ANNOTATIONS_PROC_VERSION, error_dialog, load_yaml
+from vpv.common import get_stage_from_proc_id, ANNOTATIONS_PROC_VERSION, error_dialog, load_yaml
 from os.path import splitext, isfile, isdir
 
 SCRIPT_DIR = dirname(abspath(__file__))

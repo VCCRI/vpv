@@ -42,8 +42,8 @@ class Import(QDialog):
         self.virtual_stack_callback = virtual_stack_callback
 
         # Connect up the buttons for movin gthe rows around
-        self.ui.pushButtonUp.clicked.connect(self.move_up)
-        self.ui.pushButtonDown.clicked.connect(self.move_down)
+        # self.ui.pushButtonUp.clicked.connect(self.move_up)
+        # self.ui.pushButtonDown.clicked.connect(self.move_down)
 
         # Setup signals
         self.ui.pushButtonCancel.clicked.connect(self.on_cancel)
@@ -291,12 +291,12 @@ class Import(QDialog):
         self.ui.table.resizeColumnsToContents()
         table_width = self.ui.table.horizontalHeader().length()
         self.setFixedWidth(table_width + 43)
-
         # As a bodge to get the last browsed dir, get the path of the first file in the list
         try:
             self.set_last_dir(os.path.split(files_to_open[0]))[0]
         except:
             pass
+
 
     def populate_table_for_virtual_stack(self):
         filelist = sorted(set(self.vs_file_list).difference(self.vs_file_list_to_ignore))

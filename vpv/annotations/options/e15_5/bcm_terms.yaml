@@ -364,3 +364,17 @@ parameters:
     options: 0 
     default_option: present 
     mandatory: yes 
+  param52:
+    name: Oedema
+    order: 52
+    impc_id: IMPC_EMO_172_001
+    options: 1 
+    default_option: no 
+    mandatory: yes 
+  param53:
+    name: Right lung cranial lobe
+    order: 53
+    impc_id: IMPC_EMO_093_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
