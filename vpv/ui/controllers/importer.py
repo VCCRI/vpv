@@ -55,8 +55,12 @@ class Import(QDialog):
         self.ui.virtualStackWidget.hide()
         self.ui.pushButtonFilter.clicked.connect(self.filter_virtual_stack)
 
+        # Setup folder filtering
+        self.ui.lineEditFolderFilter.editingFinished.connect(self.set_folder_filter_pattern)
+
         # Create the table
         self.files_to_open = []
+        self.folder_include_pattern = None
 
         self.vs_file_list = []
         self.vs_file_list_to_ignore = set()
@@ -97,6 +101,29 @@ class Import(QDialog):
             self.setWindowTitle("Load image volumes")
 
         self.show()
+
+    def set_folder_filter_pattern(self):
+        """
+        Gets a signal to indicate folder filtering has been specified.
+        Gets the filter pattern an filters the available images accordingly
+        """
+        pattern = self.ui.lineEditFolderFilter.text()
+        self.folder_include_pattern = str(pattern)
+        self.populate_file_list()
+
+    def folder_filter(self, path: str) -> bool:
+        """
+        Filter paths bsed on a string it contains
+        Return True
+        """
+        path = os.path.split(path)[0]
+
+        if not self.folder_include_pattern:
+            return True  # Do no filtering as there's no pattern
+        if self.folder_include_pattern in path:
+            return True # Found pattern in path
+        else:
+            return False
 
     def filter_virtual_stack(self):
         contains_text = self.ui.lineEditFileNameContains.displayText()
@@ -252,26 +279,44 @@ class Import(QDialog):
 
     def populate_file_list(self):
 
+        # Clear table
+        self.ui.table.setRowCount(0)
+
         files_to_open = self.files_to_open
+
         folder_paths = []
         folders_to_remove = []
+
         # If a single directory has been dropped onto vpv
         for path in files_to_open:
             if os.path.isdir(path):
                 folder_paths.extend(self.get_all_filles_in_dir(path))
                 folders_to_remove.append(path)
+
         if len(folder_paths) > 0:
             files_to_open.extend(folder_paths)
+
         for folder in folders_to_remove:
             if folder in files_to_open:
                 files_to_open.remove(folder)
+
+        # Filter based on pattern
+        files_to_open = [x for x in files_to_open if self.folder_filter(x)]
+
         self.ui.table.setRowCount(len(files_to_open))
+
         self.type_combo_boxes = []
 
         for row, item in enumerate(files_to_open):
+
             type_guess = self.guess_type(item)
+
+            if not self.folder_filter(item):
+                continue
+
             if not type_guess:
                 continue
+
             data_path = QtGui.QTableWidgetItem(item)
             data_path.setText(os.path.basename(item))
             data_path.setData(QtCore.Qt.UserRole, item)
@@ -296,7 +341,6 @@ class Import(QDialog):
             self.set_last_dir(os.path.split(files_to_open[0]))[0]
         except:
             pass
-
 
     def populate_table_for_virtual_stack(self):
         filelist = sorted(set(self.vs_file_list).difference(self.vs_file_list_to_ignore))
