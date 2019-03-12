@@ -194,7 +194,7 @@ class Ui_Dialog(object):
         self.pushButtonOK.setText(_translate("Dialog", "OK"))
         self.pushButtonCancel.setText(_translate("Dialog", "Cancel"))
         self.label_3.setToolTip(_translate("Dialog", "Enter foldername (or part) to filter by"))
-        self.label_3.setText(_translate("Dialog", "Folder filter"))
-        self.lineEditFolderFilter.setToolTip(_translate("Dialog", "Enter foldername (or part) to filter by"))
+        self.label_3.setText(_translate("Dialog", "Ffilter"))
+        self.lineEditFolderFilter.setToolTip(_translate("Dialog", "<html><head/><body><p>Enter a search pattern (wuth wild cards *) to filter input images by.</p><p>For example, using pattern \'reg*rig\' would find all images that had prent folderds named registrations/rigid</p></body></html>"))
 
 

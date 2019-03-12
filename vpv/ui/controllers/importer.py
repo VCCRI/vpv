@@ -14,6 +14,7 @@
 #
 #
 # @author Neil Horner <n.horner@har.mrc.ac.uk>
+import re
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QDialog, QMessageBox, QFileDialog
@@ -120,8 +121,12 @@ class Import(QDialog):
 
         if not self.folder_include_pattern:
             return True  # Do no filtering as there's no pattern
-        if self.folder_include_pattern in path:
-            return True # Found pattern in path
+
+        # Replace any asterix in the pattern to '.+' to match anything
+        pattern = self.folder_include_pattern.replace('*', '.+')
+
+        if re.search(pattern, path):
+            return True  # Found pattern in path
         else:
             return False
 

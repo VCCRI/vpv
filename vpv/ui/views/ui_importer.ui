@@ -286,14 +286,14 @@
         <string>Enter foldername (or part) to filter by</string>
        </property>
        <property name="text">
-        <string>Folder filter</string>
+        <string>Ffilter</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QLineEdit" name="lineEditFolderFilter">
        <property name="toolTip">
-        <string>Enter foldername (or part) to filter by</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter a search pattern (wuth wild cards *) to filter input images by.&lt;/p&gt;&lt;p&gt;For example, using pattern 'reg*rig' would find all images that had prent folderds named registrations/rigid&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
