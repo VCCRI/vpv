@@ -2,6 +2,8 @@ from PyQt5.QtWidgets import QMessageBox
 from enum import Enum
 from inspect import getframeinfo, stack
 import SimpleITK as sitk
+import nrrd
+import numpy as np
 import tempfile
 import gzip
 from os.path import splitext, dirname, realpath, join, isdir
@@ -9,6 +11,7 @@ from os import mkdir
 import yaml
 import logging
 import appdirs
+
 
 
 
@@ -153,11 +156,6 @@ class ImageReader(object):
         self.img = sitk.ReadImage(img_path)
         self.space = self.img.GetDirection()
         self.vol = sitk.GetArrayFromImage(self.img)
-        import numpy as np
-        # PyqtGraph displays the views on their sides.
-        # This transormation puts them the right way up and effectively flips the views so that
-        # Axial is the last dimension and sagittal the first
-        # self.vol = np.rot90(self.vol, axes=(0, 2), k=1)
 
 
 def read_image(img_path, convert_to_ras=False):

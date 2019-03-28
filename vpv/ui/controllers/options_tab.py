@@ -43,10 +43,8 @@ class OptionsTab(QtGui.QWidget):
         ]
         self.impc_flip_boxes = [
             self.ui.checkBoxAxialFlipZ,
-            self.ui.checkBoxAxialFlipx,
             self.ui.checkBoxAxialFlipY,
-            self.ui.checkBoxCoronalFlipZ,
-            self.ui.checkBoxCoronalFlipX
+            self.ui.checkBoxCoronalFlipZ
         ]
 
         self.ui.checkBoxImpcView.clicked.connect(self.on_impc_view)

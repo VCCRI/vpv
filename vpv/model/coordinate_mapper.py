@@ -52,7 +52,7 @@ class Coordinate_mapper(object):
         Notes
         -----
 
-        This maps the view coordinates from any view to the noral axial view. Then adds correction for the inverted
+        This maps the view coordinates from any view to the normal axial view. Then adds correction for the inverted
         slice ordering
 
         Problem: If the impc_vie is active the view_to_view() inverts x when mapping between
@@ -67,10 +67,11 @@ class Coordinate_mapper(object):
             dims_order = flip_from_axial_order[src_ori]
             new_dims = [j for _, j in sorted(zip(dims_order, dims), key=lambda pair: pair[0])]
 
+
             if self.flip_info[src_ori.name]['y']:
                 y = new_dims[1] - y
 
-            if self.flip_info[src_ori.name]['x']:
+            if not self.flip_info[src_ori.name]['x']:  # 280319. x is flipped by default in every view for RAS
                 x = new_dims[0] - x
 
             if self.flip_info[src_ori.name]['z']:
@@ -119,7 +120,7 @@ class Coordinate_mapper(object):
         if self.flip_info[dest_ori.name]['y']:
             dest_points[1] = new_dims[1] - dest_points[1]
 
-        if self.flip_info[dest_ori.name]['x']:
+        if not self.flip_info[dest_ori.name]['x']:
             dest_points[0] = new_dims[0] - dest_points[0]
 
         if self.flip_info[dest_ori.name]['z']:

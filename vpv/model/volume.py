@@ -26,6 +26,7 @@ class Volume(Qt.QObject):
         memory_map
         """
         super(Volume, self).__init__()
+        self.space = None
         self.data_type = datatype
         self.name = None
         self.model = model
@@ -40,7 +41,7 @@ class Volume(Qt.QObject):
         self.min = float(self._arr_data.min())
         self.max = float(self._arr_data.max())
         # The coordinate spacing of the input volume
-        self.space = None
+
 
     def shape_xyz(self):
         return tuple(reversed(self._arr_data.shape))
@@ -124,6 +125,11 @@ class Volume(Qt.QObject):
         -------
         np.ndarry 2D
 
+
+        Notes
+        -----
+        get_sagittal, get_axial and get_coronal apply a flip in in x on the 2D slice.
+
         """
         if orientation == Orientation.sagittal:
             return self._get_sagittal(index, flipx, flipz, flipy, xy=xy)
@@ -159,7 +165,7 @@ class Volume(Qt.QObject):
         slice_ = self._arr_data[:, index, :]
         if flipy:
             slice_ = np.flipud(slice_)
-        if flipx:
+        if not flipx:
             slice_ = np.fliplr(slice_)
         if xy:
             x, y = xy
@@ -172,7 +178,7 @@ class Volume(Qt.QObject):
         slice_ = self._arr_data[:, :, index]
         if flipy:
             slice_ = np.flipud(slice_)
-        if flipx:
+        if not flipx:
             slice_ = np.fliplr(slice_)
         if xy:
             x, y = xy
@@ -185,7 +191,7 @@ class Volume(Qt.QObject):
         slice_ = self._arr_data[index, :, :]
         if flipy:
             slice_ = np.flipud(slice_)
-        if flipx:
+        if not flipx:
             slice_ = np.fliplr(slice_)
         if xy:
             x, y = xy
@@ -193,7 +199,6 @@ class Volume(Qt.QObject):
         return slice_.T
 
     def set_lower_level(self, level):
-        #print 'l', level
         self.levels[0] = level
 
     def set_upper_level(self, level):
