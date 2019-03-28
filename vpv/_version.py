@@ -1,4 +1,5 @@
-__version__ = '2.1.0' # Added some checks to the annotation module. Add log viewer
+__version__ = '2.2.0' # Moved to default RAS format. RAS volumes should look the same as in Slicer
+# __version__ = '2.1.0' # Added some checks to the annotation module. Add log viewer
 #__version__ = '2.0.2' # Made changes to Jax and HAr annotation lists. Fixed the clear function a bit
 #__version__ = '2.0.1' # Fixed done checkboxes loading and addict import issue
 # __version__ = '2.0.0' #Lots of annotations changes
