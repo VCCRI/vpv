@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QMessageBox
 from enum import Enum
 from inspect import getframeinfo, stack
 import SimpleITK as sitk
-import nrrd
 import numpy as np
 import tempfile
 import gzip
