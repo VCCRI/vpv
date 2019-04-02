@@ -704,8 +704,6 @@ class Vpv(QtCore.QObject):
                         self.data_manager.show2Rows(True)
                         return
 
-
-
     def _auto_load_annotations(self, volumes):
         """
         Look for previously-written annotation files in  the annotation directory (folder with same name as loaded img)
@@ -717,11 +715,14 @@ class Vpv(QtCore.QObject):
 
         for vol_path in volumes:
 
+            # The annotation dir path will be the same as the image minus the file extension
             ann_dir = os.path.splitext(vol_path)[0]
+
             if not ann_dir:
                 return
+
             if not isdir(ann_dir):
-                logging.info("{}, is not a valid annotaiton directory".format(ann_dir))
+                logging.info("{}, is not a valid annotation directory".format(ann_dir))
                 continue
 
             ann_files = os.listdir(ann_dir)
@@ -731,6 +732,7 @@ class Vpv(QtCore.QObject):
                 if fnmatch.fnmatch(af, '*experiment.impc.xml'):
                     xml_annotation_file = join(ann_dir, af)
                     break
+
             if xml_annotation_file:
                 annotation_xml_files.append(xml_annotation_file)
 
@@ -739,7 +741,7 @@ class Vpv(QtCore.QObject):
 
     def load_annotations(self, annotation_file_list):
         """
-        Load annotations that were previosly saved as xml
+        Load annotations that were previously saved as xml
 
         Parameters
         ----------
@@ -750,7 +752,7 @@ class Vpv(QtCore.QObject):
 
         """
         non_loaded = []
-        for path in annotation_file_list: # At this point looked_at set to True
+        for path in annotation_file_list:  # At this point looked_at set to True
             error = self.model.load_annotation(path)
             if error:
                 non_loaded.append(path)

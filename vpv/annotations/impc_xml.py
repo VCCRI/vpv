@@ -1,12 +1,12 @@
+"""
+Generate an IMPC xml for the manual annotation procedure
+"""
+
 from typing import Tuple
 from lxml import etree
 import yaml
 from vpv.lib import addict
 from vpv.common import ANNOTATIONS_PROC_VERSION
-
-"""
-Generate an IMPC xml submsiion form for the manual annotation procedure
-"""
 
 
 class ExportXML(object):
@@ -14,19 +14,19 @@ class ExportXML(object):
     TODO: project
     """
     def __init__(self,
-                 date_of_annotation,
-                 annotator_id,
-                 metadata
+                 date_of_annotation: str,
+                 annotator_id: str,
+                 metadata: str
                  ):
         """
 
         Parameters
         ----------
-        date_of_annotation: str
+        date_of_annotation
             yyy-mm-dd
-        annotator_id: str
+        annotator_id
             annonymized annotator id
-        metadata: str
+        metadata
             path to procedure_metadata.yaml
         """
 
@@ -36,6 +36,7 @@ class ExportXML(object):
         # Create separate file for each modality
         self.root = etree.Element('centreProcedureSet',
                              xmlns="http://www.mousephenotype.org/dcc/exportlibrary/datastructure/core/procedure")
+
         centre = etree.SubElement(self.root, 'centre', project=md['project'], pipeline=md['pipeline'],
                                   centreID=md['centre_id'])
 

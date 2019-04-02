@@ -111,7 +111,10 @@ class SpecimenAnnotations(object):
         # The developmental stage of the embryo being annotated
         self._stage = None
 
-        self.date_of_annotation = None  # Will be set from the annotation gui_load_done_status
+        # self.date_of_annotation = None  # Will be set from the annotation gui_load_done_status
+        self.saved_xml_fname = None  # Will be set when xml is loaded from file
+
+        self.annotation_date = None
 
         self._load_options_and_metadata()
         # self._load_done_status()
@@ -234,7 +237,8 @@ class SpecimenAnnotations(object):
         # ann.x, ann.y, ann.z = x, y, z
         ann.selected_option = selected_option
 
-    def add_impc_annotation(self, x: int, y:int, z:int, impc_param, name, options, default_option, stage, order, is_mandatory, dims):
+    def add_impc_annotation(self, x: int, y:int, z:int, impc_param, name, options, default_option, stage, order,
+                            is_mandatory, dims):
         """
         Add an emap type annotation from available terms on file
         """

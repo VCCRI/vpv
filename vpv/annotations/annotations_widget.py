@@ -14,9 +14,11 @@ from vpv.ui.views.ui_annotations import Ui_Annotations
 from vpv.common import Layers, AnnotationOption, info_dialog, error_dialog, question_dialog
 from vpv.annotations.annotations_model import centre_stage_options
 from vpv.annotations import impc_xml
+from vpv.model import ImageVolume
 from functools import partial
 import re
 import logging
+from dateutil import parser
 
 
 SCRIPT_DIR = dirname(abspath(__file__))
@@ -283,19 +285,23 @@ class AnnotationsWidget(QWidget):
         saved_file_paths = []
 
         for vol in self.controller.model.all_volumes():
+
             points_for_series_media = []
 
             # The first time an annotation is saved, get the date of annotation and set on volume
             # Next time it's loaded load the original date of annotation
-            if vol.annotations.date_of_annotation:
-                date_of_annotation = vol.annotations.date_of_annotation
+            if vol.annotations.saved_xml_fname:
+                xml_path = vol.annotations.saved_xml_fname
+                date_of_annotation = vol.annotations.annotation_date
+
             else:
                 date_of_annotation = self.ui.dateEdit.date().toString('yyyy-MM-dd')
-                vol.annotations.date_of_annotation = date_of_annotation
+                xml_path = None
 
-            xml_exporter = impc_xml.ExportXML(date_of_annotation,
-                                              annotator_id,
-                                              vol.annotations.metadata_parameter_file)
+            xml_exporter = impc_xml.ExportXML(
+                date_of_annotation,
+                annotator_id,
+                vol.annotations.metadata_parameter_file)
 
             ann = vol.annotations
 
@@ -303,17 +309,17 @@ class AnnotationsWidget(QWidget):
                 xml_exporter.add_parameter(a.term, a.selected_option)
 
                 if all((a.x, a.y, a.z)):
-                    points_for_series_media.append(a) # save as need to add points after simpleParameters
+                    points_for_series_media.append(a)  # save as need to add points after simpleParameters
 
-            xml_dir = vol.annotations.annotation_dir
+            if not xml_path:
+                xml_dir = vol.annotations.annotation_dir
 
-            increment = get_increment(xml_dir)
+                increment = get_increment(xml_dir)
 
-            xml_file_name = "{}.{}.{}.experiment.impc.xml".format(vol.annotations.center,
-                                                             date_of_annotation,
-                                                             increment)
-            xml_path = join(xml_dir, xml_file_name)
-
+                xml_file_name = "{}.{}.{}.experiment.impc.xml".format(vol.annotations.center,
+                                                                      date_of_annotation,
+                                                                      increment)
+                xml_path = join(xml_dir, xml_file_name)
 
             # Add the series media parameter now we have SimpleParameters loaded, so we can add points to it
             xml_exporter.add_series_media_parameter()
@@ -458,6 +464,11 @@ class AnnotationsWidget(QWidget):
             self.ui.comboBoxAnnotationsVolumes.addItems(self.controller.model.volume_id_list())
             self.ui.comboBoxAnnotationsVolumes.addItem("None")
             self.ui.comboBoxAnnotationsVolumes.setCurrentIndex(self.ui.comboBoxAnnotationsVolumes.findText(vol.name))
+
+            if vol.annotations.annotation_date:
+                date = parser.parse(vol.annotations.annotation_date)
+                self.ui.dateEdit.setDate(QtCore.QDate(date.year, date.month, date.day))
+                self.ui.dateEdit.setDisabled(True)
 
 
 def get_increment(dir_):
