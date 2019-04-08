@@ -14,6 +14,7 @@ appdirs = "*"
 pillow = "==2.2.1"
 lxml = "*"
 pyqtgraph = "*"
+toml = "*"
 
 [requires]
 python_version = "3.6"
