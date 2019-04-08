@@ -221,6 +221,93 @@ class AnnotationOverlay(object):
         self.annotation_item = None
 
 
+class OrientationIndicator():
+    """
+    Controls the circle that is overlaid on images to pinpoint manual annotations
+    """
+    def __init__(self, parent):
+
+        self.parent = parent
+        self.top = QLabel('S', parent)
+        self.bottom = QLabel('I', parent)
+        self.left = QLabel('R', parent)
+        self.right = QLabel('L', parent)
+        style_sheet = "color: rgba(255, 171, 0); font-size: 12pt; font-weight: 200;"
+        self.top.setStyleSheet(style_sheet)
+        self.bottom.setStyleSheet(style_sheet)
+        self.right.setStyleSheet(style_sheet)
+        self.left.setStyleSheet(style_sheet)
+
+        self.labels = (self.top, self.right, self.bottom, self.left)
+
+    def set_visibility(self, visibility: bool):
+        for l in self.labels:
+            l.setVisible(visibility)
+
+    def set_position_slot(self):
+        flipx, flipy, _ = self.parent.get_flips()
+
+        if self.parent.orientation == Orientation.axial:
+
+            if flipx:
+                r = 'R'
+                l = 'L'
+            else:
+                r = 'L'
+                l = 'R'
+
+            if flipy:
+                t= 'P'
+                b = 'A'
+            else:
+                t = 'A'
+                b = 'P'
+
+        elif self.parent.orientation == Orientation.sagittal:
+
+            if flipx:
+                r = 'A'
+                l = 'P'
+            else:
+                r = 'P'
+                l = 'A'
+
+            if flipy:
+                t = 'I'
+                b = 'S'
+            else:
+                t = 'S'
+                b = 'I'
+
+        elif self.parent.orientation == Orientation.coronal:
+
+            if flipx:
+                r = 'R'
+                l = 'L'
+            else:
+                r = 'L'
+                l = 'R'
+
+            if flipy:
+                t = 'I'
+                b = 'S'
+            else:
+                t = 'S'
+                b = 'I'
+
+        self.top.setText(t)
+        self.right.setText(r)
+        self.bottom.setText(b)
+        self.left.setText(l)
+
+        geom = self.parent.geometry()
+        self.top.move(geom.width() / 2, 25)
+        self.bottom.move(geom.width() / 2, geom.height() - 50)
+        self.left.move(10, geom.height() / 2)
+        self.right.move(geom.width() - 10, geom.height() / 2)
+
+
+
 class ScaleBar(pg.ScaleBar):
     """
     Pyqtgraph scalebar displayed at bottom of the orthogonal view
@@ -260,9 +347,12 @@ class ScaleBar(pg.ScaleBar):
         self.updateBar()
 
     def updateBar(self):
+
         view = self.parentItem()
         if view is None:
             return
+
+        # Calculate the width of the scalebar
         p1 = view.mapFromViewToItem(self, QtCore.QPointF(0, 0))
         p2 = view.mapFromViewToItem(self, QtCore.QPointF(self.scalebar_size, 0))
         w = (p2-p1).x() / self.voxel_size
@@ -386,7 +476,21 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
         self.layers = self.register_layers()
 
+        self.orientation_indicator = OrientationIndicator(self)
+
         self.show()
+
+    def set_orientation_labels_visiblility(self, visible: bool):
+        self.orientation_indicator.set_visibility(visible)
+
+    def add_box(self):
+        """
+        Testing
+        Returns
+        -------
+
+        """
+        pass
 
     @property
     def main_volume(self) -> ImageVolume:
@@ -441,6 +545,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         Overide the widget resize event. Updates the scale bar. Does not work unless I stick a sleep in there.
         TODO: Work out how to hook into an event after the size of the widget has been set
         """
+        self.orientation_indicator.set_position_slot()
         return
         QtCore.QTimer.singleShot(2000, lambda: self.resized_signal.emit())
 
@@ -783,6 +888,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         self.scalebar.updateBar()
         x, y = self.viewbox.viewRange()
         self.set_zoom(x, y)  # This is the only way I can see to update the scalebar on initial volume being added
+        self.orientation_indicator.set_position_slot()
 
 
         ### Key events ################################################################################################

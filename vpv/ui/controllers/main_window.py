@@ -96,6 +96,11 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.view_perm_crosshair_action.setChecked(False)
         view_menu.addAction(self.view_perm_crosshair_action)
 
+        self.ori_indication_visible_action = QtGui.QAction('Orientation labels', view_menu, checkable=True)
+        self.ori_indication_visible_action.triggered.connect(self.on_action_orientation_labels)
+        self.ori_indication_visible_action.setChecked(True)  # Todo this should be saved in appdata
+        view_menu.addAction(self.ori_indication_visible_action)
+
         self.load_data_action = QtGui.QAction('Load data', data_menu, checkable=False)
         self.load_data_action.triggered.connect(self.controller.browse_files)
         data_menu.addAction(self.load_data_action)
@@ -165,6 +170,9 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def show_manager(self, widget):
         self.manager_layout.addWidget(widget, 0)
+
+    def on_action_orientation_labels(self, checked):
+        self.controller.set_orientation_visibility(checked)
 
     def on_action_show_color_scale_bars(self, checked):
         self.controller.show_color_scale_bars(checked)

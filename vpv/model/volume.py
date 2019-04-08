@@ -95,14 +95,7 @@ class Volume(Qt.QObject):
         self.space = ir.space
         #
         # vol = convert_volume(vol, ir.space)
-
-        if memmap:
-            temp = tempfile.TemporaryFile()
-            m = np.memmap(temp, dtype=vol.dtype, mode='w+', shape=vol.shape)
-            m[:] = vol[:]
-            return m
-        else:
-            return vol
+        return vol
 
     def get_data(self, orientation, index=0, flipx=False, flipz=False, flipy=False, xy=None):
         """

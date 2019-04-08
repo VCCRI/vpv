@@ -178,6 +178,10 @@ class Vpv(QtCore.QObject):
 
         self.check_vpv_version()
 
+    def set_orientation_visibility(self, visible: bool):
+        for view in self.views.values():
+            view.set_orientation_labels_visiblility(visible)
+
     def check_vpv_version(self):
         """
         Check the mpi2 github page for new versions
