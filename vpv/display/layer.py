@@ -10,7 +10,7 @@ class Layer(Qt.QObject):
     def __init__(self, parent, layer_type, model):
         """
         The base class that controls the display of of one layer of data. Is extended to display heatmap data and vector
-        data. The main function is to get data into a pytgraph.ImageItem object which is then
+        data. The main function is to get data into a pytgraph.ImageItem object which is then displayed.
 
         Attributes
         ----------
@@ -33,6 +33,15 @@ class Layer(Qt.QObject):
         self.lt = Lut()
         self.isvisible = True
         self.opacity = 1.0
+        self._show_label = 0  # show all labels to start with (if label layer)
+
+    @property
+    def show_label(self):
+        return self._show_label
+
+    @show_label.setter
+    def show_label(self, label):
+        self._show_label = label
 
     def clear(self):
         """
@@ -106,8 +115,15 @@ class Layer(Qt.QObject):
         if self.vol:
 
             try:
-                self.image_item.setImage(self.vol.get_data(self.parent.orientation, index - 1,
-                                                       flip_x, flip_z, flip_y), autoLevels=False, opacity=opacity)
+                slice_ = self.vol.get_data(self.parent.orientation, index - 1,
+                                                       flip_x, flip_z, flip_y)
+
+                if self._show_label != 0:
+                    slice_ = np.copy(slice_)
+                    slice_[slice_ != self.show_label] = 0
+
+                self.image_item.setImage(slice_, autoLevels=False, opacity=opacity)
+
             except IndexError as e:
                 print(e)
 

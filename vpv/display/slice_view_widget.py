@@ -307,7 +307,6 @@ class OrientationIndicator():
         self.right.move(geom.width() - 10, geom.height() / 2)
 
 
-
 class ScaleBar(pg.ScaleBar):
     """
     Pyqtgraph scalebar displayed at bottom of the orthogonal view
@@ -479,6 +478,14 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         self.orientation_indicator = OrientationIndicator(self)
 
         self.show()
+
+    def filter_label(self, label: int):
+        """
+        On volume2 layers only show label. If 0 show all
+        """
+        l = self.layers[Layers.vol2]
+        l.show_label = label
+        self.update_view()
 
     def set_orientation_labels_visiblility(self, visible: bool):
         self.orientation_indicator.set_visibility(visible)
@@ -720,7 +727,6 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
         # Reset the interpolated slice as sliding through the faster non-interpolated slices
         pass
-
 
     def slice_slider_pressed(self):
         """

@@ -12,6 +12,7 @@ tab widget
 
 class OptionsTab(QtGui.QWidget):
     flip_signal = QtCore.pyqtSignal()
+    filter_label_signal = QtCore.pyqtSignal(int)
 
     def __init__(self, mainwindow, appdata: AppData):
         super(OptionsTab, self).__init__(mainwindow)
@@ -50,6 +51,17 @@ class OptionsTab(QtGui.QWidget):
         self.ui.checkBoxImpcView.clicked.connect(self.on_impc_view)
 
         self.appdata = appdata
+
+        # 080419 testing out filtering by label volumes on layer 2
+        self.ui.lineEditShowLabel.textChanged.connect(self.filter_label)
+
+    def filter_label(self):
+        input_ = self.ui.lineEditShowLabel.text()
+        try:
+            label = int(input_)
+        except (TypeError, ValueError):
+            label = 0 # Reset the filtering
+        self.filter_label_signal.emit(label)
 
     def set_orientations(self):
         """

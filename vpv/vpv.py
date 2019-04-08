@@ -138,6 +138,8 @@ class Vpv(QtCore.QObject):
         self.options_tab = OptionsTab(self.mainwindow, self.appdata)
         self.options_tab.flip_signal.connect(self.update_slice_views)
 
+        self.options_tab.filter_label_signal.connect(self.filter_label)
+
         # Sometimes QT console is a pain to install. If not availale do not make console tab
         if console_imported:
             self.console = Console(self.mainwindow, self)
@@ -177,6 +179,19 @@ class Vpv(QtCore.QObject):
         self.annotation_radius_changed(self.appdata.annotation_circle_radius)
 
         self.check_vpv_version()
+
+    def filter_label(self, label: int):
+        """
+        Recieves a label to show. Pass to slice views
+
+        Parameters
+        ----------
+        label
+            the label number to show
+
+        """
+        for v in self.views.values():
+            v.filter_label(label)
 
     def set_orientation_visibility(self, visible: bool):
         for view in self.views.values():
