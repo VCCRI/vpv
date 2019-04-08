@@ -29,26 +29,57 @@ i3 = vol6.nrrd
 inverted_labels/similarity
 
 """
+import sys
+from pathlib import Path
+from itertools import chain
 
 import toml
+from PyQt5 import QtGui
 
 from vpv.vpv import Vpv
+from vpv.common import Layers
 
 test_file = '/mnt/IMPC_research/neil/E14.5/img_loaders/rik_loader.toml'
 
 config = toml.load(test_file)
 print(config)
 
+vol_dir = Path(config['vol_dir'])
+labels_dir = config['labels_dir']
+
+top = config['top']
+top_specs = [Path(x) for x in top['specimens']]
+top_vols = [x / 'output' / vol_dir / x.name / f'{x.name}.nrrd' for x in top_specs]
+top_labels = [x / 'output' / labels_dir / x.name / f'{x.name}.nrrd' for x in top_specs]
+
+bottom = config['bottom']
+bottom_specs = [Path(x) for x in bottom['specimens']]
+bottom_vols = [x / 'output' / vol_dir / x.name / f'{x.name}.nrrd' for x in bottom_specs]
+
+app = QtGui.QApplication([])
 ex = Vpv()
 
+top_vols.extend(bottom_vols)
 
-vols_to_load = ""
+ex.load_volumes(chain(top_vols, bottom_vols), 'vol')
 
-ex.load_volumes(args.volumes, 'vol')
+#Load the volumes
+for i, v in enumerate(ex.views.values()):
+    vol_id = top_vols[i].stem
+    v.layers[Layers.vol1].set_volume(vol_id)
+
+# load the labels.
+for i, v in enumerate(ex.views.values()):
+    label_id = top_labels[i].stem
+    # If same name as the associated volume, will have (1) suffix
+    if label_id == top_vols[i].stem:
+        label_id = f'{label_id}(1)'
+    v.layers[Layers.vol2].set_volume(label_id)
+
+# Add labels
+# Show two rows
+# Set orientation
+
 # Can't have heatmaps loaded without any volumes loaded first
-if args.heatmaps:
-    ex.load_volumes(args.heatmaps, 'heatmap')
-if args.annotations:
-    ex.load_annotations(args.annotations)
 
 sys.exit(app.exec_())

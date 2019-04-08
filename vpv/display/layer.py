@@ -85,9 +85,12 @@ class Layer(Qt.QObject):
             self.clear()  # This clears the image
             self.vol = None
             return
+
         self.volume_label_signal.emit(volname)
 
         self.vol = self.model.getvol(volname)
+        if not self.vol:
+            print(f'cannot find vol: {volname}')
 
         self.set_series_slider()
 

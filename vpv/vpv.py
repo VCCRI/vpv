@@ -596,14 +596,13 @@ class Vpv(QtCore.QObject):
         importer.Import(self.mainwindow, self.importer_callback, self.virtual_stack_callback, last_dir, self.appdata,
                         files)
 
-
-
     def check_non_ras(self):
 
         for vol in self.model.all_volumes():
             if vol.space != common.RAS_DIRECTIONS:
                 common.info_dialog(self.mainwindow, "Image format warning!",
                                    "At lease one of your loaded volumes is not in RAS format For IMPC annotation enure HARP v2.3.0 or aboave. Or use download data from the DCC")
+                break
 
     def browse_files(self):
         last_dir = self.appdata.get_last_dir_browsed()

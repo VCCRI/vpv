@@ -111,7 +111,7 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.recent_menu.addAction('Clear')
         for r in self.appdata.get_recent_files():
-            self.recent_menu.addAction(r)
+            self.recent_menu.addAction(str(r))
 
         self.recent_menu.triggered.connect(self.on_recent_menu)
 
