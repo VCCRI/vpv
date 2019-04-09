@@ -844,7 +844,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
     def set_orientation(self, orientation: Orientation):
         """
-        Sets the orientation of theis view
+        Sets the orientation of this view. Updates the
 
         Parameters
         ----------
@@ -861,10 +861,12 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         new_orientation_len = self.layers[Layers.vol1].vol.dimension_length(self.orientation)
         self.current_slice_idx = int(new_orientation_len/2)
 
-        for layer in self.all_layers():
-            if layer.vol:
-                layer.update()
+        # for layer in self.all_layers():
+        #     if layer.vol:
+        #         layer.update()
+        self.update_view()
 
+        # setup the new range and index of the slice slider
         self.ui.sliderSlice.blockSignals(True)
         self.set_slice_slider(new_orientation_len, self.current_slice_idx)
         self.ui.sliderSlice.blockSignals(False)
@@ -891,11 +893,11 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         for layer in list(self.layers.values())[0:3]:
             if layer.vol:
                 layer.update()
+
         self.scalebar.updateBar()
         x, y = self.viewbox.viewRange()
         self.set_zoom(x, y)  # This is the only way I can see to update the scalebar on initial volume being added
         self.orientation_indicator.set_position_slot()
-
 
         ### Key events ################################################################################################
 
