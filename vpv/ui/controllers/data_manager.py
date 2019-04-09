@@ -773,12 +773,13 @@ class ManageData(QtGui.QWidget):
         self.model.set_interpolation(checked)
         self.update_slice_views()
 
-    def on_orientation(self, orientation):
+    def on_orientation(self, orientation: str):
         """
         Activated when the orientation combobox is changed
         :return:
         """
         # convert the str to an enum member
+
         orientation = Orientation[orientation]
 
         if self.link_views:

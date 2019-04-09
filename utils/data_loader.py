@@ -9,24 +9,20 @@ Examples
 
 Example toml file
 
-root =
+labels_dir = 'inverted_labels/similarity'
+vol_dir = 'registrations/rigid'
+orientation = 'sagittal'
 
-[volumes_top]  # The 3 top slice viewers
-root = /mnt/IMPC_research/neil/E14.5/baselines/output/
-dir = output/registrations/rigid
-i1 = vol1.nrrd
-i2 = vol2.nrrd
-i3 = vol3.nrrd
 
-[volumes_bottom]
-root = /mnt/IMPC_research/neil/E14.5/mutants/output
-dir = output/registrations/rigid
-i1 = vol4.nrrd
-i2 = vol5.nrrd
-i3 = vol6.nrrd
+[top]
+specimens = ['/mnt/IMPC_research/neil/E14.5/baselines/output/baseline/20150916_RBMS1_E14.5_14.3f_WT_XY_rec_scaled_4.6878_pixel_14',
+'/mnt/IMPC_research/neil/E14.5/baselines/output/baseline/20170214_1200014J11RIK_E14.5_1.5h_WT_XX_REC_scaled_4.7297_pixel_13',
+'/mnt/IMPC_research/neil/E14.5/baselines/output/baseline/20140121_RIC8B_E14.5_15.4b_wt_xy_rec_scaled_3.125_pixel_14']
 
-[overlays]
-inverted_labels/similarity
+[bottom]
+specimens = ['/mnt/IMPC_research/neil/E14.5/mutants/output/1200014J11RIK/20170214_1200014J11RIK_E14.5_1.5f_HOM_XX_REC_scaled_4.7297_pixel_13.9999',
+'/mnt/IMPC_research/neil/E14.5/mutants/output/1200014J11RIK/20170214_1200014J11RIK_E14.5_2.4c_HOM_XX_REC_scaled_4.7297_pixel_13.9999',
+'/mnt/IMPC_research/neil/E14.5/mutants/output/1200014J11RIK/20170214_1200014J11RIK_E14.5_2.4i_HOM_XY_REC_scaled_4.7297_pixel_13.9999']
 
 """
 import sys
@@ -37,7 +33,7 @@ import toml
 from PyQt5 import QtGui
 
 from vpv.vpv import Vpv
-from vpv.common import Layers
+from vpv.common import Layers, Orientation
 
 test_file = '/mnt/IMPC_research/neil/E14.5/img_loaders/rik_loader.toml'
 
@@ -55,31 +51,39 @@ top_labels = [x / 'output' / labels_dir / x.name / f'{x.name}.nrrd' for x in top
 bottom = config['bottom']
 bottom_specs = [Path(x) for x in bottom['specimens']]
 bottom_vols = [x / 'output' / vol_dir / x.name / f'{x.name}.nrrd' for x in bottom_specs]
+bottom_labels = [x / 'output' / labels_dir / x.name / f'{x.name}.nrrd' for x in bottom_specs]
 
 app = QtGui.QApplication([])
 ex = Vpv()
 
-top_vols.extend(bottom_vols)
+all_vols = top_vols + bottom_vols
+all_labels = top_labels + bottom_labels
 
-ex.load_volumes(chain(top_vols, bottom_vols), 'vol')
+ex.load_volumes(chain(all_vols, all_labels), 'vol')
 
-#Load the volumes
+# Set the volumes to each slice view
 for i, v in enumerate(ex.views.values()):
-    vol_id = top_vols[i].stem
+    vol_id = all_vols[i].stem
     v.layers[Layers.vol1].set_volume(vol_id)
 
-# load the labels.
+# Set the label overlays
 for i, v in enumerate(ex.views.values()):
-    label_id = top_labels[i].stem
-    # If same name as the associated volume, will have (1) suffix
-    if label_id == top_vols[i].stem:
+    label_id = all_labels[i].stem
+    # If label file has same name as the associated volume, it will have (1) suffix
+    if label_id == v.layers[Layers.vol1].vol.name:
         label_id = f'{label_id}(1)'
     v.layers[Layers.vol2].set_volume(label_id)
 
-# Add labels
 # Show two rows
-# Set orientation
+ex.data_manager.show2Rows(True)
 
-# Can't have heatmaps loaded without any volumes loaded first
+# Set orientation
+ex.data_manager.on_orientation('sagittal')
+
+# Set colormap
+ex.data_manager.on_vol2_lut_changed('anatomy_labels')
+
+# opacity
+ex.data_manager.modify_layer(Layers.vol2, 'set_opacity', 0.6)
 
 sys.exit(app.exec_())
