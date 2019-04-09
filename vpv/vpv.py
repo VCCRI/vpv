@@ -102,7 +102,7 @@ class Vpv(QtCore.QObject):
     volume_pixel_signal = QtCore.pyqtSignal(float)
     volume2_pixel_signal = QtCore.pyqtSignal(float)
     heatmap_pixel_signal = QtCore.pyqtSignal(float)
-    volume_position_signal = QtCore.pyqtSignal(int, int, int)
+    # volume_position_signal = QtCore.pyqtSignal(int, int, int)
 
     def __init__(self):
         super(Vpv, self).__init__()
@@ -221,11 +221,16 @@ class Vpv(QtCore.QObject):
     def on_slice_view_mouse_move(self, x: int, y: int, z: int, src_view: SliceWidget):
         """
         Given coordinates of mouse hover position, emit signals to update the voxel value indicators.
-        If shitf key is pressed, activaye sunchronised viewing
+        If shift key is pressed, activate synchronised viewing
+
         Parameters
         ----------
-        src_view: the emitting slice widget
-
+        src_view
+            the emitting slice view widge
+        x, y
+            the hover coordinates in the 2D slice view
+        z
+            The current slice index of the slice view
         """
 
         vol = src_view.main_volume
@@ -234,6 +239,7 @@ class Vpv(QtCore.QObject):
 
         if not vol:
             return
+
         if any(i < 0 for i in (x, y, z)):
             return
 
@@ -424,6 +430,7 @@ class Vpv(QtCore.QObject):
         self.mainwindow.add_slice_view(view, row, column)
         view.setHidden(hidden)
 
+        # Connect the mouse moving so we can get pixel/label value and position
         view.mouse_moved_signal.connect(self.on_slice_view_mouse_move)
 
     def gradient_editor(self):
