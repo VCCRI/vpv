@@ -52,29 +52,29 @@ class Volume(Qt.QObject):
     def get_axial_slot(self):
         print('get_axial_slot')
 
-    def pixel_axial(self, z, y, x, flipx, flipz):
-        """
-        get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the z axis
-        """
-        try:
-            vox = self.get_data(Orientation.axial, z, flipx, flipz, xy=(x, y))
-        except TypeError as e:
-            print(e.message)
-        return vox
-
-    def pixel_sagittal(self, z, y, x, flipx, flipz):
-        """
-        get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the y axis
-        """
-        vox = self.get_data(Orientation.sagittal, x, flipx, flipz, xy=(y, z))
-        return vox
-
-    def pixel_coronal(self, z, y, x, flipx, flipz):
-        """
-        get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the y axis
-        """
-        vox = self.get_data(Orientation.coronal, y, flipx, flipz, xy=(x, z))
-        return vox
+    # def pixel_axial(self, z, y, x, flipx, flipz):
+    #     """
+    #     get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the z axis
+    #     """
+    #     try:
+    #         vox = self.get_data(Orientation.axial, z, flipx, flipz, xy=(x, y))
+    #     except TypeError as e:
+    #         print(e.message)
+    #     return vox
+    #
+    # def pixel_sagittal(self, z, y, x, flipx, flipz):
+    #     """
+    #     get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the y axis
+    #     """
+    #     vox = self.get_data(Orientation.sagittal, x, flipx, flipz, xy=(y, z))
+    #     return vox
+    #
+    # def pixel_coronal(self, z, y, x, flipx, flipz):
+    #     """
+    #     get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the y axis
+    #     """
+    #     vox = self.get_data(Orientation.coronal, y, flipx, flipz, xy=(x, z))
+    #     return vox
 
     def intensity_range(self):
         return self.min, self.max
@@ -179,6 +179,7 @@ class Volume(Qt.QObject):
         return slice_.T
 
     def _get_axial(self, index, flipx, flipz, flipy, xy=None):
+        print(index, xy, flipx, flipz, flipy)
         if flipz:
             index = self.shape_xyz()[2] - index
         slice_ = self._arr_data[index, :, :]
@@ -188,7 +189,7 @@ class Volume(Qt.QObject):
             slice_ = np.fliplr(slice_)
         if xy:
             x, y = xy
-            slice_ = slice_[y, x]
+            slice_ = slice_.T[y, x]
         return slice_.T
 
     def set_lower_level(self, level):

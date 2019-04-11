@@ -376,13 +376,13 @@ class SliceWidget(QWidget, Ui_SliceWidget):
     """
     mouse_pressed_annotation_signal = QtCore.pyqtSignal(int, int, int, object, name='mouse_pressed')
     crosshair_visible_signal = QtCore.pyqtSignal(bool)
-    volume_position_signal = QtCore.pyqtSignal(int, int, int, object)
+    # volume_position_signal = QtCore.pyqtSignal(int, int, int, object)
 
     mouse_moved_signal = QtCore.pyqtSignal(int, int, int, object, name='mouse_move')
     object_counter = 0
     manage_views_signal = QtCore.pyqtSignal(int)
-    voxel_clicked_signal = QtCore.pyqtSignal(tuple, Orientation, tuple)  # vols, orientation, (x, y)
-    orthoview_link_signal = QtCore.pyqtSignal(str, QtCore.QPoint)
+    # voxel_clicked_signal = QtCore.pyqtSignal(tuple, Orientation, tuple)  # vols, orientation, (x, y)
+    # orthoview_link_signal = QtCore.pyqtSignal(str, QtCore.QPoint)
     scale_changed_signal = QtCore.pyqtSignal(Orientation, int, list)
     resized_signal = QtCore.pyqtSignal()
     slice_index_changed_signal = QtCore.pyqtSignal(Orientation, int, int)
@@ -631,39 +631,40 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
         self.mouse_moved_signal.emit(x, y, self.current_slice_idx, self)
 
-    def get_pixel(self, layer_index, z, y, x):
-        """
-        given a layer index and coords, get the corresponding voxel value
-        Parameters
-        ----------
-        layer_index: int
-            the key for the layer in Layers
-        z: int: NOT USED
-            z
-        y: int
-            y
-        x: int
-            y
-
-        Returns
-        -------
-
-        """
-        try:
-            flip_x, flip_y, flip_z = self.get_flips()
-
-            if self.orientation == Orientation.axial:
-                pixel_func = self.layers[layer_index].vol.pixel_axial
-            elif self.orientation == Orientation.sagittal:
-                pixel_func = self.layers[layer_index].vol.pixel_sagittal
-            elif self.orientation == Orientation.coronal:
-                pixel_func = self.layers[layer_index].vol.pixel_coronal
-
-            pix_intensity = pixel_func(self.current_slice_idx, y, x, flip_x=flip_x, flip_z=flip_z, flip_y=flip_y)
-
-            return pix_intensity
-        except AttributeError:
-            print(self.layers[layer_index].vol)
+    # def get_pixel(self, layer_index, z, y, x):
+    #     """
+    #     given a layer index and coords, get the corresponding voxel value
+    #     Parameters
+    #     ----------
+    #     layer_index: int
+    #         the key for the layer in Layers
+    #     z: int: NOT USED
+    #         z
+    #     y: int
+    #         y
+    #     x: int
+    #         y
+    #
+    #     Returns
+    #     -------
+    #
+    #     """
+    #     try:
+    #         flip_x, flip_y, flip_z = self.get_flips()
+    #
+    #         if self.orientation == Orientation.axial:
+    #             pixel_func = self.layers[layer_index].vol.pixel_axial
+    #         elif self.orientation == Orientation.sagittal:
+    #             pixel_func = self.layers[layer_index].vol.pixel_sagittal
+    #         elif self.orientation == Orientation.coronal:
+    #             pixel_func = self.layers[layer_index].vol.pixel_coronal
+    #
+    #         pix_intensity = pixel_func(self.current_slice_idx, y, x, flip_x=flip_x, flip_z=flip_z, flip_y=flip_y)
+    #
+    #         return pix_intensity
+    #
+    #     except AttributeError:
+    #         print(self.layers[layer_index].vol)
 
     def get_flips(self):
         flips = self.mapper.flip_info
@@ -844,7 +845,7 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
     def set_orientation(self, orientation: Orientation):
         """
-        Sets the orientation of theis view
+        Sets the orientation of this view. Updates the
 
         Parameters
         ----------
@@ -861,10 +862,12 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         new_orientation_len = self.layers[Layers.vol1].vol.dimension_length(self.orientation)
         self.current_slice_idx = int(new_orientation_len/2)
 
-        for layer in self.all_layers():
-            if layer.vol:
-                layer.update()
+        # for layer in self.all_layers():
+        #     if layer.vol:
+        #         layer.update()
+        self.update_view()
 
+        # setup the new range and index of the slice slider
         self.ui.sliderSlice.blockSignals(True)
         self.set_slice_slider(new_orientation_len, self.current_slice_idx)
         self.ui.sliderSlice.blockSignals(False)
@@ -891,11 +894,11 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         for layer in list(self.layers.values())[0:3]:
             if layer.vol:
                 layer.update()
+
         self.scalebar.updateBar()
         x, y = self.viewbox.viewRange()
         self.set_zoom(x, y)  # This is the only way I can see to update the scalebar on initial volume being added
         self.orientation_indicator.set_position_slot()
-
 
         ### Key events ################################################################################################
 

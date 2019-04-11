@@ -102,7 +102,7 @@ class Vpv(QtCore.QObject):
     volume_pixel_signal = QtCore.pyqtSignal(float)
     volume2_pixel_signal = QtCore.pyqtSignal(float)
     heatmap_pixel_signal = QtCore.pyqtSignal(float)
-    volume_position_signal = QtCore.pyqtSignal(int, int, int)
+    # volume_position_signal = QtCore.pyqtSignal(int, int, int)
 
     def __init__(self):
         super(Vpv, self).__init__()
@@ -221,11 +221,16 @@ class Vpv(QtCore.QObject):
     def on_slice_view_mouse_move(self, x: int, y: int, z: int, src_view: SliceWidget):
         """
         Given coordinates of mouse hover position, emit signals to update the voxel value indicators.
-        If shitf key is pressed, activaye sunchronised viewing
+        If shift key is pressed, activate synchronised viewing
+
         Parameters
         ----------
-        src_view: the emitting slice widget
-
+        src_view
+            the emitting slice view widge
+        x, y
+            the hover coordinates in the 2D slice view
+        z
+            The current slice index of the slice view
         """
 
         vol = src_view.main_volume
@@ -234,16 +239,32 @@ class Vpv(QtCore.QObject):
 
         if not vol:
             return
+
         if any(i < 0 for i in (x, y, z)):
             return
+
+        print('mouse1', x, y, z)
 
         # map to the volume space
         vol_points = self.mapper.view_to_volume(x, y, z, src_view.orientation, src_view.main_volume.shape_xyz())
 
+        index =  src_view.main_volume.shape_xyz()[2] - vol_points[2]
+
+
+        print('mouse2', vol_points)
+
+
         self.mainwindow.set_mouse_position_indicator(*vol_points)
+
+        # Get any flips that have been applied to the data
+        flipx, flipy, flipz = src_view.get_flips()
         # Get the values of the voxels underneath the mouse pointer
         try:
-            vol_hover_voxel_value = vol.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
+            print('mouse move', index, vol_points[0], vol_points[1])
+            vol_hover_voxel_value = vol.get_data(Orientation.axial, vol_points[2],
+                                                 xy=[vol_points[0], vol_points[1]],
+                                                 flipx=flipx, flipy=flipy, flipz=flipz)
+
         except IndexError:
             pass
         else:
@@ -424,6 +445,7 @@ class Vpv(QtCore.QObject):
         self.mainwindow.add_slice_view(view, row, column)
         view.setHidden(hidden)
 
+        # Connect the mouse moving so we can get pixel/label value and position
         view.mouse_moved_signal.connect(self.on_slice_view_mouse_move)
 
     def gradient_editor(self):
@@ -817,6 +839,7 @@ class Vpv(QtCore.QObject):
                                                QtGui.QMessageBox.Cancel)
         # self.any_data_loaded
         self.check_non_ras()
+        self._auto_load_annotations(file_list)
 
     def load_impc_analysis(self, impc_zip_file):
         """
