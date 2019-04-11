@@ -12,7 +12,7 @@ flip_to_axial_order = {
 }
 
 flip_from_axial_order = {
-    Orientation.axial:    [0, 1, 2],
+    Orientation.axial:    [0, 1, 2],  # Keep same
     Orientation.coronal:  [0, 2, 1],
     Orientation.sagittal: [2, 0, 1]
 }
@@ -39,7 +39,7 @@ class Coordinate_mapper(object):
         y: int
         z: int
         src_ori: Orientation
-            The orieantation of the source view
+            The orientation of the source view
         dims: list
             dimensions of source volume xyz
         from_saved: bool

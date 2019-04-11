@@ -243,13 +243,28 @@ class Vpv(QtCore.QObject):
         if any(i < 0 for i in (x, y, z)):
             return
 
+        print('mouse1', x, y, z)
+
         # map to the volume space
         vol_points = self.mapper.view_to_volume(x, y, z, src_view.orientation, src_view.main_volume.shape_xyz())
 
+        index =  src_view.main_volume.shape_xyz()[2] - vol_points[2]
+
+
+        print('mouse2', vol_points)
+
+
         self.mainwindow.set_mouse_position_indicator(*vol_points)
+
+        # Get any flips that have been applied to the data
+        flipx, flipy, flipz = src_view.get_flips()
         # Get the values of the voxels underneath the mouse pointer
         try:
-            vol_hover_voxel_value = vol.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
+            print('mouse move', index, vol_points[0], vol_points[1])
+            vol_hover_voxel_value = vol.get_data(Orientation.axial, vol_points[2],
+                                                 xy=[vol_points[0], vol_points[1]],
+                                                 flipx=flipx, flipy=flipy, flipz=flipz)
+
         except IndexError:
             pass
         else:
@@ -824,6 +839,7 @@ class Vpv(QtCore.QObject):
                                                QtGui.QMessageBox.Cancel)
         # self.any_data_loaded
         self.check_non_ras()
+        self._auto_load_annotations(file_list)
 
     def load_impc_analysis(self, impc_zip_file):
         """
