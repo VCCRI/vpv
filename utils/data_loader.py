@@ -35,7 +35,7 @@ from PyQt5 import QtGui
 from vpv.vpv import Vpv
 from vpv.common import Layers, Orientation
 
-test_file = '/mnt/IMPC_research/neil/E14.5/img_loaders/rik_loader.toml'
+test_file = '/mnt/IMPC_research/neil/E14.5/img_loaders/jag2.toml'
 
 config = toml.load(test_file)
 print(config)

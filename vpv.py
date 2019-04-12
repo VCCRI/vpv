@@ -30,7 +30,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser("Volume Phenptype Viewer")
     parser.add_argument('-v', '-volumes',  dest='volumes', nargs='*', help='Volume paths seperated by spaces', default=False)
     parser.add_argument('-hm', '-heatmaps', dest='heatmaps', nargs='*', help='Heatmap paths seperated by spaces', default=False)
-    parser.add_argument('-a',  '-annotations', dest='annotations', nargs='*', help='Annotations paths seperated by spaces', default=False)
     args = parser.parse_args()
 
     for handler in logging.root.handlers[:]:
@@ -47,7 +46,6 @@ if __name__ == '__main__':
     # Log all uncaught exceptions
     sys.excepthook = excepthook_overide
 
-
     ex = Vpv()
 
     if args.volumes:
@@ -55,6 +53,4 @@ if __name__ == '__main__':
         # Can't have heatmaps loaded without any volumes loaded first
         if args.heatmaps:
             ex.load_volumes(args.heatmaps, 'heatmap')
-        if args.annotations:
-            ex.load_annotations(args.annotations)
     sys.exit(app.exec_())

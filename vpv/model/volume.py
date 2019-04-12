@@ -52,29 +52,29 @@ class Volume(Qt.QObject):
     def get_axial_slot(self):
         print('get_axial_slot')
 
-    def pixel_axial(self, z, y, x, flipx, flipz):
-        """
-        get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the z axis
-        """
-        try:
-            vox = self.get_data(Orientation.axial, z, flipx, flipz, xy=(x, y))
-        except TypeError as e:
-            print(e.message)
-        return vox
-
-    def pixel_sagittal(self, z, y, x, flipx, flipz):
-        """
-        get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the y axis
-        """
-        vox = self.get_data(Orientation.sagittal, x, flipx, flipz, xy=(y, z))
-        return vox
-
-    def pixel_coronal(self, z, y, x, flipx, flipz):
-        """
-        get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the y axis
-        """
-        vox = self.get_data(Orientation.coronal, y, flipx, flipz, xy=(x, z))
-        return vox
+    # def pixel_axial(self, z, y, x, flipx, flipz):
+    #     """
+    #     get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the z axis
+    #     """
+    #     try:
+    #         vox = self.get_data(Orientation.axial, z, flipx, flipz, xy=(x, y))
+    #     except TypeError as e:
+    #         print(e.message)
+    #     return vox
+    #
+    # def pixel_sagittal(self, z, y, x, flipx, flipz):
+    #     """
+    #     get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the y axis
+    #     """
+    #     vox = self.get_data(Orientation.sagittal, x, flipx, flipz, xy=(y, z))
+    #     return vox
+    #
+    # def pixel_coronal(self, z, y, x, flipx, flipz):
+    #     """
+    #     get pixel intensity. due to way pyqtgraph orders the axes, we have to flip the y axis
+    #     """
+    #     vox = self.get_data(Orientation.coronal, y, flipx, flipz, xy=(x, z))
+    #     return vox
 
     def intensity_range(self):
         return self.min, self.max

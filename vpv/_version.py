@@ -1,4 +1,5 @@
-__version__ = '2.2.2' # Added anatomical orientation indicators
+__version__ = '2.2.3' # Bugfix - prolems with incorredc tmouse hover voxel value reporting
+#__version__ = '2.2.2' # Added anatomical orientation indicators
 # __version__ = '2.2.1' # Moved to default RAS format. RAS volumes should look the same as in Slicer
 #__version__ = '2.2.0' # Moved to default RAS format. RAS volumes should look the same as in Slicer
 # __version__ = '2.1.0' # Added some checks to the annotation module. Add log viewer
