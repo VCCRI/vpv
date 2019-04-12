@@ -243,16 +243,10 @@ class Vpv(QtCore.QObject):
         if any(i < 0 for i in (x, y, z)):
             return
 
-        print('mouse1', x, y, z)
-
         # map to the volume space
         vol_points = self.mapper.view_to_volume(x, y, z, src_view.orientation, src_view.main_volume.shape_xyz())
 
-        index =  src_view.main_volume.shape_xyz()[2] - vol_points[2]
-
-
-        print('mouse2', vol_points)
-
+        x1 = src_view.main_volume.shape_xyz()[0] - vol_points[0]
 
         self.mainwindow.set_mouse_position_indicator(*vol_points)
 
@@ -260,10 +254,8 @@ class Vpv(QtCore.QObject):
         flipx, flipy, flipz = src_view.get_flips()
         # Get the values of the voxels underneath the mouse pointer
         try:
-            print('mouse move', index, vol_points[0], vol_points[1])
             vol_hover_voxel_value = vol.get_data(Orientation.axial, vol_points[2],
-                                                 xy=[vol_points[0], vol_points[1]],
-                                                 flipx=flipx, flipy=flipy, flipz=flipz)
+                                                 xy=[x1, vol_points[1]])
 
         except IndexError:
             pass
@@ -271,10 +263,10 @@ class Vpv(QtCore.QObject):
             if x > 0 and x > 0:
                 self.volume_pixel_signal.emit(round(float(vol_hover_voxel_value), 2))
                 if vol2:
-                    vol2_hover_voxel_value = vol2.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
+                    vol2_hover_voxel_value = vol2.get_data(Orientation.axial, vol_points[2], xy=[x1, vol_points[1]])
                     self.volume2_pixel_signal.emit((round(float(vol2_hover_voxel_value), 4)))
                 if hm:
-                    hm_hover_voxel_value = hm.get_data(Orientation.axial, vol_points[2], xy=[vol_points[0], vol_points[1]])
+                    hm_hover_voxel_value = hm.get_data(Orientation.axial, vol_points[2], xy=[x1, vol_points[1]])
                     self.heatmap_pixel_signal.emit((round(float(hm_hover_voxel_value), 4)))
 
         # # If shift is pressed emit signal to get other views to get to the same or interscting slice
