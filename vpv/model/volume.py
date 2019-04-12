@@ -179,6 +179,7 @@ class Volume(Qt.QObject):
         return slice_.T
 
     def _get_axial(self, index, flipx, flipz, flipy, xy=None):
+        print(index, xy, flipx, flipz, flipy)
         if flipz:
             index = self.shape_xyz()[2] - index
         slice_ = self._arr_data[index, :, :]
@@ -188,7 +189,7 @@ class Volume(Qt.QObject):
             slice_ = np.fliplr(slice_)
         if xy:
             x, y = xy
-            slice_ = slice_[y, x]
+            slice_ = slice_.T[y, x]
         return slice_.T
 
     def set_lower_level(self, level):

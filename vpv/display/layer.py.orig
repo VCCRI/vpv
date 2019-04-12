@@ -119,6 +119,10 @@ class Layer(Qt.QObject):
         if self.vol:
 
             try:
+<<<<<<< HEAD
+=======
+                print('Set slice layer', index)
+>>>>>>> 9ad1c4fbef4d98065cb3d79015b642f5b441263a
                 slice_ = self.vol.get_data(self.parent.orientation, index,
                                                        flip_x, flip_z, flip_y)
 
