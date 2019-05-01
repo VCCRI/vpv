@@ -91,6 +91,7 @@ class Layer(Qt.QObject):
         self.vol = self.model.getvol(volname)
         if not self.vol:
             print(f'cannot find vol: {volname}')
+            return
 
         self.set_series_slider()
 

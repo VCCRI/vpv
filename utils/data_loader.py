@@ -35,7 +35,7 @@ from PyQt5 import QtGui
 from vpv.vpv import Vpv
 from vpv.common import Layers, Orientation
 
-test_file = '/mnt/IMPC_research/neil/E14.5/img_loaders/jag2.toml'
+test_file = '/mnt/IMPC_research/neil/E14.5/img_loaders/fboxo11.toml'
 
 config = toml.load(test_file)
 print(config)
@@ -59,20 +59,35 @@ ex = Vpv()
 all_vols = top_vols + bottom_vols
 all_labels = top_labels + bottom_labels
 
-ex.load_volumes(chain(all_vols, all_labels), 'vol')
 
-# Set the volumes to each slice view
-for i, v in enumerate(ex.views.values()):
-    vol_id = all_vols[i].stem
-    v.layers[Layers.vol1].set_volume(vol_id)
+ex.load_volumes(chain(top_vols, bottom_vols, top_labels, bottom_labels), 'vol')
 
-# Set the label overlays
-for i, v in enumerate(ex.views.values()):
-    label_id = all_labels[i].stem
-    # If label file has same name as the associated volume, it will have (1) suffix
-    if label_id == v.layers[Layers.vol1].vol.name:
-        label_id = f'{label_id}(1)'
-    v.layers[Layers.vol2].set_volume(label_id)
+
+# Set the top row of views
+for i in range(3):
+    try:
+        vol_id = top_vols[i].stem
+        label_id = top_labels[i].stem
+        if label_id == vol_id:
+            label_id = f'{label_id}(1)'
+        ex.views[i].layers[Layers.vol1].set_volume(vol_id)
+        ex.views[i].layers[Layers.vol2].set_volume(label_id)
+    except IndexError:
+        continue
+
+# Set the top row of views
+for i in range(3):
+    try:
+        vol_id = bottom_vols[i].stem
+        label_id = bottom_labels[i].stem
+        if label_id ==vol_id:
+            label_id = f'{label_id}(1)'
+        ex.views[i + 3].layers[Layers.vol1].set_volume(vol_id)
+        ex.views[i + 3].layers[Layers.vol2].set_volume(label_id)
+    except IndexError:
+        continue
+
+
 
 # Show two rows
 ex.data_manager.show2Rows(True)
