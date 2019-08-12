@@ -156,6 +156,7 @@ class HeatmapVolume(Volume):
 
         """
         array = super(HeatmapVolume, self).get_data(orientation, index, flipx, flipz, flipy, xy)
+
         if xy:
            return array
 

@@ -10,6 +10,7 @@ from os import mkdir
 import yaml
 import logging
 import appdirs
+from PyQt5 import QtGui
 
 
 
@@ -89,8 +90,14 @@ def error_dialog(parent, title, msg):
     QMessageBox.warning(parent, title, msg, QMessageBox.Ok)
 
 
-def question_dialog(parent, title, question):
-    return QMessageBox.question(parent, title, question)
+def question_dialog(parent, title, message):
+    reply = QMessageBox.question(parent, title, message, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+
+    if reply == QtGui.QMessageBox.Yes:
+        return True
+
+    else:
+        return False
 
 
 class ImType(Enum):

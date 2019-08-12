@@ -429,6 +429,7 @@ class ManageData(QtGui.QWidget):
         self.populate_heatmap_controls()
         self.populate_vector_controls()
 
+
     def refresh_data_comboboxes(self):
         """
         """
@@ -444,6 +445,7 @@ class ManageData(QtGui.QWidget):
             self.controller.current_orientation().name))
         self.ui.comboBoxLutHeatmap.clear()
         self.ui.comboBoxLutHeatmap.addItems(self.luts.heatmap_lut_list())
+        # self.update_connected_components()  TODO: how signal update
         self.update_data_controls()
 
     def clear_layout(self, layout):

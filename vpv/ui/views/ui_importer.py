@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_importer.ui'
 #
-# Created by: PyQt5 UI code generator 5.12
+# Created by: PyQt5 UI code generator 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -193,8 +193,8 @@ class Ui_Dialog(object):
         self.label_4.setText(_translate("Dialog", "Number of files:"))
         self.pushButtonOK.setText(_translate("Dialog", "OK"))
         self.pushButtonCancel.setText(_translate("Dialog", "Cancel"))
-        self.label_3.setToolTip(_translate("Dialog", "Enter foldername (or part) to filter by"))
-        self.label_3.setText(_translate("Dialog", "Ffilter"))
+        self.label_3.setToolTip(_translate("Dialog", "<html><head/><body><p>Filter volumes using wildcard patterns..</p><p><br/></p><p>For example if you have data structure like this</p><p><br/></p><p>root_dir</p><p>    - mutant_1</p><p>        - registration</p><p>             - images</p><p>             - deformations</p><p>        - other</p><p>    - mutant_2</p><p>        - registration</p><p>             - images</p><p>             - deformations</p><p>        - other</p><p>Using the following pattern would load volumes from the registration/images subfolders only</p><p><br/></p><p><span style=\" font-style:italic;\">*reg*image*</span></p></body></html>"))
+        self.label_3.setText(_translate("Dialog", "filter"))
         self.lineEditFolderFilter.setToolTip(_translate("Dialog", "<html><head/><body><p>Enter a search pattern (wuth wild cards *) to filter input images by.</p><p>For example, using pattern \'reg*rig\' would find all images that had prent folderds named registrations/rigid</p></body></html>"))
 
 

@@ -283,10 +283,10 @@
      <item>
       <widget class="QLabel" name="label_3">
        <property name="toolTip">
-        <string>Enter foldername (or part) to filter by</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Filter volumes using wildcard patterns..&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;For example if you have data structure like this&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;root_dir&lt;/p&gt;&lt;p&gt;    - mutant_1&lt;/p&gt;&lt;p&gt;        - registration&lt;/p&gt;&lt;p&gt;             - images&lt;/p&gt;&lt;p&gt;             - deformations&lt;/p&gt;&lt;p&gt;        - other&lt;/p&gt;&lt;p&gt;    - mutant_2&lt;/p&gt;&lt;p&gt;        - registration&lt;/p&gt;&lt;p&gt;             - images&lt;/p&gt;&lt;p&gt;             - deformations&lt;/p&gt;&lt;p&gt;        - other&lt;/p&gt;&lt;p&gt;Using the following pattern would load volumes from the registration/images subfolders only&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;*reg*image*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Ffilter</string>
+        <string>filter</string>
        </property>
       </widget>
      </item>

@@ -2,7 +2,7 @@
 This script loads a series of volumes and associated labels from a config file
 And dispays them accordign to some options that can be set.
 
-Currently woeks with the data structure as output by lama, but will add option to specify paths
+Currently works with the data structure as output by lama, but will add option to specify paths
 
 Examples
 --------
@@ -35,7 +35,7 @@ from PyQt5 import QtGui
 from vpv.vpv import Vpv
 from vpv.common import Layers, Orientation
 
-test_file = '/mnt/IMPC_research/neil/E14.5/img_loaders/fboxo11.toml'
+test_file = sys.argv[1]
 
 config = toml.load(test_file)
 print(config)
@@ -48,19 +48,28 @@ top_specs = [Path(x) for x in top['specimens']]
 top_vols = [x / 'output' / vol_dir / x.name / f'{x.name}.nrrd' for x in top_specs]
 top_labels = [x / 'output' / labels_dir / x.name / f'{x.name}.nrrd' for x in top_specs]
 
-bottom = config['bottom']
-bottom_specs = [Path(x) for x in bottom['specimens']]
-bottom_vols = [x / 'output' / vol_dir / x.name / f'{x.name}.nrrd' for x in bottom_specs]
-bottom_labels = [x / 'output' / labels_dir / x.name / f'{x.name}.nrrd' for x in bottom_specs]
+bottom = config['bottom']['specimens']
+if bottom: # We allow only top vier visible
+    bottom_specs = [Path(x) for x in bottom['specimens']]
+    bottom_vols = [x / 'output' / vol_dir / x.name / f'{x.name}.nrrd' for x in bottom_specs]
+    bottom_labels = [x / 'output' / labels_dir / x.name / f'{x.name}.nrrd' for x in bottom_specs]
+else:
+    bottom_specs = []
+    bottom_vols = []
+    bottom_labels = []
 
 app = QtGui.QApplication([])
 ex = Vpv()
+
+p2s = lambda x: [str(z) for z in x]
+
+
 
 all_vols = top_vols + bottom_vols
 all_labels = top_labels + bottom_labels
 
 
-ex.load_volumes(chain(top_vols, bottom_vols, top_labels, bottom_labels), 'vol')
+ex.load_volumes(chain(p2s(top_vols), p2s(bottom_vols), p2s(top_labels), p2s(bottom_labels)), 'vol')
 
 
 # Set the top row of views
@@ -75,22 +84,23 @@ for i in range(3):
     except IndexError:
         continue
 
-# Set the top row of views
-for i in range(3):
-    try:
-        vol_id = bottom_vols[i].stem
-        label_id = bottom_labels[i].stem
-        if label_id ==vol_id:
-            label_id = f'{label_id}(1)'
-        ex.views[i + 3].layers[Layers.vol1].set_volume(vol_id)
-        ex.views[i + 3].layers[Layers.vol2].set_volume(label_id)
-    except IndexError:
-        continue
+if bottom:
+    # Set the top row of views
+    for i in range(3):
+        try:
+            vol_id = bottom_vols[i].stem
+            label_id = bottom_labels[i].stem
+            if label_id ==vol_id:
+                label_id = f'{label_id}(1)'
+            ex.views[i + 3].layers[Layers.vol1].set_volume(vol_id)
+            ex.views[i + 3].layers[Layers.vol2].set_volume(label_id)
+        except IndexError:
+            continue
 
-
+print('Finished loading')
 
 # Show two rows
-ex.data_manager.show2Rows(True)
+ex.data_manager.show2Rows(True if bottom else False)
 
 # Set orientation
 ex.data_manager.on_orientation('sagittal')

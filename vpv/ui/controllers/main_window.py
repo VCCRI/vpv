@@ -20,7 +20,7 @@ import os
 from vpv import _version
 from PyQt5 import QtGui, QtCore, QtWidgets
 from vpv.ui.views.ui_main_window import Ui_MainWindow
-from vpv.common import style_sheet_path
+from vpv.common import style_sheet_path, question_dialog
 
 
 class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -299,7 +299,11 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.controller.data_labels_visible(checked)
 
     def closeEvent(self, evnt):
-        self.controller.close()
+
+        close = question_dialog(self, 'Close', 'Do you want to exit?')
+
+        if not close:
+            evnt.ignore()
 
     def data_processing_slot(self):
         self.progress_dialog = QtGui.QProgressDialog('Rendering...', 'cancel', 0, 0, self)

@@ -3,7 +3,7 @@ import os
 import tempfile
 from PyQt5 import QtCore, Qt
 from scipy import ndimage
-from scipy.misc import imresize
+# from scipy.misc import imresize
 from ..common import Orientation, ImageReader
 from vpv.utils.read_minc import minc_to_numpy
 
@@ -205,6 +205,6 @@ class Volume(Qt.QObject):
     def set_interpolation(self, state):
         self.interpolate = state
 
-    def _interpolate(self, slice_):
-        return imresize(ndimage.zoom(slice_, 2, order=4), 0.5, interp='bicubic')
-        #return ndimage.gaussian_filter(slice_, sigma=0.7, order=0)
+    # def _interpolate(self, slice_):
+    #     return imresize(ndimage.zoom(slice_, 2, order=4), 0.5, interp='bicubic')
+    #     #return ndimage.gaussian_filter(slice_, sigma=0.7, order=0)
