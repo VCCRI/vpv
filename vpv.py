@@ -32,7 +32,7 @@ if __name__ == '__main__':
                         default=False)
     parser.add_argument('-hm', '-heatmaps', dest='heatmaps', nargs='*', help='Heatmap paths seperated by spaces',
                         default=False)
-    parser.add_argument('-an', '-analysis', dest='analysis_zips', nargs='1', help='Analysis zip path',
+    parser.add_argument('-an', '-analysis', dest='analysis_zips', nargs=1, help='Analysis zip path',
                         default=False)
     args = parser.parse_args()
 
@@ -55,6 +55,7 @@ if __name__ == '__main__':
     if args.volumes:
         ex.load_volumes(args.volumes, 'vol')
         # Can't have heatmaps loaded without any volumes loaded first
+
         if args.heatmaps:
             ex.load_volumes(args.heatmaps, 'heatmap')
 
