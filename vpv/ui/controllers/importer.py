@@ -125,7 +125,7 @@ class Import(QDialog):
         # Replace any asterix in the pattern to '.+' to match anything
         pattern = self.folder_include_pattern.replace('*', '.+')
 
-        if re.search(pattern, path):
+        if re.search(pattern, path, re.IGNORECASE):
             return True  # Found pattern in path
         else:
             return False
@@ -381,10 +381,7 @@ class Import(QDialog):
             return ANNOTATIONS
 
         if extension not in volume_types:
-            print('not found')
             return False
-        else:
-            print('found')
 
         heatmap_suggestions = ('stats', 'inten', 'jac')
         if any(x in data_basname for x in heatmap_suggestions):

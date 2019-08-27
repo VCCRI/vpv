@@ -1,6 +1,6 @@
 """
 This script loads a series of volumes and associated labels from a config file
-And dispays them accordign to some options that can be set.
+And displays them according to some options that can be set.
 
 Currently works with the data structure as output by lama, but will add option to specify paths
 
