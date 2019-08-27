@@ -32,7 +32,7 @@ if __name__ == '__main__':
                         default=False)
     parser.add_argument('-hm', '-heatmaps', dest='heatmaps', nargs='*', help='Heatmap paths seperated by spaces',
                         default=False)
-    parser.add_argument('-an', '-analysis', dest='analysis_zips', nargs=1, help='Analysis zip path',
+    parser.add_argument('-an', '-analysis', dest='analysis_zips', help='Analysis zip path',
                         default=False)
     args = parser.parse_args()
 
@@ -59,6 +59,6 @@ if __name__ == '__main__':
         if args.heatmaps:
             ex.load_volumes(args.heatmaps, 'heatmap')
 
-        if args.analysis_zips:
-            ex.load_impc_analysis(args.analysis_zips)
+    if args.analysis_zips:
+        ex.load_impc_analysis(args.analysis_zips)
     sys.exit(app.exec_())

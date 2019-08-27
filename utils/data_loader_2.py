@@ -12,13 +12,11 @@ orientation = 'sagittal'
 [top]
 specimens = [
 'path1.nrrd',
-'path1.nrrd',
 'path2.nrrd',
 'path3.nrrd']
 
 [bottom]
 specimens = [
-'path1.nrrd',
 'path1.nrrd',
 'path2.nrrd',
 'path3.nrrd']
