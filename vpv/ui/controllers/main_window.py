@@ -304,6 +304,8 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         if not close:
             evnt.ignore()
+        else:
+            self.controller.close()
 
     def data_processing_slot(self):
         self.progress_dialog = QtGui.QProgressDialog('Rendering...', 'cancel', 0, 0, self)

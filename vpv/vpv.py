@@ -27,6 +27,7 @@ PYTHON_DIR = 'python-3.6.3.amd64'
 
 import os
 import sys
+from pathlib import Path
 import logging
 from os.path import join, isdir
 p = sys.path
@@ -364,7 +365,17 @@ class Vpv(QtCore.QObject):
         # Hide the sliders, take screenshot, then show slider
         sshot = self.mainwindow.ui.centralwidget.grab()
         QtGui.QApplication.clipboard().setPixmap(sshot)
-        common.info_dialog(self.mainwindow, 'Message', "Screenshot copied to clipboard")
+
+        if common.question_dialog(self.mainwindow, "Screenshot copied to clipboard", 'Save to file?'):
+
+            path = QtWidgets.QFileDialog.getSaveFileName(self.mainwindow, 'Save screen shot',
+                                                  self.appdata.last_screen_shot_dir)
+            print(path)
+            if path[0]:
+                self.appdata.last_screen_shot_dir = str(Path(path[0]).parent)
+                sshot.save(path[0])
+
+        # common.info_dialog(self.mainwindow, 'Message', "Screenshot copied to clipboard")
 
     def volume_changed(self, vol_name):
         self.data_manager.volume_changed(vol_name)

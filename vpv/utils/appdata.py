@@ -116,6 +116,16 @@ class AppData(object):
     def annotator_id(self, id_):
         self.app_data['annotator_id'] = id_
 
+    @property
+    def last_screen_shot_dir(self):
+        if not self.app_data.get('last_screenshot_dir'):
+            self.app_data['last_screenshot_dir'] = expanduser("~")
+        return self.app_data['last_screenshot_dir']
+
+    @last_screen_shot_dir.setter
+    def last_screen_shot_dir(self, dir_):
+        self.app_data['last_screenshot_dir'] = dir_
+
     def write_app_data(self):
         with open(self.app_data_file, 'w') as fh:
             fh.write(yaml.dump(self.app_data))
