@@ -48,8 +48,8 @@ top_specs = [Path(x) for x in top['specimens']]
 top_vols = [x / 'output' / vol_dir / x.name / f'{x.name}.nrrd' for x in top_specs]
 top_labels = [x / 'output' / labels_dir / x.name / f'{x.name}.nrrd' for x in top_specs]
 
-bottom = config['bottom']['specimens']
-if bottom: # We allow only top vier visible
+bottom = config['bottom']
+if bottom: # We allow only top tier visible
     bottom_specs = [Path(x) for x in bottom['specimens']]
     bottom_vols = [x / 'output' / vol_dir / x.name / f'{x.name}.nrrd' for x in bottom_specs]
     bottom_labels = [x / 'output' / labels_dir / x.name / f'{x.name}.nrrd' for x in bottom_specs]

@@ -84,7 +84,7 @@ class Import(QDialog):
                 box.setText('Load individual 2D slices from folder, or load multiple single images volumes?')
                 box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
                 button_y = box.button(QMessageBox.Yes)
-                button_y.setText('Satack of 2D image slices')
+                button_y.setText('Load stack from individual 2D image slices')
                 button_n = box.button(QMessageBox.No)
                 button_n.setText('Load multiple 3D image volumes')
                 box.exec_()
@@ -114,10 +114,14 @@ class Import(QDialog):
 
     def folder_filter(self, path: str) -> bool:
         """
-        Filter paths bsed on a string it contains
-        Return True
+        Filter paths based on a string it contains
+
+        Returns
+        -------
+        True if path matches pattern
+        False if path does not match pattern
         """
-        path = os.path.split(path)[0]
+        # path
 
         if not self.folder_include_pattern:
             return True  # Do no filtering as there's no pattern

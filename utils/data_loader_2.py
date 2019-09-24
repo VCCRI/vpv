@@ -32,53 +32,61 @@ from PyQt5 import QtGui
 from vpv.vpv import Vpv
 from vpv.common import Layers
 
-test_file = sys.argv[1]
+from typing import Dict
 
-config = toml.load(test_file)
-
-top_vols = config['top']['specimens']
+def load(config: Dict):
 
 
-bottom = config['bottom']['specimens']
-if bottom:
-    bottom_vols =  config['bottom']['specimens']
-else: # We allow only top vier visible
-    bottom_specs = []
-    bottom_vols = []
-    bottom_labels = []
 
-app = QtGui.QApplication([])
-ex = Vpv()
-
-p2s = lambda x: [str(z) for z in x]
-
-all_vols = top_vols + bottom_vols
-ex.load_volumes(chain(p2s(top_vols), p2s(bottom_vols)), 'vol')
+    top_vols = config['top']['specimens']
 
 
-# Set the top row of views
-for i in range(3):
-    try:
-        vol_id = Path(top_vols[i]).stem
-        ex.views[i].layers[Layers.vol1].set_volume(vol_id)
-    except IndexError:
-        continue
+    bottom = config['bottom']['specimens']
+    if bottom:
+        bottom_vols =  config['bottom']['specimens']
+    else: # We allow only top vier visible
+        bottom_specs = []
+        bottom_vols = []
+        bottom_labels = []
 
-if bottom:
+    app = QtGui.QApplication([])
+    ex = Vpv()
+
+    p2s = lambda x: [str(z) for z in x]
+
+    all_vols = top_vols + bottom_vols
+    ex.load_volumes(chain(p2s(top_vols), p2s(bottom_vols)), 'vol')
+
+
     # Set the top row of views
     for i in range(3):
         try:
-            vol_id = Path(bottom_vols[i]).stem
-            ex.views[i + 3].layers[Layers.vol1].set_volume(vol_id)
+            vol_id = Path(top_vols[i]).stem
+            ex.views[i].layers[Layers.vol1].set_volume(vol_id)
         except IndexError:
             continue
 
-print('Finished loading')
+    if bottom:
+        # Set the top row of views
+        for i in range(3):
+            try:
+                vol_id = Path(bottom_vols[i]).stem
+                ex.views[i + 3].layers[Layers.vol1].set_volume(vol_id)
+            except IndexError:
+                continue
 
-# Show two rows
-ex.data_manager.show2Rows(True if bottom else False)
+    print('Finished loading')
 
-# Set orientation
-ex.data_manager.on_orientation(config['orientation'])
+    # Show two rows
+    ex.data_manager.show2Rows(True if bottom else False)
 
-sys.exit(app.exec_())
+    # Set orientation
+    ex.data_manager.on_orientation(config['orientation'])
+
+    sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    file_ = sys.argv[1]
+    config = toml.load(file_)
+    load(config)

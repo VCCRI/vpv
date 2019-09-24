@@ -838,8 +838,7 @@ class Vpv(QtCore.QObject):
                 print(e)
                 non_loaded.append(vol_path)
         if len(non_loaded) > 0:
-            dialog = QtGui.QMessageBox.warning(self.mainwindow, 'Volumes not loaded', '\n'.join(non_loaded),
-                                               QtGui.QMessageBox.Cancel)
+            common.error_dialog(self.mainwindow, 'Volumes not loaded', '\n'.join(non_loaded))
         # self.any_data_loaded
         self.check_non_ras()
         self._auto_load_annotations(file_list)
