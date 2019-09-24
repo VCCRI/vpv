@@ -951,13 +951,27 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         # else:
         event.ignore()
 
-    def move_to_next_volume(self, reverse=False):
+    def move_to_next_volume(self, reverse: bool = False):
+        """
+        Cycle through volumes in the top layer (layer1)
+
+        Parameters
+        ----------
+        reverse
+            Cycle forwards or backwards
+
+        """
+
         vol_ids = self.model.volume_id_list()
+
         if len(vol_ids) < 2:
             return
+
         current_vol_idx = vol_ids.index(self.layers[Layers.vol1].vol.name)
+
         if not self.layers[Layers.vol1].vol.name or self.layers[Layers.vol1].vol.name == 'None':
             return
+
         if reverse:
             if current_vol_idx - 1 < 0:
                 new_index = len(vol_ids) - 1
@@ -968,5 +982,6 @@ class SliceWidget(QWidget, Ui_SliceWidget):
                 new_index = 0
             else:
                 new_index = current_vol_idx + 1
+
         new_vol_name = vol_ids[new_index]
         self.layers[Layers.vol1].set_volume(new_vol_name)

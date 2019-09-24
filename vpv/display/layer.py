@@ -93,7 +93,7 @@ class Layer(Qt.QObject):
             print(f'cannot find vol: {volname}')
             return
 
-        self.set_series_slider()
+        # self.set_series_slider()
 
         orientation = self.parent.orientation
         self.name = self.vol.name
@@ -110,7 +110,8 @@ class Layer(Qt.QObject):
         self.parent.set_slice_slider(dim_len, slice_indx)
 
         # This fixes problem with linked zooming
-        self.parent.viewbox.autoRange()
+        if initial:
+            self.parent.viewbox.autoRange()
         self.parent.scalebar.updateBar()
 
     def set_slice(self, index: int):
