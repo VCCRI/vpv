@@ -507,7 +507,11 @@ class Vpv(QtCore.QObject):
             self.update_manager()
 
     def toggle_link_views(self):
-        pass
+        if self.data_manager.link_views:
+            link = False
+        else:
+            link = True
+        self.data_manager.on_link_views(link)
 
     def update_manager(self, slice_id=0):  # called from data_manager:update_manager
         """

@@ -213,7 +213,7 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         elif event.key() == QtCore.Qt.Key_Space:
             self.controller.toggle_dock_widget_visibility()
         elif event.key() == QtCore.Qt.Key_L:
-            self.controller.toggle_dock_widget_visibility()
+            self.controller.toggle_link_views()
         elif event.key() == QtCore.Qt.Key_Z:
             visible = self.view_slider_action.isChecked()
             self.view_slider_action.toggle()
