@@ -276,7 +276,7 @@ class Vpv(QtCore.QObject):
         if modifiers == QtCore.Qt.ShiftModifier:
 
             # With mouse move signal, also send current vol.
-            # If veiews are not synchronised, syncyed slicing only occurs within volumes
+            # If veiews are not synchronised, syncyed slicing only occurs within the same volumes
             self.mouse_shift(x, y, z, src_view)
 
     def map_annotation_signal_view_to_view(self, slice_idx: int, x: int, y: int, src_view: SliceWidget,
@@ -335,6 +335,9 @@ class Vpv(QtCore.QObject):
             the calling view
         """
 
+        if not self.current_annotation_volume():
+            return
+        
         dims = self.current_annotation_volume().shape_xyz()
 
         for dest_view in self.views.values():
