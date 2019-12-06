@@ -227,8 +227,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QLineEdit" name="lineEditShowLabel">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>460</y>
+     <x>30</x>
+     <y>490</y>
      <width>113</width>
      <height>25</height>
     </rect>
@@ -239,12 +239,12 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>10</x>
      <y>460</y>
-     <width>241</width>
+     <width>461</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>Show only this label (experimental)</string>
+    <string>Show only these lables (space-seperated list of label numbers)</string>
    </property>
   </widget>
  </widget>

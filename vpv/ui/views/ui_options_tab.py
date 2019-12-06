@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_options_tab.ui'
 #
-# Created by: PyQt5 UI code generator 5.12
+# Created by: PyQt5 UI code generator 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -99,10 +99,10 @@ class Ui_options(object):
         self.textBrowser.setGeometry(QtCore.QRect(50, 270, 256, 151))
         self.textBrowser.setObjectName("textBrowser")
         self.lineEditShowLabel = QtWidgets.QLineEdit(options)
-        self.lineEditShowLabel.setGeometry(QtCore.QRect(260, 460, 113, 25))
+        self.lineEditShowLabel.setGeometry(QtCore.QRect(30, 490, 113, 25))
         self.lineEditShowLabel.setObjectName("lineEditShowLabel")
         self.label_9 = QtWidgets.QLabel(options)
-        self.label_9.setGeometry(QtCore.QRect(10, 460, 241, 17))
+        self.label_9.setGeometry(QtCore.QRect(10, 460, 461, 17))
         self.label_9.setObjectName("label_9")
 
         self.retranslateUi(options)
@@ -126,6 +126,6 @@ class Ui_options(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">IMPC view. </span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Checking this button with ensure that data downloaded from the DCC will be in the agreed orientation. For other data you may have to use the individual flip options.</p></body></html>"))
-        self.label_9.setText(_translate("options", "Show only this label (experimental)"))
+        self.label_9.setText(_translate("options", "Show only these lables (space-seperated list of label numbers)"))
 
 
