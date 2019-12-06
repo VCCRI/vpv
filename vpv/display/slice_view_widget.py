@@ -23,6 +23,7 @@ This module is involved in the display of a single orthogonal view.
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QWidget, QLabel
 import pyqtgraph as pg
+from typing import Iterable
 from vpv.ui.views.ui_slice_widget import Ui_SliceWidget
 import os
 from collections import OrderedDict
@@ -479,12 +480,12 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
         self.show()
 
-    def filter_label(self, label: int):
+    def filter_label(self, label: Iterable[int]):
         """
-        On volume2 layers only show label. If 0 show all
+        On volume2 layers only show these labels. If 0 show all.
         """
         l = self.layers[Layers.vol2]
-        l.show_label = label
+        l.show_labels = label
         self.update_view()
 
     def set_orientation_labels_visiblility(self, visible: bool):

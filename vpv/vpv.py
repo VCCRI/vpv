@@ -30,6 +30,7 @@ import sys
 from pathlib import Path
 import logging
 from os.path import join, isdir
+from typing import Iterable
 p = sys.path
 
 from PyQt5 import QtGui, QtCore, QtWidgets
@@ -181,18 +182,18 @@ class Vpv(QtCore.QObject):
 
         self.check_vpv_version()
 
-    def filter_label(self, label: int):
+    def filter_label(self, labels: Iterable[int]):
         """
         Recieves a label to show. Pass to slice views
 
         Parameters
         ----------
-        label
-            the label number to show
+        labels
+            the label numbers to show, if 0 set to view all
 
         """
         for v in self.views.values():
-            v.filter_label(label)
+            v.filter_label(labels)
 
     def set_orientation_visibility(self, visible: bool):
         for view in self.views.values():
@@ -337,7 +338,7 @@ class Vpv(QtCore.QObject):
 
         if not self.current_annotation_volume():
             return
-        
+
         dims = self.current_annotation_volume().shape_xyz()
 
         for dest_view in self.views.values():
