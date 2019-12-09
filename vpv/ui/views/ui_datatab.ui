@@ -180,7 +180,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="comboBoxOrientation">
+            <widget class="QComboBoxIgnoreSCroll" name="comboBoxOrientation">
              <item>
               <property name="text">
                <string>sagittal</string>
@@ -277,7 +277,7 @@ color: rgb(223, 223, 223);</string>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="QComboBox" name="comboBoxVolume"/>
+        <widget class="QComboBoxIgnoreSCroll" name="comboBoxVolume"/>
        </item>
        <item>
         <widget class="QPushButton" name="pushButtonEditVolName">
@@ -310,7 +310,7 @@ color: rgb(223, 223, 223);</string>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayoutVol1Levels">
        <item>
-        <widget class="QComboBox" name="comboBoxVolumeLut">
+        <widget class="QComboBoxIgnoreSCroll" name="comboBoxVolumeLut">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -389,12 +389,12 @@ color: rgb(223, 223, 223);</string>
         <item>
          <layout class="QVBoxLayout" name="layoutVolume2">
           <item>
-           <widget class="QComboBox" name="comboBoxVolume2"/>
+           <widget class="QComboBoxIgnoreSCroll" name="comboBoxVolume2"/>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayoutVol2Levels">
             <item>
-             <widget class="QComboBox" name="comboBoxVolumeLut2">
+             <widget class="QComboBoxIgnoreSCroll" name="comboBoxVolumeLut2">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -502,12 +502,12 @@ color: rgb(223, 223, 223);</string>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_8">
         <item>
-         <widget class="QComboBox" name="comboBoxData"/>
+         <widget class="QComboBoxIgnoreSCroll" name="comboBoxData"/>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_11">
           <item>
-           <widget class="QComboBox" name="comboBoxLutHeatmap">
+           <widget class="QComboBoxIgnoreSCroll" name="comboBoxLutHeatmap">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -643,7 +643,7 @@ color: rgb(223, 223, 223);</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QComboBox" name="comboBoxVectors"/>
+         <widget class="QComboBoxIgnoreSCroll" name="comboBoxVectors"/>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -793,6 +793,13 @@ color: rgb(223, 223, 223);</string>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QComboBoxIgnoreSCroll</class>
+   <extends>QComboBox</extends>
+   <header>combobox_ignore_scroll</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../resources/resources.qrc"/>
  </resources>

@@ -10,7 +10,7 @@ from os import mkdir
 import yaml
 import logging
 import appdirs
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtCore
 
 
 
