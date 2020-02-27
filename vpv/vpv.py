@@ -113,7 +113,8 @@ class Vpv(QtCore.QObject):
         self.view_scale_basrs = False
         self.view_id_counter = 0
         self.appdata = AppData()
-        self.current_view = None
+
+        print(self.appdata.monster_munch)
         self.mainwindow = main_window.Mainwindow(self, self.appdata)
         # self.mainwindow.showFullScreen()
         self.model = DataModel()
