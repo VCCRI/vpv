@@ -184,7 +184,7 @@ class AnnotationsWidget(QWidget):
 
     def populate_available_terms(self):
         """
-        Runs at start up and when volume is changed. Poulates the avaible annotation terms
+        Runs when annotations tab is viewed and when volume is changed. Populates the avaible annotation terms.
         """
 
         self.ui.treeWidgetAvailableTerms.clear()
@@ -195,7 +195,9 @@ class AnnotationsWidget(QWidget):
             return
 
         self.ui.lineEditCentre.setText(vol.annotations.center)
-        self.ui.lineEditStage.setText(vol.annotations.stage)
+        self.ui.lineEditStage.setText(vol.annotations.stage.name)
+
+        self.ui.lineEditModality.setText(vol.annotations.modality.value)
 
         def setup_option_box_signal(box_: QComboBox, child_: QTreeWidgetItem):
             """
@@ -269,7 +271,7 @@ class AnnotationsWidget(QWidget):
         Parameters
         ----------
         suppress_msg: bool
-            When doing autosave do not give a dialog informing od save (True)
+            When doing autosave do not give a dialog informing of save (True)
             When doing manual save, give dialog with saved file path
 
         Returns

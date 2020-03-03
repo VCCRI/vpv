@@ -6,7 +6,6 @@ from typing import Tuple
 from lxml import etree
 import yaml
 from vpv.lib import addict
-from vpv.common import ANNOTATIONS_PROC_VERSION
 
 
 class ExportXML(object):
@@ -158,8 +157,8 @@ class ExportXML(object):
 
 def load_metadata(yaml_path):
     """
-    Load in the procedure_metadata yaml file
-    Override the procedureID as this needs to be version 2
+    Load in the procedure_metadata yaml file - Update the version ID to be 002 for now
+    increase the procedureID if at 001 as this needs to be version 002 for validation
 
     Parameters
     ----------
@@ -176,7 +175,9 @@ def load_metadata(yaml_path):
         data = yaml.load(fh)
 
     # override the procedure ID
-    data['procedure_id'] = ANNOTATIONS_PROC_VERSION
+    proc_id: str = data['procedure_id'].replace('_001', '_002')
+    data['procedure_id'] = proc_id
+
     return data
 
 
@@ -210,7 +211,7 @@ def load_xml(xml_file) -> Tuple:
 
         elif a.tag == 'procedure':
             # proc_id = a.attrib['procedureID']  hard code to v2
-            proc_id = ANNOTATIONS_PROC_VERSION
+            proc_id = a.attrib['procedureID']
 
         elif a.tag == 'simpleParameter':
             param_id = a.attrib['parameterID']

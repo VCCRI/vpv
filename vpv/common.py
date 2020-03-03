@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QMessageBox
 from enum import Enum
 from inspect import getframeinfo, stack
 import SimpleITK as sitk
-import numpy as np
 import tempfile
 import gzip
 from os.path import splitext, dirname, realpath, join, isdir
@@ -11,6 +10,7 @@ import yaml
 import logging
 import appdirs
 from PyQt5 import QtGui, QtCore
+from typing import Tuple
 
 
 
@@ -25,7 +25,19 @@ resources_dir = join(_this_dir, 'resources')
 style_sheet_path = join(resources_dir, 'stylesheet.qss')
 generic_anatomy_label_map_path = join(resources_dir, 'generic_anatomy.csv')
 
-ANNOTATIONS_PROC_VERSION = "IMPC_EMO_002"
+
+class Stage(Enum):
+    e9_5 = 'E9.5'
+    e12_5 = 'E12.5'
+    e14_5 = 'E14.5'
+    e15_5 = 'E15.5'
+    e18_5 = 'E18.5'
+
+
+class Modality(Enum):
+    micro_ct = 'micro-ct'
+    opt = 'opt'
+
 
 log_dir = appdirs.user_data_dir(appname='vpv', appauthor="")
 if not isdir(log_dir):
@@ -38,7 +50,8 @@ def get_fname_and_line_number():
     caller = getframeinfo(stack()[1][0])
     return caller.filename, caller.lineno
 
-def get_stage_from_proc_id(proc_id: str, center_id: dict):
+
+def get_stage_and_modality(proc_id: str, center_id: dict) -> Tuple[Stage, Modality]:
     """
     There is nowhere in the IMPC xml to log what stage we are using.
     We must infer that from the procedures we are using.
@@ -51,15 +64,31 @@ def get_stage_from_proc_id(proc_id: str, center_id: dict):
 
     Returns
     -------
-    str: stage identifier
+    Enum: Stage
+    Enum: Modality
+
+    Raises
+    ------
+    ValueError if proc_id not recognised
     """
 
-    if 'EMO' in proc_id:
+    for e9_5 in ['eml', 'eol']:   # Currently only harwell doing these
+        if e9_5 in proc_id.lower():
+            if 'eml' in proc_id.lower():
+                mod = Modality.micro_ct
+            elif 'eol' in proc_id.lower():
+                mod = Modality.opt
+            return Stage.e9_5, mod
+
+    if 'emo' in proc_id.lower():
         if center_id.lower() == 'h':
-            return 'e14.5'
-        return 'e15.5'
-    elif 'EMP' in proc_id:
-        return 'e18.5'  # Not sure this is correct. Look up. For now only using E15.5
+            return Stage.e14_5, Modality.micro_ct
+        return Stage.e15_5, Modality.micro_ct
+
+    elif 'emp' in proc_id.lower():
+        return Stage.e18_5, Modality.micro_ct  # Not sure this is correct. Look up. For now only using E15.5/E14.5 and E9.5 anyway
+    else:
+        raise ValueError(f'{proc_id} not currently recognised')
 
 
 def load_yaml(path):
@@ -123,14 +152,6 @@ class Orientation(Enum):
     sagittal = 1
     coronal = 2
     axial = 3
-
-
-class Stage(Enum):
-    e9_5 = 'E9.5'
-    e12_5 = 'E12.5'
-    e14_5 = 'E14.5'
-    e15_5 = 'E15.5'
-    e18_5 = 'E18.5'
 
 
 class Layers(Enum):

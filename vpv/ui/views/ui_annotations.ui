@@ -277,13 +277,13 @@
       <attribute name="title">
        <string/>
       </attribute>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>41</x>
          <y>31</y>
          <width>197</width>
-         <height>58</height>
+         <height>89</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
@@ -307,9 +307,19 @@
         <item row="1" column="1">
          <widget class="QLineEdit" name="lineEditStage"/>
         </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="lineEditModality"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Modality</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>40</x>

@@ -2,11 +2,12 @@
 
 # Form implementation generated from reading ui file 'ui_annotations.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Annotations(object):
     def setupUi(self, Annotations):
@@ -22,7 +23,6 @@ class Ui_Annotations(object):
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.tab_3)
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
@@ -163,40 +163,46 @@ class Ui_Annotations(object):
         self.tabWidgetOptions.addTab(self.tab_3, icon1, "")
         self.tab_4 = QtWidgets.QWidget()
         self.tab_4.setObjectName("tab_4")
-        self.widget = QtWidgets.QWidget(self.tab_4)
-        self.widget.setGeometry(QtCore.QRect(41, 31, 197, 58))
-        self.widget.setObjectName("widget")
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.widget)
+        self.layoutWidget = QtWidgets.QWidget(self.tab_4)
+        self.layoutWidget.setGeometry(QtCore.QRect(41, 31, 197, 89))
+        self.layoutWidget.setObjectName("layoutWidget")
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.layoutWidget)
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.label_4 = QtWidgets.QLabel(self.widget)
+        self.label_4 = QtWidgets.QLabel(self.layoutWidget)
         self.label_4.setObjectName("label_4")
         self.gridLayout_2.addWidget(self.label_4, 0, 0, 1, 1)
-        self.lineEditCentre = QtWidgets.QLineEdit(self.widget)
+        self.lineEditCentre = QtWidgets.QLineEdit(self.layoutWidget)
         self.lineEditCentre.setObjectName("lineEditCentre")
         self.gridLayout_2.addWidget(self.lineEditCentre, 0, 1, 1, 1)
-        self.label_5 = QtWidgets.QLabel(self.widget)
+        self.label_5 = QtWidgets.QLabel(self.layoutWidget)
         self.label_5.setObjectName("label_5")
         self.gridLayout_2.addWidget(self.label_5, 1, 0, 1, 1)
-        self.lineEditStage = QtWidgets.QLineEdit(self.widget)
+        self.lineEditStage = QtWidgets.QLineEdit(self.layoutWidget)
         self.lineEditStage.setObjectName("lineEditStage")
         self.gridLayout_2.addWidget(self.lineEditStage, 1, 1, 1, 1)
-        self.widget1 = QtWidgets.QWidget(self.tab_4)
-        self.widget1.setGeometry(QtCore.QRect(40, 120, 280, 59))
-        self.widget1.setObjectName("widget1")
-        self.gridLayout = QtWidgets.QGridLayout(self.widget1)
+        self.lineEditModality = QtWidgets.QLineEdit(self.layoutWidget)
+        self.lineEditModality.setObjectName("lineEditModality")
+        self.gridLayout_2.addWidget(self.lineEditModality, 2, 1, 1, 1)
+        self.label_7 = QtWidgets.QLabel(self.layoutWidget)
+        self.label_7.setObjectName("label_7")
+        self.gridLayout_2.addWidget(self.label_7, 2, 0, 1, 1)
+        self.layoutWidget1 = QtWidgets.QWidget(self.tab_4)
+        self.layoutWidget1.setGeometry(QtCore.QRect(40, 120, 280, 59))
+        self.layoutWidget1.setObjectName("layoutWidget1")
+        self.gridLayout = QtWidgets.QGridLayout(self.layoutWidget1)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
-        self.label = QtWidgets.QLabel(self.widget1)
+        self.label = QtWidgets.QLabel(self.layoutWidget1)
         self.label.setObjectName("label")
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
-        self.lineEditAnnotatorId = QtWidgets.QLineEdit(self.widget1)
+        self.lineEditAnnotatorId = QtWidgets.QLineEdit(self.layoutWidget1)
         self.lineEditAnnotatorId.setObjectName("lineEditAnnotatorId")
         self.gridLayout.addWidget(self.lineEditAnnotatorId, 0, 1, 1, 1)
-        self.label_3 = QtWidgets.QLabel(self.widget1)
+        self.label_3 = QtWidgets.QLabel(self.layoutWidget1)
         self.label_3.setObjectName("label_3")
         self.gridLayout.addWidget(self.label_3, 1, 0, 1, 1)
-        self.dateEdit = QtWidgets.QDateEdit(self.widget1)
+        self.dateEdit = QtWidgets.QDateEdit(self.layoutWidget1)
         self.dateEdit.setObjectName("dateEdit")
         self.gridLayout.addWidget(self.dateEdit, 1, 1, 1, 1)
         icon2 = QtGui.QIcon()
@@ -223,7 +229,9 @@ class Ui_Annotations(object):
         self.labelZPos.setText(_translate("Annotations", "0"))
         self.label_4.setText(_translate("Annotations", "Centre"))
         self.label_5.setText(_translate("Annotations", "Stage"))
+        self.label_7.setText(_translate("Annotations", "Modality"))
         self.label.setText(_translate("Annotations", "Annotator ID"))
         self.label_3.setText(_translate("Annotations", "Date of annotation"))
+
 
 import resources_rc
