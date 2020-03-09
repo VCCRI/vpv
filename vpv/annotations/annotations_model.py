@@ -117,6 +117,8 @@ class SpecimenAnnotations(object):
 
         self.annotation_date = None
 
+        self.proc_id = None  # The imaging procedure eg IMPC_EOL__002
+
         self._load_options_and_metadata()
         # self._load_done_status()
 
@@ -179,6 +181,7 @@ class SpecimenAnnotations(object):
 
         # Temp fix 030320 to increment procedures to 002 so they vallidate correctly
         proc_id = proc_id.replace('_001', '_002')
+        self.proc_id = proc_id
 
         center_id = metadata_params['centre_id']
         stage_id, modality = get_stage_and_modality(proc_id, center_id)

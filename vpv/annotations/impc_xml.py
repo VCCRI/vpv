@@ -65,16 +65,23 @@ class ExportXML(object):
         etree.ElementTree(self.root).write(file_path, pretty_print=True, xml_declaration=True, encoding='UTF-8',
                                       standalone='yes')
 
-    def add_series_media_parameter(self):
-        # Get parameter info and append to procedure
+    def add_series_media_parameter(self, parameter_id: str):
+        """
+        Add SMP which will have parameterAssociations attached to it later (annotation points)
+
+        Parameters
+        ----------
+        parameter_id: the IMPC reconstruction parameter
+
+        """
         smp = etree.SubElement(self.procedure_element,
                                'seriesMediaParameter',
-                               parameterID="IMPC_EMO_001_001")
+                               parameterID=parameter_id)
 
         smp_value = etree.SubElement(smp, 'value',
                                      {"incrementValue": "1",  "URI": self.metadata['reconstruction_url']})
 
-        # Add the deafault imagages parameter
+        # Add the deafault images parameter
         self.series_media_parameter = smp_value
 
     def add_point(self, param_id, xyz, xyz_percents):

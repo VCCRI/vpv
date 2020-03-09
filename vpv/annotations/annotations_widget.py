@@ -90,6 +90,7 @@ class AnnotationsWidget(QWidget):
         # Make the line edits non editable
         self.ui.lineEditStage.setReadOnly(True)
         self.ui.lineEditCentre.setReadOnly(True)
+        self.ui.lineEditModality.setReadOnly(True)
         self.first_run = True
 
     def d_pressed_slot(self):
@@ -324,7 +325,11 @@ class AnnotationsWidget(QWidget):
                 xml_path = join(xml_dir, xml_file_name)
 
             # Add the series media parameter now we have SimpleParameters loaded, so we can add points to it
-            xml_exporter.add_series_media_parameter()
+            # To get the reconstruction parameter just strip off digits from procedure and add _001_001
+            reconstruction_param = vol.annotations.proc_id[:8] + '_001_001'
+
+            xml_exporter.add_series_media_parameter(reconstruction_param)
+
             for a in points_for_series_media:
                 xml_exporter.add_point(a.term, (a.x, a.y, a.z), (a.x_percent, a.y_percent, a.z_percent))
 
