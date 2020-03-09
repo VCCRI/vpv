@@ -8,6 +8,26 @@ import yaml
 from vpv.lib import addict
 
 
+def get_annotator_id_and_date(procedure_id) -> Tuple[str, str]:
+    """
+    Get the unique annotator_id and annotation date parameter ids for a procedure.
+    Parameters
+    ----------
+    procedure_id
+
+    Returns
+    -------
+    annotator_id, date_of_annotation
+    """
+
+    map_ = {
+        'IMPC_EOL': ('IMPC_EOL_052_001', 'IMPC_EOL_053_001'),
+        'IMPC_EML': ('IMPC_EML_057_001', 'IMPC_EML_058_001'),
+        'IMPC_EMO': ('IMPC_EMO_178_001', ' IMPC_EMO_179_001')
+    }
+    return map_[procedure_id[:8]]
+
+
 class ExportXML(object):
     """
     TODO: project
@@ -49,9 +69,10 @@ class ExportXML(object):
 
         self.procedure_element = etree.SubElement(self.experiment, 'procedure', procedureID=md['procedure_id'])
 
+        annotator_param_id, date_of_annotation_param_id = get_annotator_id_and_date(self.metadata['procedure_id'])
         # Add metadata parameters that are not supplied in the procedure_metadata.yaml
-        self.metadata['metadata']['IMPC_EMO_178_001'] = annotator_id
-        self.metadata['metadata']['IMPC_EMO_179_001'] = date_of_annotation
+        self.metadata['metadata'][annotator_param_id] = annotator_id
+        self.metadata['metadata'][date_of_annotation_param_id] = date_of_annotation
 
     def add_metadata(self):
         for id_, param_value in self.metadata['metadata'].items():

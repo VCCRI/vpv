@@ -24,7 +24,7 @@ import tempfile
 from PIL import Image
 from PyQt5 import QtCore
 from vpv.common import read_image, get_stage_and_modality, error_dialog
-from vpv.annotations.impc_xml import load_xml
+from vpv.annotations.impc_xml import load_xml, get_annotator_id_and_date
 from vpv.annotations.annotations_model import centre_stage_options, PROCEDURE_METADATA, ANNOTATION_DONE_METADATA_FILE
 
 from .ImageVolume import ImageVolume
@@ -206,7 +206,8 @@ class DataModel(QtCore.QObject):
 
         vol.annotations.clear()
         # Get the dict that contains the available options for a given center/stage
-        ann_date = [x[1] for x in procedure_metadata if x[0] == 'IMPC_EMO_179_001']
+        annotation_date_param_id = get_annotator_id_and_date(proc_id)[1]
+        ann_date = [x[1] for x in procedure_metadata if x[0] == annotation_date_param_id]
         ann_date = ann_date[0]
         vol.annotations.annotation_date = ann_date
 
