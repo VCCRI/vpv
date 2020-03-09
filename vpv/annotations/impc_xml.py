@@ -23,7 +23,7 @@ def get_annotator_id_and_date(procedure_id) -> Tuple[str, str]:
     map_ = {
         'IMPC_EOL': ('IMPC_EOL_052_001', 'IMPC_EOL_053_001'),
         'IMPC_EML': ('IMPC_EML_057_001', 'IMPC_EML_058_001'),
-        'IMPC_EMO': ('IMPC_EMO_178_001', ' IMPC_EMO_179_001')
+        'IMPC_EMO': ('IMPC_EMO_178_001', 'IMPC_EMO_179_001')
     }
     return map_[procedure_id[:8]]
 
@@ -32,7 +32,8 @@ class ExportXML(object):
     """
     TODO: project
     """
-    def __init__(self,
+    def __init__(self,qq
+    qq
                  date_of_annotation: str,
                  annotator_id: str,
                  metadata: str
