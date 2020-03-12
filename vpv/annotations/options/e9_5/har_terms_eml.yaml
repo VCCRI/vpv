@@ -5,43 +5,43 @@ parameters:
     order: 0
     impc_id: IMPC_EML_018_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param1:
     name: 4th ventricle
     order: 1
     impc_id: IMPC_EML_019_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param2:
     name: Mesencephalic vesicle
     order: 2
     impc_id: IMPC_EML_020_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param3:
     name: Forebrain
     order: 3
     impc_id: IMPC_EML_021_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param4:
     name: Telecenphalic (lateral) ventricle
     order: 4
     impc_id: IMPC_EML_022_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param5:
     name: Rhombomeres
     order: 5
     impc_id: IMPC_EML_023_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param6:
     name: Infundibular recess of 3rd ventricle
     order: 6
@@ -54,78 +54,78 @@ parameters:
     order: 7
     impc_id: IMPC_EML_026_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param8:
     name: Optic vesicle
     order: 8
     impc_id: IMPC_EML_027_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param9:
     name: Otocyst
     order: 9
     impc_id: IMPC_EML_028_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param10:
     name: 1st branchial arch
     order: 10
     impc_id: IMPC_EML_029_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param11:
     name: 2nd branchial arch
     order: 11
     impc_id: IMPC_EML_031_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param12:
     name: Oropharynx
     order: 12
     impc_id: IMPC_EML_033_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param13:
     name: 3rd branchial arch
     order: 13
     impc_id: IMPC_EML_034_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param14:
     name: Aortic sac
     order: 14
     impc_id: IMPC_EML_036_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param15:
     name: Common atrial chamber
     order: 15
     impc_id: IMPC_EML_037_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param16:
     name: Atrioventricular canal
     order: 16
     impc_id: IMPC_EML_038_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param17:
     name: Heart ventricle
     order: 17
     impc_id: IMPC_EML_039_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param18:
     name: Primitive heart tube cardiac muscle
     order: 18
@@ -138,22 +138,22 @@ parameters:
     order: 19
     impc_id: IMPC_EML_054_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param20:
     name: Dorsal aorta
     order: 20
     impc_id: IMPC_EML_041_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param21:
     name: Hindgut
     order: 21
     impc_id: IMPC_EML_043_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param22:
     name: Midgut
     order: 22
@@ -166,33 +166,33 @@ parameters:
     order: 23
     impc_id: IMPC_EML_044_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param24:
     name: Neural tube
     order: 24
     impc_id: IMPC_EML_045_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param25:
     name: Caudal neuropore
     order: 25
     impc_id: IMPC_EML_046_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param26:
     name: Somite
     order: 26
     impc_id: IMPC_EML_047_001
     options: 0 
-    mandatory: no 
-    default_option: imageOnly 
+    mandatory: yes 
+    default_option: present 
   param27:
     name: Delayed embronic development
     order: 27
     impc_id: IMPC_EML_049_001
     options: 1 
-    mandatory: no 
+    mandatory: yes 
     default_option: 'no' 
