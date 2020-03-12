@@ -32,8 +32,7 @@ class ExportXML(object):
     """
     TODO: project
     """
-    def __init__(self,qq
-    qq
+    def __init__(self,
                  date_of_annotation: str,
                  annotator_id: str,
                  metadata: str
