@@ -139,7 +139,7 @@ parameters:
     impc_id: IMPC_EML_054_001
     options: 0 
     mandatory: yes 
-    default_option: present 
+    default_option: imageOnly 
   param20:
     name: Dorsal aorta
     order: 20
@@ -148,50 +148,57 @@ parameters:
     mandatory: yes 
     default_option: present 
   param21:
-    name: Hindgut
+    name: Peritoneal cavity
     order: 21
+    impc_id: IMPC_EML_055_001
+    options: 0 
+    mandatory: no 
+    default_option: imageOnly 
+  param22:
+    name: Hindgut
+    order: 22
     impc_id: IMPC_EML_043_001
     options: 0 
     mandatory: yes 
     default_option: present 
-  param22:
+  param23:
     name: Midgut
-    order: 22
+    order: 23
     impc_id: IMPC_EML_053_001
     options: 0 
     mandatory: no 
     default_option: imageOnly 
-  param23:
+  param24:
     name: Forelimb bud
-    order: 23
+    order: 24
     impc_id: IMPC_EML_044_001
     options: 0 
     mandatory: yes 
     default_option: present 
-  param24:
+  param25:
     name: Neural tube
-    order: 24
+    order: 25
     impc_id: IMPC_EML_045_001
     options: 0 
     mandatory: yes 
     default_option: present 
-  param25:
+  param26:
     name: Caudal neuropore
-    order: 25
+    order: 26
     impc_id: IMPC_EML_046_001
     options: 0 
     mandatory: yes 
     default_option: present 
-  param26:
+  param27:
     name: Somite
-    order: 26
+    order: 27
     impc_id: IMPC_EML_047_001
     options: 0 
     mandatory: yes 
     default_option: present 
-  param27:
+  param28:
     name: Delayed embronic development
-    order: 27
+    order: 28
     impc_id: IMPC_EML_049_001
     options: 1 
     mandatory: yes 
