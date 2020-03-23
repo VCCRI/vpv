@@ -90,7 +90,7 @@ class Volume(Qt.QObject):
         if ext == '.mnc':
             return minc_to_numpy(path)
 
-        ir = ImageReader(path)
+        ir = ImageReader(path, memmap=memmap)
         vol = ir.vol
         self.space = ir.space
         #

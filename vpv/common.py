@@ -11,9 +11,7 @@ import logging
 import appdirs
 from PyQt5 import QtGui, QtCore
 from typing import Tuple
-
-
-
+import numpy as np
 
 RAS_DIRECTIONS = (-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0)
 LPS_DIRECTIONS = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
@@ -165,7 +163,7 @@ class Layers(Enum):
 
 
 class ImageReader(object):
-    def __init__(self, img_path):
+    def __init__(self, img_path, memmap=False):
 
         if img_path.endswith('.gz'):
             # Get the image file extension
@@ -182,7 +180,13 @@ class ImageReader(object):
         # else:
         self.img = sitk.ReadImage(img_path)
         self.space = self.img.GetDirection()
-        self.vol = sitk.GetArrayFromImage(self.img)
+        vol = sitk.GetArrayFromImage(self.img)
+        if memmap:
+            temp = tempfile.TemporaryFile()
+            mm = np.memmap(temp, dtype=vol.dtype, mode='w+', shape=vol.shape)
+            mm[:] = vol[:]
+            vol = mm
+        self.vol = vol
 
 
 def read_image(img_path, convert_to_ras=False):
