@@ -400,7 +400,14 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         self.mapper = mapper # Contains info on whether views should be flipped or not
 
         self.scalebar = None
-        self.ui.setupUi(self)
+
+        # New version of Qt raises SystemError for as yet unkown reason
+        # See http://phobos/n.horner/vpv2/issues/45
+        try:
+            self.ui.setupUi(self)
+        except SystemError as e:
+            pass
+
         self.ui.labelSliceNumber.setFixedWidth(30)
 
         self.orientation = orientation
