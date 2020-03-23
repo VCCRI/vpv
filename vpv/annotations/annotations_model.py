@@ -1,8 +1,7 @@
 import os
 import logging
 from os.path import join, dirname, abspath
-import yaml
-from vpv.common import get_stage_from_proc_id, ANNOTATIONS_PROC_VERSION, error_dialog, load_yaml
+from vpv.common import get_stage_and_modality, error_dialog, load_yaml, Stage, Modality
 from os.path import splitext, isfile, isdir
 
 SCRIPT_DIR = dirname(abspath(__file__))
@@ -65,7 +64,7 @@ class Annotation(object):
 
 
 class ImpcAnnotation(Annotation):
-    def __init__(self, x, y, z, emapa_term, name, options, default_option, dims, stage, order, is_mandatory):
+    def __init__(self, x, y, z, emapa_term, name, options, default_option, dims, stage: Stage, order, is_mandatory):
         super(ImpcAnnotation, self).__init__(x, y, z, dims, stage)
         self.term = str(emapa_term)
         self.name = name
@@ -81,7 +80,7 @@ class ImpcAnnotation(Annotation):
 
 class SpecimenAnnotations(object):
     """
-    Associated with a single Volume (specimen)
+    Associated with a single Volume (specimen) contains multiple Annotation
     
     For testing we're just doing the E15.5 stage. We will have to have multiple stages later and there will need
     to be some way of only allowing one stage of annotation per volume
@@ -111,10 +110,14 @@ class SpecimenAnnotations(object):
         # The developmental stage of the embryo being annotated
         self._stage = None
 
+        self.modality = None
+
         # self.date_of_annotation = None  # Will be set from the annotation gui_load_done_status
         self.saved_xml_fname = None  # Will be set when xml is loaded from file
 
         self.annotation_date = None
+
+        self.proc_id = None  # The imaging procedure eg IMPC_EOL__002
 
         self._load_options_and_metadata()
         # self._load_done_status()
@@ -156,10 +159,7 @@ class SpecimenAnnotations(object):
     def _load_options_and_metadata(self):
         """
         The volume has been loaded. Now see if there is an associated annotation folder that will contain the IMPC
-        metadata parameter file. Also load in any partially completed xml annotation files
-
-        Returns
-        -------
+        metadata parameter file. Also load in any partially completed xml annotation files.
 
         """
         if not self.annotation_dir:
@@ -177,16 +177,29 @@ class SpecimenAnnotations(object):
         if not metadata_params:
             return
 
-        # proc_id = metadata_params['procedure_id']
-        proc_id = metadata_params['procedure_id'] = ANNOTATIONS_PROC_VERSION
+        proc_id = metadata_params['procedure_id']
+
+        # Temp fix 030320 to increment procedures to 002 so they vallidate correctly
+        proc_id = proc_id.replace('_001', '_002')
+        self.proc_id = proc_id
+
         center_id = metadata_params['centre_id']
-        stage_id = get_stage_from_proc_id(proc_id, center_id)
+        stage_id, modality = get_stage_and_modality(proc_id, center_id)
 
         self.stage = stage_id
         self.center = center_id
+        self.modality = modality
 
         # Get the procedure parameters for the given center/stage
-        center_stage_default_params = cso['centers'][center_id]['stages'][stage_id]['parameters']
+        try:
+            cso['centers'][center_id]['procedures'][proc_id]
+        except KeyError:
+            logging.error(f'Procedure id {proc_id} not in the annotation_conf')
+            return
+
+        center_stage_default_params = cso['centers'][center_id]['procedures'][proc_id]['parameters']
+
+        # opts['centers'][center]['procedures'][proc_id]['parameters'] = self.load_centre_stage_file(param_file_)
 
         for _, param_info in center_stage_default_params.items():
 
@@ -237,7 +250,7 @@ class SpecimenAnnotations(object):
         # ann.x, ann.y, ann.z = x, y, z
         ann.selected_option = selected_option
 
-    def add_impc_annotation(self, x: int, y:int, z:int, impc_param, name, options, default_option, stage, order,
+    def add_impc_annotation(self, x: int, y:int, z:int, impc_param, name, options, default_option, stage: Stage, order,
                             is_mandatory, dims):
         """
         Add an emap type annotation from available terms on file
@@ -288,11 +301,17 @@ class CenterStageOptions(object):
         self.opts = opts
         self.available_options = self.opts['available_options']
 
-        for center in opts['centers']:
-            for stage_id, stage_data in opts['centers'][center]['stages'].items():
-                stage_file = stage_data['file_']
+        # Get the centre/stage-specific parameters
+
+        for centre_id, centre_data in opts['centers'].items():
+            for proc_id, proc_data in centre_data['procedures'].items():
+                param_file_ = proc_data['file_']
+
                 # now add the parameters from each individual centre/stage file to the main options config
-                opts['centers'][center]['stages'][stage_id]['parameters'] = self.load_centre_stage_file(stage_file)
+                try:
+                    opts['centers'][centre_id]['procedures'][proc_id]['parameters'] = self.load_centre_stage_file(param_file_)
+                except KeyError as e:
+                    raise
 
     def load_centre_stage_file(self, yaml_name):
         """

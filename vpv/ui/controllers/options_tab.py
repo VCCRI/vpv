@@ -12,7 +12,7 @@ tab widget
 
 class OptionsTab(QtGui.QWidget):
     flip_signal = QtCore.pyqtSignal()
-    filter_label_signal = QtCore.pyqtSignal(int)
+    filter_label_signal = QtCore.pyqtSignal(list)
 
     def __init__(self, mainwindow, appdata: AppData):
         super(OptionsTab, self).__init__(mainwindow)
@@ -57,11 +57,12 @@ class OptionsTab(QtGui.QWidget):
 
     def filter_label(self):
         input_ = self.ui.lineEditShowLabel.text()
+        labels = input_.split(' ')
         try:
-            label = int(input_)
+            labels = [int(x) for x in labels]
         except (TypeError, ValueError):
-            label = 0 # Reset the filtering
-        self.filter_label_signal.emit(label)
+            labels = [0] # Reset the filtering
+        self.filter_label_signal.emit(labels)
 
     def set_orientations(self):
         """

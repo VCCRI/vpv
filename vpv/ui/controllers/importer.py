@@ -114,7 +114,6 @@ class Import(QDialog):
 
     def folder_filter(self, path: str) -> bool:
         """
-        Filter paths based on a string it contains
 
         Returns
         -------
@@ -126,8 +125,12 @@ class Import(QDialog):
         if not self.folder_include_pattern:
             return True  # Do no filtering as there's no pattern
 
-        # Replace any asterix in the pattern to '.+' to match anything
+        # Replace any asterix in the pattern to '.+' to match anything` ````
         pattern = self.folder_include_pattern.replace('*', '.+')
+
+        # 211019 temp bodge: ignore these subfolders that keep getting in the way
+        if 'resolution_images' in path:
+            return False
 
         if re.search(pattern, path, re.IGNORECASE):
             return True  # Found pattern in path

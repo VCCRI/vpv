@@ -23,6 +23,7 @@ This module is involved in the display of a single orthogonal view.
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QWidget, QLabel
 import pyqtgraph as pg
+from typing import Iterable
 from vpv.ui.views.ui_slice_widget import Ui_SliceWidget
 import os
 from collections import OrderedDict
@@ -486,12 +487,12 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
         self.show()
 
-    def filter_label(self, label: int):
+    def filter_label(self, label: Iterable[int]):
         """
-        On volume2 layers only show label. If 0 show all
+        On volume2 layers only show these labels. If 0 show all.
         """
         l = self.layers[Layers.vol2]
-        l.show_label = label
+        l.show_labels = label
         self.update_view()
 
     def set_orientation_labels_visiblility(self, visible: bool):
@@ -958,13 +959,27 @@ class SliceWidget(QWidget, Ui_SliceWidget):
         # else:
         event.ignore()
 
-    def move_to_next_volume(self, reverse=False):
+    def move_to_next_volume(self, reverse: bool = False):
+        """
+        Cycle through volumes in the top layer (layer1)
+
+        Parameters
+        ----------
+        reverse
+            Cycle forwards or backwards
+
+        """
+
         vol_ids = self.model.volume_id_list()
+
         if len(vol_ids) < 2:
             return
+
         current_vol_idx = vol_ids.index(self.layers[Layers.vol1].vol.name)
+
         if not self.layers[Layers.vol1].vol.name or self.layers[Layers.vol1].vol.name == 'None':
             return
+
         if reverse:
             if current_vol_idx - 1 < 0:
                 new_index = len(vol_ids) - 1
@@ -975,5 +990,6 @@ class SliceWidget(QWidget, Ui_SliceWidget):
                 new_index = 0
             else:
                 new_index = current_vol_idx + 1
+
         new_vol_name = vol_ids[new_index]
         self.layers[Layers.vol1].set_volume(new_vol_name)

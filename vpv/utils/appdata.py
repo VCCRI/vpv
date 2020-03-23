@@ -46,122 +46,124 @@ class AppData(object):
 
         if os.path.isfile(self.app_data_file):
 
-            self.app_data = common.load_yaml(self.app_data_file)
-            if not self.app_data:
-                logging('Warning: could not load app data file')
-                self.app_data = {}
+            self.monster_munch = common.load_yaml(self.app_data_file)
+            if not self.monster_munch:
+                logging.error(f'Warning: could not load app data file\nTry deleting {self.app_data_file}')
+                self.monster_munch = {}
         else:
-            self.app_data = {}
+            self.monster_munch = {}
 
         # Appdata versioning was not always in place. If a we find some appdata without a version, reset the data
         # Also reset the data if we find a previous version
 
         # This breaks for JIm on v2.02. Complains about NoneType not having a get(). Catch attribute error
         try:
-            if self.app_data.get('version') is None or self.app_data['version'] < VPV_APPDATA_VERSION:
+            if self.monster_munch.get('version') is None or self.monster_munch['version'] < VPV_APPDATA_VERSION:
                 print("resetting appdata")
-                self.app_data = {}
+                self.monster_munch = {}
         except AttributeError:
-            self.app_data = {}
+            self.monster_munch = {}
 
-        if self.app_data == {}:
-            self.app_data['version'] = VPV_APPDATA_VERSION
+        if self.monster_munch == {}:
+            self.monster_munch['version'] = VPV_APPDATA_VERSION
 
-        if 'recent_files' not in self.app_data:
-            self.app_data['recent_files'] = collections.deque(maxlen=10)
+        if 'recent_files' not in self.monster_munch:
+            self.monster_munch['recent_files'] = collections.deque(maxlen=10)
 
     def set_flips(self, flip_options: dict):
-        self.app_data['flips'] = flip_options
+        self.monster_munch['flips'] = flip_options
 
     def get_flips(self):
-        flips = self.app_data.get('flips')
+        flips = self.monster_munch.get('flips')
 
         if not flips:
-            self.app_data['flips'] = {'axial':    {'x': False, 'z': False, 'y': False},
+            self.monster_munch['flips'] = {'axial':    {'x': False, 'z': False, 'y': False},
                                       'coronal':  {'x': False, 'z': False, 'y': False},
                                       'sagittal': {'x': False, 'z': False, 'y': False},
                                       'impc_view': False}
 
-        return self.app_data['flips']
+        return self.monster_munch['flips']
 
     @property
     def annotation_circle_radius(self):
-        return self.app_data.get('annotation_cricle_radius', ANNOTATION_CRICLE_RADIUS_DEFAULT)
+        return self.monster_munch.get('annotation_cricle_radius', ANNOTATION_CRICLE_RADIUS_DEFAULT)
 
     @annotation_circle_radius.setter
     def annotation_circle_radius(self, radius):
-        self.app_data['annotation_cricle_radius'] = radius
+        self.monster_munch['annotation_cricle_radius'] = radius
 
     @property
     def annotation_centre(self):
-        return self.app_data.get('annotation_centre')
+        return self.monster_munch.get('annotation_centre')
 
     @annotation_centre.setter
     def annotation_centre(self, centre):
-        self.app_data['annotation_centre'] = centre
+        self.monster_munch['annotation_centre'] = centre
 
     @property
     def annotation_stage(self):
-        return self.app_data.get('annotation_stage')
+        return self.monster_munch.get('annotation_stage')
 
     @annotation_stage.setter
     def annotation_stage(self, stage):
-       self.app_data['annotation_stage'] = stage
+       self.monster_munch['annotation_stage'] = stage
 
     @property
     def annotator_id(self):
-        return self.app_data.get('annotator_id')
+        return self.monster_munch.get('annotator_id')
 
     @annotator_id.setter
     def annotator_id(self, id_):
-        self.app_data['annotator_id'] = id_
+        self.monster_munch['annotator_id'] = id_
 
     @property
     def last_screen_shot_dir(self):
-        if not self.app_data.get('last_screenshot_dir'):
-            self.app_data['last_screenshot_dir'] = expanduser("~")
-        return self.app_data['last_screenshot_dir']
+        if not self.monster_munch.get('last_screenshot_dir'):
+            self.monster_munch['last_screenshot_dir'] = expanduser("~")
+        return self.monster_munch['last_screenshot_dir']
 
     @last_screen_shot_dir.setter
     def last_screen_shot_dir(self, dir_):
-        self.app_data['last_screenshot_dir'] = dir_
+        self.monster_munch['last_screenshot_dir'] = dir_
 
     def write_app_data(self):
+        #first convert yaml-incompatible stuff
+        self.monster_munch['recent_files'] = list(self.monster_munch['recent_files'])[0: 10]
         with open(self.app_data_file, 'w') as fh:
-            fh.write(yaml.dump(self.app_data))
+            fh.write(yaml.dump(self.monster_munch))
 
     def get_last_dir_browsed(self):
-        if not self.app_data.get('last_dir_browsed'):
-            self.app_data['last_dir_browsed'] = expanduser("~")
-        return self.app_data['last_dir_browsed']
+        if not self.monster_munch.get('last_dir_browsed'):
+            self.monster_munch['last_dir_browsed'] = expanduser("~")
+        return self.monster_munch['last_dir_browsed']
 
     def set_last_dir_browsed(self, path):
-        self.app_data['last_dir_browsed'] = path
+        self.monster_munch['last_dir_browsed'] = path
 
     def add_used_volume(self, volpath):
-        if volpath not in self.app_data['recent_files']:
-            self.app_data['recent_files'].append(volpath)
+        if volpath not in self.monster_munch['recent_files']:
+            self.monster_munch['recent_files'].append(volpath)
 
     def get_recent_files(self):
-        return self.app_data['recent_files']
+        return self.monster_munch['recent_files']
 
     def set_include_filter_patterns(self, patterns):
-        self.app_data['include_patterns'] = patterns
+        self.monster_munch['include_patterns'] = patterns
 
     def get_include_filter_patterns(self):
-        if not self.app_data.get('include_patterns'):
+        if not self.monster_munch.get('include_patterns'):
             return []
         else:
-            return self.app_data.get('include_patterns')
+            return self.monster_munch.get('include_patterns')
 
     def set_exclude_filter_patterns(self, patterns):
-        self.app_data['exclude_patterns'] = patterns
+        self.monster_munch['exclude_patterns'] = patterns
 
     def get_exclude_filter_patterns(self):
-        if not self.app_data.get('exclude_patterns'):
+        if not self.monster_munch.get('exclude_patterns'):
             return []
         else:
-            return self.app_data.get('exclude_patterns')
+            return self.monster_munch.get('exclude_patterns')
 
     def clear_recent(self):
-        self.app_data['recent_files'].clear()
+        self.monster_munch['recent_files'].clear()

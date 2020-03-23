@@ -6,7 +6,26 @@ from typing import Tuple
 from lxml import etree
 import yaml
 from vpv.lib import addict
-from vpv.common import ANNOTATIONS_PROC_VERSION
+
+
+def get_annotator_id_and_date(procedure_id) -> Tuple[str, str]:
+    """
+    Get the unique annotator_id and annotation date parameter ids for a procedure.
+    Parameters
+    ----------
+    procedure_id
+
+    Returns
+    -------
+    annotator_id, date_of_annotation
+    """
+
+    map_ = {
+        'IMPC_EOL': ('IMPC_EOL_052_001', 'IMPC_EOL_053_001'),
+        'IMPC_EML': ('IMPC_EML_057_001', 'IMPC_EML_058_001'),
+        'IMPC_EMO': ('IMPC_EMO_178_001', 'IMPC_EMO_179_001')
+    }
+    return map_[procedure_id[:8]]
 
 
 class ExportXML(object):
@@ -50,9 +69,10 @@ class ExportXML(object):
 
         self.procedure_element = etree.SubElement(self.experiment, 'procedure', procedureID=md['procedure_id'])
 
+        annotator_param_id, date_of_annotation_param_id = get_annotator_id_and_date(self.metadata['procedure_id'])
         # Add metadata parameters that are not supplied in the procedure_metadata.yaml
-        self.metadata['metadata']['IMPC_EMO_178_001'] = annotator_id
-        self.metadata['metadata']['IMPC_EMO_179_001'] = date_of_annotation
+        self.metadata['metadata'][annotator_param_id] = annotator_id
+        self.metadata['metadata'][date_of_annotation_param_id] = date_of_annotation
 
     def add_metadata(self):
         for id_, param_value in self.metadata['metadata'].items():
@@ -66,16 +86,23 @@ class ExportXML(object):
         etree.ElementTree(self.root).write(file_path, pretty_print=True, xml_declaration=True, encoding='UTF-8',
                                       standalone='yes')
 
-    def add_series_media_parameter(self):
-        # Get parameter info and append to procedure
+    def add_series_media_parameter(self, parameter_id: str):
+        """
+        Add SMP which will have parameterAssociations attached to it later (annotation points)
+
+        Parameters
+        ----------
+        parameter_id: the IMPC reconstruction parameter
+
+        """
         smp = etree.SubElement(self.procedure_element,
                                'seriesMediaParameter',
-                               parameterID="IMPC_EMO_001_001")
+                               parameterID=parameter_id)
 
         smp_value = etree.SubElement(smp, 'value',
                                      {"incrementValue": "1",  "URI": self.metadata['reconstruction_url']})
 
-        # Add the deafault imagages parameter
+        # Add the deafault images parameter
         self.series_media_parameter = smp_value
 
     def add_point(self, param_id, xyz, xyz_percents):
@@ -158,8 +185,8 @@ class ExportXML(object):
 
 def load_metadata(yaml_path):
     """
-    Load in the procedure_metadata yaml file
-    Override the procedureID as this needs to be version 2
+    Load in the procedure_metadata yaml file - Update the version ID to be 002 for now
+    increase the procedureID if at 001 as this needs to be version 002 for validation
 
     Parameters
     ----------
@@ -176,7 +203,9 @@ def load_metadata(yaml_path):
         data = yaml.load(fh)
 
     # override the procedure ID
-    data['procedure_id'] = ANNOTATIONS_PROC_VERSION
+    proc_id: str = data['procedure_id'].replace('_001', '_002')
+    data['procedure_id'] = proc_id
+
     return data
 
 
@@ -210,7 +239,7 @@ def load_xml(xml_file) -> Tuple:
 
         elif a.tag == 'procedure':
             # proc_id = a.attrib['procedureID']  hard code to v2
-            proc_id = ANNOTATIONS_PROC_VERSION
+            proc_id = a.attrib['procedureID']
 
         elif a.tag == 'simpleParameter':
             param_id = a.attrib['parameterID']

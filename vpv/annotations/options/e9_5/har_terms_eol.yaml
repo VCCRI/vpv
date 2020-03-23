@@ -1,0 +1,205 @@
+---
+parameters:
+  param0:
+    name: Hindbrain
+    order: 0
+    impc_id: IMPC_EOL_013_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param1:
+    name: 4th ventricle
+    order: 1
+    impc_id: IMPC_EOL_014_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param2:
+    name: Mesencephalic vesicle
+    order: 2
+    impc_id: IMPC_EOL_015_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param3:
+    name: Forebrain
+    order: 3
+    impc_id: IMPC_EOL_016_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param4:
+    name: Telecenphalic (lateral) ventricle
+    order: 4
+    impc_id: IMPC_EOL_017_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param5:
+    name: Rhombomeres
+    order: 5
+    impc_id: IMPC_EOL_018_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param6:
+    name: Infundibular recess of 3rd ventricle
+    order: 6
+    impc_id: IMPC_EOL_020_001
+    options: 0 
+    mandatory: no 
+    default_option: imageOnly 
+  param7:
+    name: Rathke's pouch
+    order: 7
+    impc_id: IMPC_EOL_021_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param8:
+    name: Optic vesicle
+    order: 8
+    impc_id: IMPC_EOL_022_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param9:
+    name: Otocyst
+    order: 9
+    impc_id: IMPC_EOL_023_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param10:
+    name: 1st branchial arch
+    order: 10
+    impc_id: IMPC_EOL_024_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param11:
+    name: 2nd branchial arch
+    order: 11
+    impc_id: IMPC_EOL_026_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param12:
+    name: Oropharynx
+    order: 12
+    impc_id: IMPC_EOL_028_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param13:
+    name: 3rd branchial arch
+    order: 13
+    impc_id: IMPC_EOL_029_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param14:
+    name: Aortic sac
+    order: 14
+    impc_id: IMPC_EOL_031_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param15:
+    name: Common atrial chamber
+    order: 15
+    impc_id: IMPC_EOL_032_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param16:
+    name: Atrioventricular canal
+    order: 16
+    impc_id: IMPC_EOL_033_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param17:
+    name: Heart ventricle
+    order: 17
+    impc_id: IMPC_EOL_034_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param18:
+    name: Primitive heart tube cardiac muscle
+    order: 18
+    impc_id: IMPC_EOL_035_001
+    options: 0 
+    mandatory: no 
+    default_option: imageOnly 
+  param19:
+    name: Pericardial cavity
+    order: 19
+    impc_id: IMPC_EOL_049_001
+    options: 0 
+    mandatory: yes 
+    default_option: imageOnly 
+  param20:
+    name: Dorsal aorta
+    order: 20
+    impc_id: IMPC_EOL_036_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param21:
+    name: Peritoneal cavity
+    order: 21
+    impc_id: IMPC_EOL_050_001
+    options: 0 
+    mandatory: no 
+    default_option: imageOnly 
+  param22:
+    name: Hindgut
+    order: 22
+    impc_id: IMPC_EOL_038_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param23:
+    name: Midgut
+    order: 23
+    impc_id: IMPC_EOL_048_001
+    options: 0 
+    mandatory: no 
+    default_option: imageOnly 
+  param24:
+    name: Forelimb bud
+    order: 24
+    impc_id: IMPC_EOL_039_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param25:
+    name: Neural tube
+    order: 25
+    impc_id: IMPC_EOL_040_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param26:
+    name: Caudal neuropore
+    order: 26
+    impc_id: IMPC_EOL_041_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param27:
+    name: Somite
+    order: 27
+    impc_id: IMPC_EOL_042_001
+    options: 0 
+    mandatory: yes 
+    default_option: present 
+  param28:
+    name: Delayed embronic development
+    order: 28
+    impc_id: IMPC_EOL_044_001
+    options: 1 
+    mandatory: yes 
+    default_option: 'no' 

@@ -30,6 +30,7 @@ import sys
 from pathlib import Path
 import logging
 from os.path import join, isdir
+from typing import Iterable
 p = sys.path
 
 from PyQt5 import QtGui, QtCore, QtWidgets
@@ -112,7 +113,8 @@ class Vpv(QtCore.QObject):
         self.view_scale_basrs = False
         self.view_id_counter = 0
         self.appdata = AppData()
-        self.current_view = None
+
+        print(self.appdata.monster_munch)
         self.mainwindow = main_window.Mainwindow(self, self.appdata)
         # self.mainwindow.showFullScreen()
         self.model = DataModel()
@@ -181,18 +183,18 @@ class Vpv(QtCore.QObject):
 
         self.check_vpv_version()
 
-    def filter_label(self, label: int):
+    def filter_label(self, labels: Iterable[int]):
         """
         Recieves a label to show. Pass to slice views
 
         Parameters
         ----------
-        label
-            the label number to show
+        labels
+            the label numbers to show, if 0 set to view all
 
         """
         for v in self.views.values():
-            v.filter_label(label)
+            v.filter_label(labels)
 
     def set_orientation_visibility(self, visible: bool):
         for view in self.views.values():
@@ -276,7 +278,7 @@ class Vpv(QtCore.QObject):
         if modifiers == QtCore.Qt.ShiftModifier:
 
             # With mouse move signal, also send current vol.
-            # If veiews are not synchronised, syncyed slicing only occurs within volumes
+            # If veiews are not synchronised, syncyed slicing only occurs within the same volumes
             self.mouse_shift(x, y, z, src_view)
 
     def map_annotation_signal_view_to_view(self, slice_idx: int, x: int, y: int, src_view: SliceWidget,
@@ -334,6 +336,9 @@ class Vpv(QtCore.QObject):
         src_view: SliceWidget
             the calling view
         """
+
+        if not self.current_annotation_volume():
+            return
 
         dims = self.current_annotation_volume().shape_xyz()
 
@@ -507,7 +512,11 @@ class Vpv(QtCore.QObject):
             self.update_manager()
 
     def toggle_link_views(self):
-        pass
+        if self.data_manager.link_views:
+            link = False
+        else:
+            link = True
+        self.data_manager.on_link_views(link)
 
     def update_manager(self, slice_id=0):  # called from data_manager:update_manager
         """

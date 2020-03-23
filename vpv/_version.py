@@ -1,4 +1,6 @@
-__version__ = '2.2.3' # Bugfix - prolems with incorredc tmouse hover voxel value reporting
+__version__ = '2.2.5'  # Add new annotation procedures for EOL and EML
+# __version__ = '2.2.4'  # Add new annotation procedures for EOL and EML
+#__version__ = '2.2.3' # Bugfix - prolems with incorrect mouse hover voxel value reporting
 #__version__ = '2.2.2' # Added anatomical orientation indicators
 # __version__ = '2.2.1' # Moved to default RAS format. RAS volumes should look the same as in Slicer
 #__version__ = '2.2.0' # Moved to default RAS format. RAS volumes should look the same as in Slicer

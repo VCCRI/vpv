@@ -9,6 +9,7 @@ if sys.version_info[0] < 3:
 
 from PyQt5 import QtGui
 from vpv.vpv import Vpv
+from vpv.utils import data_loader
 from vpv.common import Orientation, Layers, log_path, error_dialog
 from vpv._version import __version__ as vpv_version
 import logging
@@ -24,6 +25,7 @@ def excepthook_overide(exctype, value, traceback_):
                          ''.join(traceback.format_tb(traceback_))))
     print(exctype, value, ''.join(traceback.format_tb(traceback_)))
 
+
 if __name__ == '__main__':
 
     import argparse
@@ -33,6 +35,8 @@ if __name__ == '__main__':
     parser.add_argument('-hm', '-heatmaps', dest='heatmaps', nargs='*', help='Heatmap paths seperated by spaces',
                         default=False)
     parser.add_argument('-an', '-analysis', dest='analysis_zips', help='Analysis zip path',
+                        default=False)
+    parser.add_argument('-l', '-loader', dest='loader_file', help='Pass in a loder toml file created by utils.data_loader.py',
                         default=False)
     args = parser.parse_args()
 
@@ -44,6 +48,9 @@ if __name__ == '__main__':
                         level=logging.DEBUG, filename=log_path)
 
     logging.info('VPV v{} starting'.format(vpv_version))
+
+    if not args.volumes and args.loader_file:
+        data_loader.load(args.loader_file)
 
     app = QtGui.QApplication(sys.argv)
 
@@ -61,4 +68,6 @@ if __name__ == '__main__':
 
     if args.analysis_zips:
         ex.load_impc_analysis(args.analysis_zips)
+
     sys.exit(app.exec_())
+

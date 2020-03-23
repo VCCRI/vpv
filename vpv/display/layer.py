@@ -33,15 +33,15 @@ class Layer(Qt.QObject):
         self.lt = Lut()
         self.isvisible = True
         self.opacity = 1.0
-        self._show_label = 0  # show all labels to start with (if label layer)
+        self._show_labels = [0]  # show all labels to start with (if label layer)
 
     @property
-    def show_label(self):
-        return self._show_label
+    def show_labels(self):
+        return self._show_labels
 
-    @show_label.setter
-    def show_label(self, label):
-        self._show_label = label
+    @show_labels.setter
+    def show_labels(self, labels):
+        self._show_labels = labels
 
     def clear(self):
         """
@@ -93,7 +93,7 @@ class Layer(Qt.QObject):
             print(f'cannot find vol: {volname}')
             return
 
-        self.set_series_slider()
+        # self.set_series_slider()
 
         orientation = self.parent.orientation
         self.name = self.vol.name
@@ -110,7 +110,8 @@ class Layer(Qt.QObject):
         self.parent.set_slice_slider(dim_len, slice_indx)
 
         # This fixes problem with linked zooming
-        self.parent.viewbox.autoRange()
+        if initial:
+            self.parent.viewbox.autoRange()
         self.parent.scalebar.updateBar()
 
     def set_slice(self, index: int):
@@ -123,9 +124,9 @@ class Layer(Qt.QObject):
                 slice_ = self.vol.get_data(self.parent.orientation, index,
                                                        flip_x, flip_z, flip_y)
 
-                if self._show_label != 0:
+                if self._show_labels != [0]:
                     slice_ = np.copy(slice_)
-                    slice_[slice_ != self.show_label] = 0
+                    slice_[~np.isin(slice_, self._show_labels)] = 0
 
                 self.image_item.setImage(slice_, autoLevels=False, opacity=opacity)
 

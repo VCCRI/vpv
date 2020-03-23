@@ -2,11 +2,12 @@
 
 # Form implementation generated from reading ui file 'ui_datatab.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_data(object):
     def setupUi(self, data):
@@ -112,7 +113,7 @@ class Ui_data(object):
         self.label_2.setSizePolicy(sizePolicy)
         self.label_2.setObjectName("label_2")
         self.verticalLayout_9.addWidget(self.label_2)
-        self.comboBoxOrientation = QtWidgets.QComboBox(data)
+        self.comboBoxOrientation = QComboBoxIgnoreSCroll(data)
         self.comboBoxOrientation.setObjectName("comboBoxOrientation")
         self.comboBoxOrientation.addItem("")
         self.comboBoxOrientation.addItem("")
@@ -160,7 +161,7 @@ class Ui_data(object):
         self.layoutVolume.addLayout(self.horizontalLayout_12)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.comboBoxVolume = QtWidgets.QComboBox(data)
+        self.comboBoxVolume = QComboBoxIgnoreSCroll(data)
         self.comboBoxVolume.setObjectName("comboBoxVolume")
         self.horizontalLayout_2.addWidget(self.comboBoxVolume)
         self.pushButtonEditVolName = QtWidgets.QPushButton(data)
@@ -180,7 +181,7 @@ class Ui_data(object):
         self.layoutVolume.addLayout(self.horizontalLayout_2)
         self.horizontalLayoutVol1Levels = QtWidgets.QHBoxLayout()
         self.horizontalLayoutVol1Levels.setObjectName("horizontalLayoutVol1Levels")
-        self.comboBoxVolumeLut = QtWidgets.QComboBox(data)
+        self.comboBoxVolumeLut = QComboBoxIgnoreSCroll(data)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -489,4 +490,6 @@ class Ui_data(object):
         self.label_16.setText(_translate("data", "Scale bar length"))
         self.checkBoxScaleBarLabel.setText(_translate("data", "scale label"))
 
+
+from combobox_ignore_scroll import QComboBoxIgnoreSCroll
 import resources_rc

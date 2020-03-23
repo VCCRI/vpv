@@ -1,5 +1,5 @@
 """
-Load volumes into vpv from a tml config file
+Load volumes into vpv from a toml config file. Just load volumes and no overlays
 
 Examples
 --------
