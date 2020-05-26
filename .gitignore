@@ -4,3 +4,6 @@ tests/stats/*
 *.pyc
 windows_build/*
 mypy_cache/**
+build/**
+dist/**
+vpv.egg-info/**
