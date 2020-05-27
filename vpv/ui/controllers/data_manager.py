@@ -56,7 +56,7 @@ class ManageData(QtGui.QWidget):
         self.mainwindow = mainwindow
         self.appdata = appdata
         lut = Lut()
-        self.controller = controller  # vpv.py
+        self.controller = controller  # run_vpv.py
 
         self.hotred = lut._hot_red_blue()[0]
         self.hotblue = lut._hot_red_blue()[1]

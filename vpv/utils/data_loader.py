@@ -32,7 +32,7 @@ from itertools import chain
 import toml
 from PyQt5 import QtGui
 
-from vpv.vpv import Vpv
+from vpv.vpv_temp import Vpv
 from vpv.common import Layers, Orientation
 
 

@@ -37,11 +37,11 @@ class Modality(Enum):
     opt = 'opt'
 
 
-log_dir = appdirs.user_data_dir(appname='vpv', appauthor="")
+log_dir = appdirs.user_data_dir(appname='vpv_viewer', appauthor="")
 if not isdir(log_dir):
     mkdir(log_dir)
 
-log_path = join(log_dir, 'vpv.log')
+log_path = join(log_dir, 'vpv_viewer.log')
 
 
 def get_fname_and_line_number():

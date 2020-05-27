@@ -30,7 +30,7 @@ ANNOTATION_CRICLE_RADIUS_DEFAULT = 40
 class AppData(object):
     def __init__(self):
         self.using_appdata = True # Set to false if we weren't able to find a sirectory to save the appdata
-        appname = 'vpv'
+        appname = 'vpv_viewer'
         appdata_dir = appdirs.user_data_dir(appname)
 
         if not os.path.isdir(appdata_dir):
@@ -42,7 +42,7 @@ class AppData(object):
                 if not os.path.isdir(appdata_dir):
                     os.mkdir(appdata_dir)
 
-        self.app_data_file = os.path.join(appdata_dir, 'vpv.yaml')
+        self.app_data_file = os.path.join(appdata_dir, 'vpv_viewer.yaml')
 
         if os.path.isfile(self.app_data_file):
 

@@ -1,33 +1,61 @@
-#!/usr/bin/env python
+# coding: utf-8
 
-# Copyright 2016 Medical Research Council Harwell.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-#
-# @author Neil Horner <n.horner@har.mrc.ac.uk>
+from pathlib import Path
+from setuptools import setup, find_packages
+from vpv import annotations
+import os
+import vpv
 
-from setuptools.command import easy_install
+def get_annotation_files():
+    """
+    Need to find the non-.py file that are needed for annotations
+    Returns
+    -------
 
-dependencies = ["pyqtgraph", "appdirs", "SimpleITK", "numpy"]
+    """
+    options_dir = Path(annotations.__file__).parent
+    config_files = [os.path.relpath(x, Path(vpv.__file__).parent) for x in options_dir.rglob('*.yaml')]
+    return config_files
 
-for dep in dependencies:
+# config_files = [x for x in options_dir.iterdir()]
 
-	try:
-		mod = __import__(dep)  # try to import module
-		print("{0} already installed.".format(dep))
+setup(
+    name='vpv_viewer',
+    download_url='https://github.com/mpi2/lama/archive/0.9.4.tar.gz',
+    version='2.2.2',
+    packages=find_packages(exclude=("dev")),
+	package_data={'': get_annotation_files()},  # Puts it in the wheel dist. MANIFEST.in gets it in source dist
+    # package_data={'': ['current_commit',
+    #                    'stats/rscripts/lmFast.R',
+    #                    'stats/rscripts/r_padjust.R']},  # Puts it in the wheel dist. MANIFEST.in gets it in source dist
+    include_package_data=True,
+    install_requires=[
+        'pyqt5',
+        'simpleitk',
+        'pyyaml',
+        'scipy',
+        'appdirs',
+        'pillow',
+        'lxml',
+        'pyqtgraph',
+        'toml',
+        'python-dateutil'
+    ],
 
-	except ImportError:
-
-		# If it fails, try to easy install it
-		easy_install.main(["--user", dep])
+    url='https://github.com/mpi2/vpv',
+    license='Apache2',
+    author='Neil Horner',
+    author_email='n.horner@har.mrc.ac.uk, bit@har.mrc.ac.uk',
+    description='Viewing and annotation of 3D volumetric phenotype data for the IMPC',
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+     ],
+    keywords=['image processing', 'bioinformatics', 'phenotype'],
+    entry_points ={
+            'console_scripts': [
+                'vpv_l=vpv.run_vpv:main',
+            ]
+        },
+)

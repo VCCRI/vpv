@@ -8,7 +8,7 @@ if sys.version_info[0] < 3:
     sys.exit("VPV must me run with Python3. Exiting")
 
 from PyQt5 import QtGui
-from vpv.vpv import Vpv
+from vpv.vpv_temp import Vpv
 from vpv.utils import data_loader
 from vpv.common import Orientation, Layers, log_path, error_dialog
 from vpv._version import __version__ as vpv_version
@@ -26,8 +26,7 @@ def excepthook_overide(exctype, value, traceback_):
     print(exctype, value, ''.join(traceback.format_tb(traceback_)))
 
 
-if __name__ == '__main__':
-
+def main():
     import argparse
     parser = argparse.ArgumentParser("Volume Phenptype Viewer")
     parser.add_argument('-v', '-volumes', dest='volumes', nargs='*', help='Volume paths seperated by spaces',
@@ -70,4 +69,9 @@ if __name__ == '__main__':
         ex.load_impc_analysis(args.analysis_zips)
 
     sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    main()
+
 

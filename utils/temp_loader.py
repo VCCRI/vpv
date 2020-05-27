@@ -3,7 +3,7 @@ import sys
 
 from PyQt5 import QtGui
 
-from vpv.vpv import Vpv
+from vpv.vpv_temp import Vpv
 from lama.paths import specimen_iterator
 
 root_dir = Path('/mnt/IMPC_research/neil/E14.5/baselines/output')

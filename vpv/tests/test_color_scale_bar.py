@@ -12,7 +12,7 @@ def test_color_bar():
     Just runs the color scale bar code. Not a proper test as such. You have to tell whether it's passed by looking
     at the image produced
 
-    Used in development as it's quicker than running an instance of vpv each time
+    Used in development as it's quicker than running an instance of vpv_viewer each time
     """
     lut = Lut()
     hotred = lut._hot_red_blue()[0]

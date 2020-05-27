@@ -1,5 +1,5 @@
 """
-Load volumes into vpv from a toml config file. Just load volumes and no overlays
+Load volumes into vpv_viewer from a toml config file. Just load volumes and no overlays
 
 Examples
 --------
@@ -29,7 +29,7 @@ from itertools import chain
 import toml
 from PyQt5 import QtGui
 
-from vpv.vpv import Vpv
+from vpv.vpv_temp import Vpv
 from vpv.common import Layers
 
 from typing import Dict

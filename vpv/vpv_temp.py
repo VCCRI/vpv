@@ -46,7 +46,7 @@ except AttributeError:
     logging.info("High DPI scaling not available. QT >=5.6 is needed for this ")
 
 if os.name == 'nt':
-    # check where vpv has been installed
+    # check where vpv_viewer has been installed
     vpv_installation_dir = os.path.dirname(os.path.realpath(__file__))
     winpython_path = os.path.join(vpv_installation_dir, WINPYTHON_DIR, PYTHON_DIR)
     if os.path.isdir(winpython_path):

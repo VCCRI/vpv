@@ -1,6 +1,6 @@
 """
 09/04/19
-data_loader in vpv.util can now load in a a series of volumes and setup the views in a predifned way.
+data_loader in vpv_viewer.util can now load in a a series of volumes and setup the views in a predifned way.
 
 This script will generate a config for each line.
 

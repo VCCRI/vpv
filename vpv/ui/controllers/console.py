@@ -31,7 +31,7 @@ class Console(QWidget):
         self.ui.setupUi(self)
         self.vpv = vpv
         variables = {
-             "vpv": self.vpv,
+             "vpv_viewer": self.vpv,
              "current_volume": self.current_volume,
              "volume_ids": self.volume_ids,
              "get_volume": self.get_volume,

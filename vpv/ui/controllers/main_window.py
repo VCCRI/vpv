@@ -33,7 +33,7 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         Parameters
         ----------
-        controller: vpv.vpv
+        controller: vpv.vpv_temp
         appdata
         """
 

@@ -49,7 +49,7 @@ class AnnotationsWidget(QWidget):
         """
         Parameters
         ----------
-        controller: vpv.Vpv
+        controller: vpv_viewer.Vpv
             The entry point of the app
         main_window: QtWidgets.QmainWindow
             The mainwindow. Used as a parent for other widgets

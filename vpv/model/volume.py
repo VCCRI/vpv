@@ -15,7 +15,7 @@ class Volume(Qt.QObject):
     """
     axial_slice_signal = QtCore.pyqtSignal(str, name='axial_signal')
 
-    def __init__(self, vol_path: str, model: "vpv.model.model", datatype: str,  memory_map: bool=False):
+    def __init__(self, vol_path: str, model: "vpv_viewer.model.model", datatype: str,  memory_map: bool=False):
         """
 
         Parameters

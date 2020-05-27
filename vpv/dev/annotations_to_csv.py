@@ -15,7 +15,7 @@ xml_dir = Path('/home/neil/Desktop/xml_to_csv')
 outfile = '/home/neil/Desktop/181218_xml_annotations_to_csv.csv'
 
 
-term_mapping_file = '/home/neil/git/vpv/vpv/annotations/options/e15_5/ucd_terms.yaml'
+term_mapping_file = '/vpv_viewer/annotations/options/e15_5/ucd_terms.yaml'
 with open(term_mapping_file) as fh:
     terms = yaml.load(fh)
 

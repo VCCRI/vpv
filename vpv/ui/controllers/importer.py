@@ -299,7 +299,7 @@ class Import(QDialog):
         folder_paths = []
         folders_to_remove = []
 
-        # If a single directory has been dropped onto vpv
+        # If a single directory has been dropped onto vpv_viewer
         for path in files_to_open:
             if os.path.isdir(path):
                 folder_paths.extend(self.get_all_filles_in_dir(path))
