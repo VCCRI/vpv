@@ -22,7 +22,7 @@ def get_annotation_files():
 setup(
     name='vpv_viewer',
     download_url='https://github.com/mpi2/lama/archive/0.9.4.tar.gz',
-    version='2.2.2',
+    version='2.2.4',
     packages=find_packages(exclude=("dev")),
 	package_data={'': get_annotation_files()},  # Puts it in the wheel dist. MANIFEST.in gets it in source dist
     # package_data={'': ['current_commit',
@@ -55,7 +55,7 @@ setup(
     keywords=['image processing', 'bioinformatics', 'phenotype'],
     entry_points ={
             'console_scripts': [
-                'vpv_l=vpv.run_vpv:main',
+                'vpv=vpv.run_vpv:main',
             ]
         },
 )
