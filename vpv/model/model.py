@@ -118,8 +118,11 @@ class DataModel(QtCore.QObject):
         self._volumes = {}
         self._data = {}
 
-    def volume_id_list(self):
-        return sorted([id_ for id_ in self._volumes])
+    def volume_id_list(self, sort=True):
+        if sort: # Not sure if we need this
+            return sorted([id_ for id_ in self._volumes])
+        else:
+            return [id_ for id_ in self._volumes]
 
     def data_id_list(self):
         return sorted([id_ for id_ in self._data])

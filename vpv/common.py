@@ -161,6 +161,8 @@ class Layers(Enum):
     heatmap = 2
     vectors = 3
 
+# If the space directions are like this, no need to transform
+NO_TRANSFORM_VEC = (1, 0, 0, 0, 1, 0, 0, 0, 1)
 
 class ImageReader(object):
     def __init__(self, img_path, memmap=False):
@@ -179,8 +181,45 @@ class ImageReader(object):
         #     self.space = None
         # else:
         self.img = sitk.ReadImage(img_path)
-        self.space = self.img.GetDirection()
+        # self.dir_cos = np.asarray(self.img.GetDirection()).reshape((3,3))
+        self.dir_cos = self.img.GetDirection()
+
         vol = sitk.GetArrayFromImage(self.img)
+
+        # if self.dir_cos != NO_TRANSFORM_VEC:
+        #
+        #     from scipy.ndimage import affine_transform
+        #     # dir_cos_mat =  np.asarray(list(self.dir_cos))
+        #     #
+        #     rot_mat = np.identity(4)
+        #     # rot_mat.ravel()[0: len(dir_cos_mat)] = dir_cos_mat
+        #     #
+        #     # # from scipy.spatial.transform import Rotation as R
+        #     # # r = R.from_dcm(rot_mat)
+        #     # np.dot(rot_mat, vol)
+        #
+        #     # affine = sitk.AffineTransform(3)
+        #     # affine.SetParameters(self.img.GetDirection())
+        #     # resampled = sitk.Resample(self.img, affine_transform)
+        #     # print(resampled)
+        #
+        #     from scipy.ndimage import affine_transform
+        #     rot_mat[0][0:3] = self.dir_cos[0][0:3]
+        #     rot_mat[1][0:3] = self.dir_cos[1][0:3]
+        #     rot_mat[2][0:3] = self.dir_cos[2][0:3]
+        x = self.dir_cos[0]
+        y = self.dir_cos[4]
+        z = self.dir_cos[8]
+
+        # We dispaly the data as RAS by default.
+        # ITK reads in images as LPS by default. So if data is RAS, the y and x directions will be -1
+        # In this case we leave it as it is as VPV was previously made to show this data in RAS format
+        # However, if the directions for y and x are 1 then we do a flip of these axes.
+        # if y == 1:
+        #     vol = np.flip(vol, axis=1)
+        # if x == 1:
+        #     vol = np.flip(vol, axis=2)
+
         if memmap:
             temp = tempfile.TemporaryFile()
             mm = np.memmap(temp, dtype=vol.dtype, mode='w+', shape=vol.shape)
@@ -190,6 +229,8 @@ class ImageReader(object):
 
 
 def read_image(img_path, convert_to_ras=False):
+    # todo: This needs removing
+
     if img_path.endswith('.gz'):
         # Get the image file extension
         ex = splitext(splitext(img_path)[0])[1]
@@ -199,9 +240,11 @@ def read_image(img_path, convert_to_ras=False):
         with open(tmp.name, 'wb') as outfile:
             outfile.write(data)
         img_path = tmp.name
+
     img = sitk.ReadImage(img_path)
     direction = img.GetDirection()
-    arr = sitk.GetArrayFromImage(img)  # Leave this fix out for now until I make optin available to chose orientation
+    arr = sitk.GetArrayFromImage(img)
+
     # if convert_to_ras: # testing to get orientation the same as in IEV by default
     #     #convert to RAS (testing)
     #     arr = np.flip(arr, 0)

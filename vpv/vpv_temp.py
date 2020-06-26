@@ -30,7 +30,7 @@ import sys
 from pathlib import Path
 import logging
 from os.path import join, isdir
-from typing import Iterable
+from typing import Iterable, List
 p = sys.path
 
 from PyQt5 import QtGui, QtCore, QtWidgets
@@ -631,9 +631,9 @@ class Vpv(QtCore.QObject):
                         files)
 
     def check_non_ras(self):
-
+        return
         for vol in self.model.all_volumes():
-            if vol.space != common.RAS_DIRECTIONS:
+            if vol.dir_ != common.RAS_DIRECTIONS:
                 common.info_dialog(self.mainwindow, "Image format warning!",
                                    "At lease one of your loaded volumes is not in RAS format For IMPC annotation enure HARP v2.3.0 or aboave. Or use download data from the DCC")
                 break
@@ -818,7 +818,8 @@ class Vpv(QtCore.QObject):
 
     def load_volumes(self, file_list, data_type, memory_map=False, fdr_thresholds=False):
         """
-        Load some volumes from a list of paths.
+        Load volumes from a list of paths.
+
         Parameters
         ----------
         file_list: list
@@ -831,9 +832,10 @@ class Vpv(QtCore.QObject):
             q -> t statistic mappings
                 {0.01: 3.4,
                 0.05:, 3.1}
-
         """
+
         non_loaded = []
+
         for i, vol_path in enumerate(file_list):
             try:
 
@@ -851,6 +853,9 @@ class Vpv(QtCore.QObject):
         # self.any_data_loaded
         self.check_non_ras()
         self._auto_load_annotations(file_list)
+
+    def img_ids(self):
+        return self.model.volume_id_list(sort=False)
 
     def load_impc_analysis(self, impc_zip_file):
         """

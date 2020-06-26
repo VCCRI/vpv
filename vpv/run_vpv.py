@@ -1,7 +1,5 @@
 #! /usr/bin/env python3
 
-
-
 import sys
 
 if sys.version_info[0] < 3:
@@ -10,7 +8,7 @@ if sys.version_info[0] < 3:
 from PyQt5 import QtGui
 from vpv.vpv_temp import Vpv
 from vpv.utils import data_loader
-from vpv.common import Orientation, Layers, log_path, error_dialog
+from vpv.common import log_path
 from vpv._version import __version__ as vpv_version
 import logging
 import traceback

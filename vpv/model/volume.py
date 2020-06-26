@@ -92,7 +92,7 @@ class Volume(Qt.QObject):
 
         ir = ImageReader(path, memmap=memmap)
         vol = ir.vol
-        self.space = ir.space
+        self.space = ir.dir_cos
         #
         # vol = convert_volume(vol, ir.space)
         return vol
