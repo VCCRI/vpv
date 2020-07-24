@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_slice_widget.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.3
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -106,4 +106,4 @@ class Ui_SliceWidget(object):
         SliceWidget.setWindowTitle(_translate("SliceWidget", "Form"))
         self.labelSliceNumber.setAccessibleName(_translate("SliceWidget", "sliceNumber"))
 from pyqtgraph import GraphicsLayoutWidget
-import resources_rc
+from . import resources_rc

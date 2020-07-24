@@ -2,29 +2,33 @@
 
 from pathlib import Path
 from setuptools import setup, find_packages
-from vpv import annotations
+from vpv import annotations, resources
 import os
 import vpv
 
-def get_annotation_files():
+
+def get_resources():
     """
     Need to find the non-.py file that are needed for annotations
     Returns
     -------
 
     """
+    # get the IMPC annotation configs
     options_dir = Path(annotations.__file__).parent
-    config_files = [os.path.relpath(x, Path(vpv.__file__).parent) for x in options_dir.rglob('*.yaml')]
-    return config_files
+    files = [os.path.relpath(x, Path(vpv.__file__).parent) for x in options_dir.rglob('*.yaml')]
 
-# config_files = [x for x in options_dir.iterdir()]
+    resources_dir = Path(resources.__file__).parent
+    resource_files = [os.path.relpath(x, Path(vpv.__file__).parent) for x in resources_dir.rglob('*')]
+    files.extend(resource_files)
+    return files
+
 
 setup(
     name='vpv_viewer',
-    download_url='https://github.com/mpi2/lama/archive/0.9.4.tar.gz',
-    version='2.2.4',
+    version='2.3.5',
     packages=find_packages(exclude=("dev")),
-	package_data={'': get_annotation_files()},  # Puts it in the wheel dist. MANIFEST.in gets it in source dist
+	package_data={'': get_resources()},  # Puts it in the wheel dist. MANIFEST.in gets it in source dist
     # package_data={'': ['current_commit',
     #                    'stats/rscripts/lmFast.R',
     #                    'stats/rscripts/r_padjust.R']},  # Puts it in the wheel dist. MANIFEST.in gets it in source dist
@@ -39,7 +43,8 @@ setup(
         'lxml',
         'pyqtgraph',
         'toml',
-        'python-dateutil'
+        'python-dateutil',
+        'addict'
     ],
 
     url='https://github.com/mpi2/vpv',
@@ -55,7 +60,7 @@ setup(
     keywords=['image processing', 'bioinformatics', 'phenotype'],
     entry_points ={
             'console_scripts': [
-                'vpv=vpv.run_vpv:main',
+                'vpv_viewer=vpv.run_vpv:main',
             ]
         },
 )

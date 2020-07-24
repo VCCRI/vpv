@@ -797,7 +797,7 @@ color: rgb(223, 223, 223);</string>
   <customwidget>
    <class>QComboBoxIgnoreSCroll</class>
    <extends>QComboBox</extends>
-   <header>combobox_ignore_scroll</header>
+   <header>vpv/ui/views/combobox_ignore_scroll</header>
   </customwidget>
  </customwidgets>
  <resources>

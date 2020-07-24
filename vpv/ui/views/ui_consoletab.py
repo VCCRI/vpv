@@ -25,4 +25,4 @@ class Ui_console(object):
         _translate = QtCore.QCoreApplication.translate
         console.setWindowTitle(_translate("console", "Form"))
 
-import resources_rc
+from . import resources_rc

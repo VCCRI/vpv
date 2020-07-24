@@ -32,4 +32,4 @@ class Ui_console(object):
         console.setWindowTitle(_translate("console", "Form"))
         self.pushButton.setText(_translate("console", "save selected images"))
 
-import resources_rc
+from . import resources_rc

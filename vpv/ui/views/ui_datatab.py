@@ -2,9 +2,10 @@
 
 # Form implementation generated from reading ui file 'ui_datatab.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.2
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
+
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -489,7 +490,5 @@ class Ui_data(object):
         self.label_15.setText(_translate("data", "Voxel size"))
         self.label_16.setText(_translate("data", "Scale bar length"))
         self.checkBoxScaleBarLabel.setText(_translate("data", "scale label"))
-
-
-from combobox_ignore_scroll import QComboBoxIgnoreSCroll
-import resources_rc
+from vpv.ui.views.combobox_ignore_scroll import QComboBoxIgnoreSCroll
+from . import resources_rc

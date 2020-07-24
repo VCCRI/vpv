@@ -234,4 +234,4 @@ class Ui_Annotations(object):
         self.label_3.setText(_translate("Annotations", "Date of annotation"))
 
 
-import resources_rc
+from . import resources_rc
