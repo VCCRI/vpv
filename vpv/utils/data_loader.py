@@ -37,17 +37,17 @@ def load(loader_file):
     top_labels = [Path(x.labels.path) for x in top.values()]
 
     bottom = config['bottom_row']
-    if bottom: # We allow only top tier visible
+    if bottom:
         bottom_vols = [Path(x.vol.path) for x in bottom.values()]
         bottom_labels = [Path(x.labels.path) for x in bottom.values()]
-    else:
+    else: # We allow only top tier visible
         bottom_vols = []
         bottom_labels = []
 
     app = QtGui.QApplication([])
     ex = Vpv()
 
-    s_ = lambda x: [str(z) for z in x]
+    s_ = lambda x: [str(z) for z in x] # Get strs from Paths and TODO: prevent duplicate loading
 
     ex.load_volumes(chain(s_(top_vols), s_(top_labels), s_(bottom_vols), s_(bottom_labels)), 'vol')
 
@@ -102,6 +102,9 @@ def load(loader_file):
 
     # opacity
     ex.data_manager.modify_layer(Layers.vol2, 'set_opacity', config.opacity)
+
+    # Set title
+    ex.mainwindow.setWindowTitle(config['title'])
 
     sys.exit(app.exec_())
 

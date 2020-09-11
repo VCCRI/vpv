@@ -83,7 +83,7 @@ def get_stage_and_modality(proc_id: str, center_id: dict) -> Tuple[Stage, Modali
             return Stage.e14_5, Modality.micro_ct
         return Stage.e15_5, Modality.micro_ct
 
-    elif 'emp' in proc_id.lower():
+    elif 'ema' in proc_id.lower():
         return Stage.e18_5, Modality.micro_ct  # Not sure this is correct. Look up. For now only using E15.5/E14.5 and E9.5 anyway
     else:
         raise ValueError(f'{proc_id} not currently recognised')

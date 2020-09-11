@@ -24,6 +24,8 @@ centers:
     procedures:
       IMPC_EMO_002:
         file_:  e15_5/jax_terms.yaml
+      IMPC_EMA_002:
+        file_: e18_5/jax_terms.yaml
 
   BCM:
     short_name: BCM

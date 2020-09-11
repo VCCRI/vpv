@@ -1,0 +1,688 @@
+---
+parameters:
+  param0:
+    name: Tail
+    order: 0
+    impc_id: IMPC_EMA_019_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param1:
+    name: Limbs
+    order: 1
+    impc_id: IMPC_EMA_020_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param2:
+    name: Pinna
+    order: 2
+    impc_id: IMPC_EMA_021_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param3:
+    name: Vibrissa
+    order: 3
+    impc_id: IMPC_EMA_022_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param4:
+    name: Edema
+    order: 4
+    impc_id: IMPC_EMA_023_001
+    options: 1 
+    default_option: 'no' 
+    mandatory: no 
+  param5:
+    name: Spinal Cord
+    order: 5
+    impc_id: IMPC_EMA_025_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param6:
+    name: Spine curvature
+    order: 6
+    impc_id: IMPC_EMA_026_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param7:
+    name: Craniofacial morphology
+    order: 7
+    impc_id: IMPC_EMA_027_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param8:
+    name: Midbrain roof plate
+    order: 8
+    impc_id: IMPC_EMA_029_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param9:
+    name: Midbrain
+    order: 9
+    impc_id: IMPC_EMA_030_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param10:
+    name: Cerebellum
+    order: 10
+    impc_id: IMPC_EMA_031_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param11:
+    name: Cerebral cortex
+    order: 11
+    impc_id: IMPC_EMA_032_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param12:
+    name: Thalamus
+    order: 12
+    impc_id: IMPC_EMA_033_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param13:
+    name: Hippocampus
+    order: 13
+    impc_id: IMPC_EMA_035_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param14:
+    name: Hypothalamus
+    order: 14
+    impc_id: IMPC_EMA_036_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param15:
+    name: Medulla oblongata
+    order: 15
+    impc_id: IMPC_EMA_039_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param16:
+    name: Lateral ventricles
+    order: 16
+    impc_id: IMPC_EMA_040_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param17:
+    name: Lateral ventricle choroid plexus
+    order: 17
+    impc_id: IMPC_EMA_041_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param18:
+    name: 4th ventricle choroid plexus
+    order: 18
+    impc_id: IMPC_EMA_042_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param19:
+    name: 4th Ventricle
+    order: 19
+    impc_id: IMPC_EMA_043_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param20:
+    name: 3rd ventricle
+    order: 20
+    impc_id: IMPC_EMA_046_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param21:
+    name: Olfactory lobe
+    order: 21
+    impc_id: IMPC_EMA_047_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param22:
+    name: Trigeminal ganglion
+    order: 22
+    impc_id: IMPC_EMA_048_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param23:
+    name: Pituitary gland
+    order: 23
+    impc_id: IMPC_EMA_049_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param24:
+    name: Spinal cord cervical region
+    order: 24
+    impc_id: IMPC_EMA_050_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param25:
+    name: Dorsal root ganglion
+    order: 25
+    impc_id: IMPC_EMA_051_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param26:
+    name: Cochlea
+    order: 26
+    impc_id: IMPC_EMA_052_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param27:
+    name: Nasal septum
+    order: 27
+    impc_id: IMPC_EMA_053_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param28:
+    name: Nasal cavity
+    order: 28
+    impc_id: IMPC_EMA_054_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param29:
+    name: Vomeronasal organ
+    order: 29
+    impc_id: IMPC_EMA_056_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param30:
+    name: Oral cavity
+    order: 30
+    impc_id: IMPC_EMA_058_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param31:
+    name: Optic nerve
+    order: 31
+    impc_id: IMPC_EMA_059_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param32:
+    name: Intraretinal space
+    order: 32
+    impc_id: IMPC_EMA_060_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param33:
+    name: Hyaloid cavity
+    order: 33
+    impc_id: IMPC_EMA_061_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param34:
+    name: Cornea
+    order: 34
+    impc_id: IMPC_EMA_062_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param35:
+    name: Lens
+    order: 35
+    impc_id: IMPC_EMA_063_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param36:
+    name: Eyelids
+    order: 36
+    impc_id: IMPC_EMA_064_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param37:
+    name: Pharyngo-tympanic tube
+    order: 37
+    impc_id: IMPC_EMA_066_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param38:
+    name: Palate
+    order: 38
+    impc_id: IMPC_EMA_067_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param39:
+    name: Epiglottis
+    order: 39
+    impc_id: IMPC_EMA_068_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param40:
+    name: Tongue
+    order: 40
+    impc_id: IMPC_EMA_069_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param41:
+    name: Mandible
+    order: 41
+    impc_id: IMPC_EMA_070_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param42:
+    name: Lower jaw molar
+    order: 42
+    impc_id: IMPC_EMA_071_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param43:
+    name: Upper jaw molar
+    order: 43
+    impc_id: IMPC_EMA_072_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param44:
+    name: Sphenoid bone
+    order: 44
+    impc_id: IMPC_EMA_073_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param45:
+    name: Thyroid gland
+    order: 45
+    impc_id: IMPC_EMA_074_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param46:
+    name: Submandibular gland
+    order: 46
+    impc_id: IMPC_EMA_075_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param47:
+    name: Brown fat
+    order: 47
+    impc_id: IMPC_EMA_076_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param48:
+    name: Vertebrae
+    order: 48
+    impc_id: IMPC_EMA_077_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param49:
+    name: Esophagus
+    order: 49
+    impc_id: IMPC_EMA_078_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param50:
+    name: Clavicle
+    order: 50
+    impc_id: IMPC_EMA_079_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param51:
+    name: Scapula
+    order: 51
+    impc_id: IMPC_EMA_080_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param52:
+    name: Ulna
+    order: 52
+    impc_id: IMPC_EMA_081_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param53:
+    name: Humerus
+    order: 53
+    impc_id: IMPC_EMA_082_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param54:
+    name: Trachea
+    order: 54
+    impc_id: IMPC_EMA_085_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param55:
+    name: Thymus
+    order: 55
+    impc_id: IMPC_EMA_087_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param56:
+    name: Sternum
+    order: 56
+    impc_id: IMPC_EMA_088_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param57:
+    name: Rib
+    order: 57
+    impc_id: IMPC_EMA_089_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param58:
+    name: T1 rib
+    order: 58
+    impc_id: IMPC_EMA_090_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param59:
+    name: Vena cava
+    order: 59
+    impc_id: IMPC_EMA_091_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param60:
+    name: Ductus arteriosus
+    order: 60
+    impc_id: IMPC_EMA_095_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param61:
+    name: Pulmonary valve
+    order: 61
+    impc_id: IMPC_EMA_096_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param62:
+    name: Pulmonary trunk
+    order: 62
+    impc_id: IMPC_EMA_097_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param63:
+    name: Aorta
+    order: 63
+    impc_id: IMPC_EMA_100_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param64:
+    name: Aortic valve
+    order: 64
+    impc_id: IMPC_EMA_101_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param65:
+    name: Heart atrium
+    order: 65
+    impc_id: IMPC_EMA_102_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param66:
+    name: Heart ventricle
+    order: 66
+    impc_id: IMPC_EMA_103_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param67:
+    name: Tricuspid valve
+    order: 67
+    impc_id: IMPC_EMA_104_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param68:
+    name: Mitral valve
+    order: 68
+    impc_id: IMPC_EMA_105_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param69:
+    name: Interventricular septum
+    order: 69
+    impc_id: IMPC_EMA_106_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param70:
+    name: Pericardial cavity
+    order: 70
+    impc_id: IMPC_EMA_107_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param71:
+    name: Pericardium
+    order: 71
+    impc_id: IMPC_EMA_108_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param72:
+    name: Main bronchus
+    order: 72
+    impc_id: IMPC_EMA_109_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param73:
+    name: Right lung cranial lobe
+    order: 73
+    impc_id: IMPC_EMA_111_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param74:
+    name: Right lung middle lobe
+    order: 74
+    impc_id: IMPC_EMA_112_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param75:
+    name: Right lung caudal lobe
+    order: 75
+    impc_id: IMPC_EMA_113_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param76:
+    name: Right lung accessory lobe
+    order: 76
+    impc_id: IMPC_EMA_114_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param77:
+    name: Left lung
+    order: 77
+    impc_id: IMPC_EMA_115_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param78:
+    name: Diaphragm
+    order: 78
+    impc_id: IMPC_EMA_116_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param79:
+    name: Peritoneal cavity
+    order: 79
+    impc_id: IMPC_EMA_117_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param80:
+    name: Liver left lobe
+    order: 80
+    impc_id: IMPC_EMA_119_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param81:
+    name: Liver right lobe
+    order: 81
+    impc_id: IMPC_EMA_120_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param82:
+    name: Liver caudate lobe
+    order: 82
+    impc_id: IMPC_EMA_121_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param83:
+    name: Liver lobar interzone
+    order: 83
+    impc_id: IMPC_EMA_123_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param84:
+    name: Pancreas
+    order: 84
+    impc_id: IMPC_EMA_124_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param85:
+    name: Stomach
+    order: 85
+    impc_id: IMPC_EMA_125_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param86:
+    name: Small intestine
+    order: 86
+    impc_id: IMPC_EMA_129_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param87:
+    name: Hip joint
+    order: 87
+    impc_id: IMPC_EMA_132_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param88:
+    name: Femur
+    order: 88
+    impc_id: IMPC_EMA_133_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param89:
+    name: Fibula
+    order: 89
+    impc_id: IMPC_EMA_134_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param90:
+    name: Tibia
+    order: 90
+    impc_id: IMPC_EMA_135_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param91:
+    name: Adrenal gland
+    order: 91
+    impc_id: IMPC_EMA_136_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
+  param92:
+    name: Kidney
+    order: 92
+    impc_id: IMPC_EMA_137_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param93:
+    name: Bladder
+    order: 93
+    impc_id: IMPC_EMA_139_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param94:
+    name: Spleen
+    order: 94
+    impc_id: IMPC_EMA_141_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param95:
+    name: Ovary
+    order: 95
+    impc_id: IMPC_EMA_142_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param96:
+    name: Testes
+    order: 96
+    impc_id: IMPC_EMA_143_001
+    options: 0 
+    default_option: present 
+    mandatory: yes 
+  param97:
+    name: Penis
+    order: 97
+    impc_id: IMPC_EMA_144_001
+    options: 0 
+    default_option: imageOnly 
+    mandatory: no 
