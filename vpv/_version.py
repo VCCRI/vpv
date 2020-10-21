@@ -1,4 +1,5 @@
-__version__ = '2.2.6'  # Add new annotation procedures EMA for Jax
+__version__ = '2.2.7'  # Add new annotation procedures EMA for Jax - bugfix
+#__version__ = '2.2.6'  # Add new annotation procedures EMA for Jax
 # __version__ = '2.2.5'  # Add new annotation procedures for EOL and EML
 # __version__ = '2.2.4'  # Add new annotation procedures for EOL and EML
 #__version__ = '2.2.3' # Bugfix - prolems with incorrect mouse hover voxel value reporting

@@ -11,20 +11,26 @@ from vpv.lib import addict
 def get_annotator_id_and_date(procedure_id) -> Tuple[str, str]:
     """
     Get the unique annotator_id and annotation date parameter ids for a procedure.
+
     Parameters
     ----------
     procedure_id
 
     Returns
     -------
-    annotator_id, date_of_annotation
+    0: annotator_id
+    1: date_of_annotation
     """
 
     map_ = {
         'IMPC_EOL': ('IMPC_EOL_052_001', 'IMPC_EOL_053_001'),
         'IMPC_EML': ('IMPC_EML_057_001', 'IMPC_EML_058_001'),
-        'IMPC_EMO': ('IMPC_EMO_178_001', 'IMPC_EMO_179_001')
+        'IMPC_EMO': ('IMPC_EMO_178_001', 'IMPC_EMO_179_001'),
+        'IMPC_EMA': ('IMPC_EMA_002_001', 'IMPC_EMA_150_001')
     }
+
+    if procedure_id[:8] not in map_:
+        raise ValueError(f'The annotator id and date proecure terms have not been added for {procedure_id[:8]}')
     return map_[procedure_id[:8]]
 
 
