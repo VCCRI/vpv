@@ -31,6 +31,9 @@ IMPC_ANALYSIS = "IMPC analysis"
 
 TYPE_CHOICES = (VOLUME, HEATMAP, ANNOTATIONS, VECTORS, IMAGE_SERIES, IMPC_ANALYSIS)
 
+# Ignore folders with these names when loading multiple directories. Find a better way to do this
+SUBFOLDERS_TO_IGNORE = ['resolution_images', 'pyramid_images']
+
 
 class Import(QDialog):
     def __init__(self, parent, callback, virtual_stack_callback, last_dir, appdata, dragged_files=None):
@@ -128,8 +131,8 @@ class Import(QDialog):
         # Replace any asterix in the pattern to '.+' to match anything` ````
         pattern = self.folder_include_pattern.replace('*', '.+')
 
-        # 211019 temp bodge: ignore these subfolders that keep getting in the way
-        if 'resolution_images' in path:
+        # 211019 temp bodge: ignore these LAMA subfolders that keep getting in the way
+        if any([x in path for x in SUBFOLDERS_TO_IGNORE]):
             return False
 
         if re.search(pattern, path, re.IGNORECASE):
