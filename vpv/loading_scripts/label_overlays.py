@@ -4,7 +4,7 @@ A work in progress.
 Given a root directory, load image, inverted labels and set opacity etc.
 Set window title.
 
-Make it configurable
+Make it configurable, and docuetn a bit
 """
 
 from pathlib import Path
@@ -15,6 +15,7 @@ from vpv.vpv_temp import Vpv
 from vpv.common import Layers, Orientation
 from lama.common import get_file_paths
 from lama.elastix import RESOLUTION_IMGS_DIR, IMG_PYRAMID_DIR
+import yaml
 
 
 
@@ -28,12 +29,27 @@ IGNORE = [RESOLUTION_IMGS_DIR, IMG_PYRAMID_DIR]
 
 OPACITY = 0.4
 
-def load(line_dir):
+
+def load(line_dir: Path, rev=False, title=None):
     app = QtGui.QApplication([])
     ex = Vpv()
 
-    vol_dir = next(line_dir.rglob('*/reg*/*rigid*'))
-    lab_dir = next(line_dir.rglob('inverted_labels/similarity'))
+    invert_yaml = next(line_dir.glob('**/inverted_transforms/invert.yaml'))
+    with open(invert_yaml, 'r') as fh:
+        invert_order = yaml.load(fh)['inversion_order']
+
+    if not rev:
+        vol_dir = next(line_dir.rglob('**/reg*/*rigid*'))
+        try:
+            lab_dir = next(line_dir.rglob('**/inverted_labels/similarity'))
+        except StopIteration:
+            lab_dir = next(line_dir.rglob('**/inverted_labels/affine'))
+    else:
+        # Labels progated by reverse registration
+        last_dir = invert_order[-1]
+        vol_dir = line_dir / 'inputs/'
+        lab_dir = next(line_dir.rglob(f'**/inverted_labels/{last_dir}'))
+
 
     vol = get_file_paths(vol_dir, ignore_folders=IGNORE)[0]
     lab = get_file_paths(lab_dir, ignore_folders=IGNORE)[0]
@@ -57,8 +73,10 @@ def load(line_dir):
         ex.views[i].layers[Layers.vol1].set_volume(vol_id)
         ex.views[i].layers[Layers.vol2].set_volume(label_id)
 
+    if not title:
+        title = line_dir.name
+    ex.mainwindow.setWindowTitle(title)
 
-    ex.mainwindow.setWindowTitle(line_dir.name)
     print('Finished loading')
 
     # Show two rows
@@ -77,4 +95,14 @@ def load(line_dir):
 
 
 if __name__ == '__main__':
-    load(Path(sys.argv[1]))
+    import argparse
+    parser = argparse.ArgumentParser("Overlay LAMA-propagated labels")
+    parser.add_argument('dir_', help='LAMA specimen directory')
+    parser.add_argument('-r', '--rev', dest='rev',  help='If set we look for overlays in final def folder',
+                        required=False, default=False, action='store_true')
+    parser.add_argument('-t', '--title', dest='title',  help='VPV window title',
+                        required=False, default=None)
+    args = parser.parse_args()
+
+    load(Path(args.dir_), args.rev, args.title)
+

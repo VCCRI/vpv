@@ -16,8 +16,9 @@
 # @author Neil Horner <n.horner@har.mrc.ac.uk>
 
 
-import os
+from pathlib import Path
 from vpv import _version
+from vpv import resources
 from PyQt5 import QtGui, QtCore, QtWidgets
 from vpv.ui.views.ui_main_window import Ui_MainWindow
 from vpv.common import style_sheet_path, question_dialog
@@ -41,6 +42,9 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.setWindowTitle("VPV")
+        icon_path = Path(resources.__file__).parent / 'vpv.png'
+        self.setWindowIcon(QtGui.QIcon(str(icon_path)))
+        self.setWindowIconText('VPV')
 
         self.view_layout = QtGui.QGridLayout()
         self.manager_layout = QtGui.QVBoxLayout()
