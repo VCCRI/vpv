@@ -22,7 +22,7 @@ from vpv.ui.views.ui_manager import Ui_ManageViews
 
 class ManagerDockWidget(QDockWidget):
 
-    def __init__(self, model, mainwindow, appdata, data_manager, annotations_manager, options, console):
+    def __init__(self, model, mainwindow, appdata, data_manager, annotations_manager, options, console, qc):
         super(ManagerDockWidget, self).__init__(mainwindow)
         lut = Lut()
         self.appdata = appdata
@@ -30,10 +30,13 @@ class ManagerDockWidget(QDockWidget):
         self.annotations = annotations_manager
         self.options_tab = options
         self.console = console
+        self.qc = qc
         self.tab_map = {0: self.data_manager,
                         1: self.annotations}
         if self.console:
             self.tab_map[2] = self.console
+        if self.qc:
+            self.tab_map[4] = self.qc
         self.tab_map[3] = self.options_tab
         self.hotred = lut._hot_red_blue()[0]
         self.hotblue = lut._hot_red_blue()[1]
@@ -61,6 +64,8 @@ class ManagerDockWidget(QDockWidget):
 
         if self.console:
             self.ui.tabWidget.addTab(self.console, 'Console')
+        if self.qc:
+            self.ui.tabWidget.addTab(self.qc, 'QC')
 
     def tab_changed(self, indx):
         """
@@ -75,6 +80,10 @@ class ManagerDockWidget(QDockWidget):
                 self.annotations.annotating = False
         else:
             self.annotations.annotating = False
+        if indx == 4:
+            self.qc.is_active = True
+        else:
+            self.qc.is_active = False
 
     def switch_tab(self, idx):
         self.ui.tabWidget.setCurrentIndex(idx)

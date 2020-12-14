@@ -17,7 +17,6 @@
 #
 # @author Neil Horner <n.horner@har.mrc.ac.uk>
 
-
 # I distribute VPV as an installer with a bundled version of WinPython
 # In at least one case, the paths are not correctly set. So the following hack attempts to set correct paths
 
@@ -69,6 +68,7 @@ from vpv.ui.controllers.options_tab import OptionsTab
 from vpv.annotations.annotations_widget import AnnotationsWidget
 from vpv.model.coordinate_mapper import Coordinate_mapper
 from vpv.ui.controllers import main_window
+from vpv.ui.controllers.qc_tab import QC
 from vpv.utils import github
 
 
@@ -122,6 +122,13 @@ class Vpv(QtCore.QObject):
         self.model.updating_finished_signal.connect(self.updating_finished)
         self.model.updating_msg_signal.connect(self.display_update_msg)
         self.views = {}
+
+        # Initialise the QC tab
+        self.qc = QC(self, self.mainwindow)
+        self.qc.load_specimen_signal.connect(self.load_volumes)
+        self.last_selected_label = 0 # This is updated everytime mouse hovers over label
+        self.volume2_pixel_signal.connect(self.set_current_label)
+
         # display and views now created in manage_views
         self.data_manager = ManageData(self, self.model, self.mainwindow, self.appdata)
         self.data_manager.gradient_editor_signal.connect(self.gradient_editor)
@@ -150,7 +157,7 @@ class Vpv(QtCore.QObject):
             self.console = None
 
         self.dock_widget = ManagerDockWidget(self.model, self.mainwindow, self.appdata, self.data_manager,
-                                             self.annotations_manager, self.options_tab, self.console)
+                                             self.annotations_manager, self.options_tab, self.console, self.qc)
         self.dock_widget.setAllowedAreas(QtCore.Qt.LeftDockWidgetArea)
 
         # Create the initial 3 orthogonal views. plus 3 hidden for the second row
@@ -281,6 +288,18 @@ class Vpv(QtCore.QObject):
             # If veiews are not synchronised, syncyed slicing only occurs within the same volumes
             self.mouse_shift(x, y, z, src_view)
 
+    def set_current_label(self, value):
+        self.last_selected_label = value
+
+    def update_qc(self, slice_idx: int, x: int, y: int, src_view: SliceWidget,
+                                           color: tuple=(255, 0, 0), radius: int=10, reverse: bool=False):
+        """
+        We don't need all these parameters, but I'm just sharing a signal for the time being
+        """
+        if self.qc.is_active:
+            self.qc.load_specimen_signal(self.last_selected_label)
+
+
     def map_annotation_signal_view_to_view(self, slice_idx: int, x: int, y: int, src_view: SliceWidget,
                                            color: tuple=(255, 0, 0), radius: int=10, reverse: bool=False):
         """
@@ -298,6 +317,7 @@ class Vpv(QtCore.QObject):
         reverse:
 
         """
+
         if not self.current_annotation_volume():
             self.annotations_manager.reset_roi()
             return
@@ -441,7 +461,7 @@ class Vpv(QtCore.QObject):
         # view.mouse_shift.connect(self.mouse_shift)
         # view.mouse_pressed_signal.connect(self.dock_widget.mouse_pressed)
         view.mouse_pressed_annotation_signal.connect(self.map_annotation_signal_view_to_view)
-        # view.mouse_pressed_annotation_signal.connect(self.annotations_manager.mouse_pressed_annotate)
+        view.mouse_pressed_annotation_signal.connect(self.update_qc)
         view.crosshair_visible_signal.connect(self.crosshair_visible_slot)
         view.scale_changed_signal.connect(self.zoom_changed)
         view.slice_index_changed_signal.connect(self.index_changed)
@@ -816,7 +836,7 @@ class Vpv(QtCore.QObject):
         if not non_loaded:
             common.info_dialog(self.mainwindow, 'Load success', 'Annotations loaded')
 
-    def load_volumes(self, file_list, data_type, memory_map=False, fdr_thresholds=False):
+    def load_volumes(self, file_list, data_type, memory_map=False, fdr_thresholds=False) -> List:
         """
         Load volumes from a list of paths.
 
@@ -835,11 +855,12 @@ class Vpv(QtCore.QObject):
         """
 
         non_loaded = []
+        loaded_ids = []
 
         for i, vol_path in enumerate(file_list):
             try:
 
-                self.model.add_volume(vol_path, data_type, memory_map, fdr_thresholds)
+                loaded_id = self.model.add_volume(vol_path, data_type, memory_map, fdr_thresholds)
                 self.appdata.add_used_volume(vol_path)
                 if not self.any_data_loaded:
                     #  Load up one of the volumes just loaded into the bottom layer
@@ -848,11 +869,14 @@ class Vpv(QtCore.QObject):
             except (IOError, RuntimeError) as e:  # RT error Raised by SimpleITK
                 print(e)
                 non_loaded.append(vol_path)
+            else:
+                loaded_ids.append(loaded_id)
         if len(non_loaded) > 0:
             common.error_dialog(self.mainwindow, 'Volumes not loaded', '\n'.join(non_loaded))
         # self.any_data_loaded
         self.check_non_ras()
         self._auto_load_annotations(file_list)
+        return loaded_ids
 
     def img_ids(self):
         return self.model.volume_id_list(sort=False)

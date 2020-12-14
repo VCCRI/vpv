@@ -313,9 +313,10 @@ class DataModel(QtCore.QObject):
     #         return "Could not load annotation: {}. Not able to find loaded volume with same id".format(vol_id)
     #     return None
 
-    def add_volume(self, volpath, data_type, memory_map, fdr_thresholds=False):
+    def add_volume(self, volpath, data_type, memory_map, fdr_thresholds=False) -> str:
         """
         Load a volume into a subclass of a Volume object
+
         Parameters
         ----------
         volpath: str
@@ -325,8 +326,12 @@ class DataModel(QtCore.QObject):
             q -> t statistic mappings
                 {0.01: 3.4,
                 0.05:, 3.1}
-        """
 
+        Returns
+        -------
+        unique id of loaded image
+
+        """
         if data_type != 'virtual_stack':
             volpath = str(volpath)
             n = os.path.basename(volpath)
@@ -356,6 +361,7 @@ class DataModel(QtCore.QObject):
 
         self.id_counter += 1
         self.data_changed_signal.emit()
+        return unique_name
 
     def create_unique_name(self, name):
         """
