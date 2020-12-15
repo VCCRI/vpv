@@ -32,7 +32,41 @@
     </widget>
    </item>
    <item>
-    <widget class="QListWidget" name="listWidgetQcFlagged"/>
+    <widget class="QTableWidget" name="tableWidgetFlagged">
+     <column>
+      <property name="text">
+       <string>Label</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Name</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTextEdit" name="textEditSpecimenNotes">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>100</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="checkBoxFlagWholeImage">
+     <property name="text">
+      <string>Flag whole image</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QLabel" name="label_3">
@@ -42,14 +76,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QListWidget" name="listWidgetNotes"/>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="pushButtonOpenDir">
+      <widget class="QPushButton" name="pushButtonLoad">
        <property name="text">
-        <string>Open folder</string>
+        <string>Load</string>
        </property>
       </widget>
      </item>
@@ -61,16 +92,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButtonLoadAtlasMetadata">
-       <property name="text">
-        <string>Load atlas metadata</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="pushButtonNextSpecimen">
        <property name="text">
-        <string>Next image</string>
+        <string>Next image (Alt Gr)</string>
        </property>
       </widget>
      </item>

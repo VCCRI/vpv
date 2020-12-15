@@ -33,11 +33,11 @@ class ManagerDockWidget(QDockWidget):
         self.qc = qc
         self.tab_map = {0: self.data_manager,
                         1: self.annotations}
-        if self.console:
-            self.tab_map[2] = self.console
+        # if self.console:
+        #     self.tab_map[2] = self.console
         if self.qc:
-            self.tab_map[4] = self.qc
-        self.tab_map[3] = self.options_tab
+            self.tab_map[3] = self.qc
+        self.tab_map[2] = self.options_tab
         self.hotred = lut._hot_red_blue()[0]
         self.hotblue = lut._hot_red_blue()[1]
         self.ui = Ui_ManageViews()
@@ -80,7 +80,7 @@ class ManagerDockWidget(QDockWidget):
                 self.annotations.annotating = False
         else:
             self.annotations.annotating = False
-        if indx == 4:
+        if indx == 3:
             self.qc.is_active = True
         else:
             self.qc.is_active = False

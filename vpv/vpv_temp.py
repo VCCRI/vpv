@@ -129,6 +129,7 @@ class Vpv(QtCore.QObject):
         self.last_selected_label = 0 # This is updated everytime mouse hovers over label
         self.volume2_pixel_signal.connect(self.set_current_label)
 
+
         # display and views now created in manage_views
         self.data_manager = ManageData(self, self.model, self.mainwindow, self.appdata)
         self.data_manager.gradient_editor_signal.connect(self.gradient_editor)
@@ -297,7 +298,7 @@ class Vpv(QtCore.QObject):
         We don't need all these parameters, but I'm just sharing a signal for the time being
         """
         if self.qc.is_active:
-            self.qc.load_specimen_signal(self.last_selected_label)
+            self.qc.label_clicked_slot(self.last_selected_label)
 
 
     def map_annotation_signal_view_to_view(self, slice_idx: int, x: int, y: int, src_view: SliceWidget,

@@ -207,6 +207,11 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.controller.stats()
 
     def keyPressEvent(self, event):
+
+        if self.controller.qc.is_active:
+            if event.key() == QtCore.Qt.Key_AltGr:
+                self.controller.qc.next_specimen()
+
         if event.key() == QtCore.Qt.Key_Escape:
             self.on_view_full_screen(False)  # Doesn't do anything yet
         elif event.key() == QtCore.Qt.Key_F11:
