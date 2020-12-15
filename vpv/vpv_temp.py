@@ -33,6 +33,7 @@ from typing import Iterable, List
 p = sys.path
 
 from PyQt5 import QtGui, QtCore, QtWidgets
+from functools import partial
 from vpv import common
 from vpv.ui.controllers import importer
 
@@ -129,7 +130,6 @@ class Vpv(QtCore.QObject):
         self.last_selected_label = 0 # This is updated everytime mouse hovers over label
         self.volume2_pixel_signal.connect(self.set_current_label)
 
-
         # display and views now created in manage_views
         self.data_manager = ManageData(self, self.model, self.mainwindow, self.appdata)
         self.data_manager.gradient_editor_signal.connect(self.gradient_editor)
@@ -141,6 +141,10 @@ class Vpv(QtCore.QObject):
 
         self.mainwindow.d_pressed_signal.connect(self.annotations_manager.d_pressed_slot)
         self.mainwindow.key_up_down_signal.connect(self.annotations_manager.sroll_annotations)
+        self.mainwindow.toggle_volume1_visibility_signal.connect(
+            partial(self.data_manager.modify_layer, Layers.vol1, 'toggle_visibility'))
+        self.mainwindow.toggle_volume2_visibility_signal.connect(
+            partial(self.data_manager.modify_layer, Layers.vol2, 'toggle_visibility'))
 
         self.volume_pixel_signal.connect(self.mainwindow.set_volume_pix_intensity)
         self.volume2_pixel_signal.connect(self.mainwindow.set_volume2_pix_intensity)

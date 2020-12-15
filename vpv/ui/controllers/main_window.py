@@ -28,6 +28,8 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
     hide_view_signal = QtCore.pyqtSignal(int)
     d_pressed_signal = QtCore.pyqtSignal()
     key_up_down_signal= QtCore.pyqtSignal(bool)
+    toggle_volume1_visibility_signal = QtCore.pyqtSignal()  # main image
+    toggle_volume2_visibility_signal = QtCore.pyqtSignal()  # Label map or other overlay
 
     def __init__(self, controller, appdata):
         """
@@ -231,6 +233,10 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.controller.take_screen_shot()
         elif event.key() == QtCore.Qt.Key_F:
             self.d_pressed_signal.emit()
+        elif event.key() == QtCore.Qt.Key_2:
+            self.toggle_volume2_visibility_signal.emit()
+        elif event.key() == QtCore.Qt.Key_1:
+            self.toggle_volume1_visibility_signal.emit()
 
     def on_view_full_screen(self, checked):
         if checked:

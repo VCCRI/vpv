@@ -154,5 +154,11 @@ class Layer(Qt.QObject):
     def set_visibility(self, isvisible: bool):
         self.isvisible = isvisible
 
+    def toggle_visibility(self):
+        if self.isvisible:
+            self.isvisible = False
+        else:
+            self.isvisible = True
+
     def set_opacity(self, opacity: float):
         self.opacity = opacity

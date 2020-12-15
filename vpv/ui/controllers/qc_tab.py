@@ -171,7 +171,7 @@ class QC(QtGui.QWidget):
             with open(self.qc_results_file, 'r') as fh:
                 qc_info = addict.Dict(yaml.load(fh))
         else:
-            info_dialog(self.mainwindow, 'QC file NOT found', 'Creating new QC file')  # Do it on next save
+            info_dialog(self.mainwindow, 'QC file NOT found', 'A new qc session will be started')  # Do it on next save
             qc_info = {}
 
         self.qc = get_specimen_dirs(root)

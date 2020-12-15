@@ -623,6 +623,20 @@ class ManageData(QtGui.QWidget):
             self.ui.comboBoxData.setCurrentIndex(self.ui.comboBoxData.findText('None'))
 
     def modify_layer(self, layer_idx: Layers, method: str, *args):
+        """
+        Instead of of replicating all the functions in the layers here, we get the method to call on the layers by
+        str and getattr
+
+        Parameters
+        ----------
+        layer_idx
+            The enum specifying whch layer to target
+        method
+            The method in the Layer subclasses to call
+        args
+            Any arguments to pass on
+
+        """
         if self.link_views:
             for view in self.views.values():
                 getattr(view.layers[layer_idx], method)(*args)
