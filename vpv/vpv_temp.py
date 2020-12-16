@@ -857,6 +857,9 @@ class Vpv(QtCore.QObject):
             q -> t statistic mappings
                 {0.01: 3.4,
                 0.05:, 3.1}
+        Returns
+        -------
+        List of uunique volume ids.
         """
 
         non_loaded = []

@@ -15,6 +15,7 @@
 #
 # @author Neil Horner <n.horner@har.mrc.ac.uk>
 import re
+from pathlib import Path
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QDialog, QMessageBox, QFileDialog
@@ -40,6 +41,12 @@ class Import(QDialog):
         super(Import, self).__init__(parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
+
+        # self.ui.table.setSelectionBehavior(self.ui.table.SelectRows)
+        # self.ui.table.setSelectionMode(self.ui.table.SingleSelection)
+        # self.ui.table.setDragDropMode(self.ui.table.InternalMove)
+        # self.ui.table.setDragDropOverwriteMode(False)
+
         self.last_dir = last_dir
         self.callback = callback
         self.appdata = appdata
@@ -82,7 +89,7 @@ class Import(QDialog):
                 #                                                   "Load multiple image volumes (No)",
                 #                                                   'Hello' | QtGui.QMessageBox.No)
                 box = QMessageBox()
-                box.setIcon(QMessageBox.Question)
+                box.setIcon(QMessageBox.NoIcon)
                 box.setWindowTitle('Choose data type')
                 box.setText('Load individual 2D slices from folder, or load multiple single images volumes?')
                 box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
@@ -274,16 +281,6 @@ class Import(QDialog):
                 if self.guess_type(path_):
                     files_to_open.append(os.path.join(path, name))
 
-        # Now check if there's a stats yaml file in there
-        # stats_config = os.path.join(dir_, 'stats.yaml')
-        # if os.path.isfile(stats_config):
-        #     with open(stats_config) as yf:
-        #         config = yaml.load(yf)
-        #         target = config.get('target')
-        #         if target:
-        #             script_dir = os.path.dirname(os.path.abspath(__file__))
-        #             target_path = os.path.abspath(os.path.join(script_dir, target))
-        #             files_to_open.append(target_path)
         return files_to_open
 
     def type_combo_changed(self, index):
@@ -322,20 +319,22 @@ class Import(QDialog):
 
         self.type_combo_boxes = []
 
-        for row, item in enumerate(files_to_open):
+        for row, path in enumerate(files_to_open):
 
-            type_guess = self.guess_type(item)
+            type_guess = self.guess_type(path)
 
-            if not self.folder_filter(item):
+            if not self.folder_filter(path):
                 continue
 
             if not type_guess:
                 continue
 
-            data_path = QtGui.QTableWidgetItem(item)
-            data_path.setText(os.path.basename(item))
-            data_path.setData(QtCore.Qt.UserRole, item)
-            self.ui.table.setItem(row, 0, data_path)
+            item = QtGui.QTableWidgetItem(path)
+            # Show last couple of path parts so we can seee where it's oaded from
+            part_path = str(Path(*Path(path).parts[-3:]))
+            item.setText(part_path)
+            item.setData(QtCore.Qt.UserRole, path)
+            self.ui.table.setItem(row, 0, item)
 
             type_combo = QtGui.QComboBox()
             type_combo.addItems(TYPE_CHOICES)
