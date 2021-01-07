@@ -187,9 +187,10 @@ class QC(QtGui.QWidget):
                     continue
 
                 preprocessed_id = s.specimen_root.name.split('_')[1]
-                results[str(s.outroot)] = {preprocessed_id: {'qc_flagged': list(s.qc_flagged),
-                                                             'flag_whole_image': s.flag_whole_image,
-                                                             'notes': s.notes}}
+                results[preprocessed_id] = {'qc_flagged': list(s.qc_flagged),
+                                            'flag_whole_image': s.flag_whole_image,
+                                            'notes': s.notes,
+                                            'path': str(s.outroot)}
 
             yaml.dump(results, fh)
             info_dialog(self.mainwindow, 'Saved OK', f'QC dsaved to {self.qc_results_file}')
@@ -211,10 +212,12 @@ class QC(QtGui.QWidget):
         for s in self.qc:
             s.setup() # Lets get rid of setup method
             s.qc_done = False
-            if str(s.outroot) in qc_info:
-                s.qc_flagged = qc_info[str(s.outroot)]['qc_flagged']
-                s.flag_whole_image = qc_info[str(s.outroot)]['flag_whole_image']
-                s.notes = qc_info[str(s.outroot)]['notes']
+            preprocesed_id = s.specimen_root.name.split('_')[1]
+            if preprocesed_id in qc_info:
+                s.qc_done = True
+                s.qc_flagged = qc_info[preprocesed_id]['qc_flagged']
+                s.flag_whole_image = qc_info[preprocesed_id]['flag_whole_image']
+                s.notes = qc_info[preprocesed_id]['notes']
             else:
                 s.qc_flagged = set()
                 s.flag_whole_image = False
