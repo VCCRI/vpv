@@ -215,7 +215,7 @@ class QC(QtGui.QWidget):
             preprocesed_id = s.specimen_root.name.split('_')[1]
             if preprocesed_id in qc_info:
                 s.qc_done = True
-                s.qc_flagged = qc_info[preprocesed_id]['qc_flagged']
+                s.qc_flagged = set(qc_info[preprocesed_id]['qc_flagged'])
                 s.flag_whole_image = qc_info[preprocesed_id]['flag_whole_image']
                 s.notes = qc_info[preprocesed_id]['notes']
             else:
