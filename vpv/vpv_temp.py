@@ -115,7 +115,7 @@ class Vpv(QtCore.QObject):
         self.view_id_counter = 0
         self.appdata = AppData()
 
-        print(self.appdata.monster_munch)
+        print(self.appdata.data)
         self.mainwindow = main_window.Mainwindow(self, self.appdata)
         # self.mainwindow.showFullScreen()
         self.model = DataModel()
@@ -125,7 +125,7 @@ class Vpv(QtCore.QObject):
         self.views = {}
 
         # Initialise the QC tab
-        self.qc = QC(self, self.mainwindow)
+        self.qc = QC(self, self.mainwindow, self.appdata)
         self.qc.load_specimen_signal.connect(self.load_volumes)
         self.last_selected_label = 0 # This is updated everytime mouse hovers over label
         self.volume2_pixel_signal.connect(self.set_current_label)

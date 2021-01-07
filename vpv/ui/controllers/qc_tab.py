@@ -1,5 +1,6 @@
 from pathlib import Path
 import shutil
+from datetime import datetime
 import os
 
 from PyQt5 import QtGui, QtCore, QtWidgets
@@ -10,9 +11,11 @@ import yaml
 import addict
 
 from vpv.ui.views.ui_qctab import Ui_QC
+from vpv.utils.appdata import AppData
 from vpv.common import info_dialog, question_dialog, Layers, error_dialog
 from lama.common import get_file_paths
 from lama.paths import get_specimen_dirs
+from lama.paths import SpecimenDataPaths
 
 
 SUBFOLDERS_TO_IGNORE = ['resolution_images', 'pyramid_images']
@@ -23,11 +26,12 @@ class QC(QtGui.QWidget):
     load_specimen_signal = QtCore.pyqtSignal(list, str)
     clear_data_signal = QtCore.pyqtSignal()
 
-    def __init__(self, vpv, mainwindow):
+    def __init__(self, vpv, mainwindow, appdata: AppData):
         super(QC, self).__init__(mainwindow)
         self.ui = Ui_QC()
         self.ui.setupUi(self)
         self.vpv = vpv
+        self.appdata = appdata
 
         self.ui.pushButtonLoad.clicked.connect(self.load_data)
         self.ui.pushButtonSaveQC.clicked.connect(self.save_qc)
@@ -59,8 +63,12 @@ class QC(QtGui.QWidget):
         self.qc[self.specimen_index].flag_whole_image = checked
 
     def load_atlas_metadata(self):
-        paths = QFileDialog.getOpenFileName(self.mainwindow, 'Load atlas metadata')
+        lm = self.appdata.last_atlas_metadata_file
+        paths = QFileDialog.getOpenFileName(self.mainwindow, 'Load atlas metadata',
+                                            self.appdata.last_atlas_metadata_file)
+
         self.atlas_meta = pd.read_csv(str(paths[0]), index_col=0)
+        self.appdata.last_atlas_metadata_file = str(paths[0])
 
     def label_clicked_slot(self, label_num):
 
@@ -76,6 +84,7 @@ class QC(QtGui.QWidget):
             s.remove(label_num)
         else:
             s.add(label_num)
+
         self.update_flagged_list()
 
     def update_flagged_list(self):
@@ -97,6 +106,7 @@ class QC(QtGui.QWidget):
 
     def update_specimen_list(self):
         self.ui.listWidgetQcSpecimens.clear()
+
         for s in self.qc:
             view_path = str(Path(*s.outroot.parts[-4:]))
             self.ui.listWidgetQcSpecimens.addItem(view_path)
@@ -117,22 +127,37 @@ class QC(QtGui.QWidget):
         self.ui.textEditSpecimenNotes.setText(spec_qc.notes)
         self.ui.listWidgetQcSpecimens.setCurrentRow(idx)
 
-
     def load_data(self):
-        dir_ = QFileDialog.getExistingDirectory(None, "Select root directory containing lama runs")
-        root = Path(dir_)
 
-        # Check that we can write to this directory
-        if not os.access(root, os.W_OK):
-            error_dialog(self.mainwindow, 'Data not loaded!', 'Directory needs to be writable for qc output file')
-            return
+        dir_ = QFileDialog.getExistingDirectory(None, "Select root directory containing lama runs",
+                                                self.appdata.last_qc_dir)
+        self.appdata.last_qc_dir = str(dir_)
+
+        root = Path(dir_)
 
         self.load_atlas_metadata()
 
-        if self.qc:  # Any qc in memory
+        if self.qc:  # Any qc in memory?
             doit = question_dialog(self.mainwindow, 'Load QC?', 'This will delete any previously made qc flags')
             if not doit:
                 return
+
+        last_qc_dir = self.appdata.last_qc_output_dir
+
+        if not last_qc_dir:
+            last_qc_dir = Path()
+
+        suggested_qc_file = Path(last_qc_dir) / f'{root.name}_vpv_qc.yaml'
+
+        res = QFileDialog.getSaveFileName(self.mainwindow, "Select new or existing qc file",
+                                                           str(suggested_qc_file), "QC files (*.yaml)")
+        self.qc_results_file = Path(res[0])
+        self.appdata.last_qc_output_dir = str(self.qc_results_file.parent)
+
+        # Check that we can write to this directory
+        if not os.access(self.qc_results_file.parent, os.W_OK):
+            error_dialog(self.mainwindow, 'Data not loaded!', 'Directory needs to be writable for qc output')
+            return
 
         self.load_qc(root)
         self.root_dir = root
@@ -143,20 +168,28 @@ class QC(QtGui.QWidget):
         # Convert the list of SpecimenDataPath objects to a yaml
 
         # make a backup first
-        bu = self.qc_results_file.with_suffix('.bu')
+
+        bu_file = self.qc_results_file.parent / 'backup' / f'{self.qc_results_file.stem} {str(datetime.now())}'
+        bu_dir = bu_file.parent
+        bu_dir.mkdir(exist_ok=True)
+
         try:
-            shutil.copy(self.qc_results_file, bu)
+            shutil.copy(self.qc_results_file, bu_file)
         except Exception as e: # catch everything. We don't want to lose QC data.
             print(f'cannot save qc backup {e}')
 
         results = {}
         with open(self.qc_results_file, 'w') as fh:
+
+            s: SpecimenDataPaths
             for s in self.qc:
                 if not s.qc_done:
                     continue
-                results[str(s.outroot)] = {'qc_flagged': list(s.qc_flagged),
-                                           'flag_whole_image': s.flag_whole_image,
-                                           'notes': s.notes}
+
+                preprocessed_id = s.specimen_root.name.split('_')[1]
+                results[str(s.outroot)] = {preprocessed_id: {'qc_flagged': list(s.qc_flagged),
+                                                             'flag_whole_image': s.flag_whole_image,
+                                                             'notes': s.notes}}
 
             yaml.dump(results, fh)
             info_dialog(self.mainwindow, 'Saved OK', f'QC dsaved to {self.qc_results_file}')
@@ -164,10 +197,8 @@ class QC(QtGui.QWidget):
     def load_qc(self, root):
         print('loading qc')
 
-        self.qc_results_file = root / 'vpv_qc.yaml'
-
         if self.qc_results_file and self.qc_results_file.is_file():
-            info_dialog(self.mainwindow, 'QC file found', 'Continuing previous QC')
+            info_dialog(self.mainwindow, 'Previous QC file exists', 'Continuing QC')
             with open(self.qc_results_file, 'r') as fh:
                 qc_info = addict.Dict(yaml.load(fh))
         else:
