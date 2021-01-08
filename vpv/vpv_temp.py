@@ -296,10 +296,9 @@ class Vpv(QtCore.QObject):
     def set_current_label(self, value):
         self.last_selected_label = value
 
-    def update_qc(self, slice_idx: int, x: int, y: int, src_view: SliceWidget,
-                                           color: tuple=(255, 0, 0), radius: int=10, reverse: bool=False):
+    def update_qc(self, *args, **kwargs):
         """
-        We don't need all these parameters, but I'm just sharing a signal for the time being
+        We don't need all these parameters, but I'm just sharing a signal with the annotaitons for the time being
         """
         if self.qc.is_active:
             self.qc.label_clicked_slot(self.last_selected_label)
@@ -392,9 +391,16 @@ class Vpv(QtCore.QObject):
         self.update_slice_views()
 
     def take_screen_shot(self):
-        # Hide the sliders, take screenshot, then show slider
+        """
+        Take screenshot of the slice views.
+        Hide the sliders, take screenshot, then show slider
+        Copy to clipboard and ask if it should be saved as a png
+
+        """
         sshot = self.mainwindow.ui.centralwidget.grab()
         QtGui.QApplication.clipboard().setPixmap(sshot)
+
+
 
         if common.question_dialog(self.mainwindow, "Screenshot copied to clipboard", 'Save to file?'):
 
@@ -405,7 +411,7 @@ class Vpv(QtCore.QObject):
                 self.appdata.last_screen_shot_dir = str(Path(path[0]).parent)
                 sshot.save(path[0])
 
-        # common.info_dialog(self.mainwindow, 'Message', "Screenshot copied to clipboard")
+
 
     def volume_changed(self, vol_name):
         self.data_manager.volume_changed(vol_name)

@@ -209,8 +209,11 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.controller.stats()
 
     def keyPressEvent(self, event):
+        """
+        Define keyboard shortcuts
+        """
 
-        if self.controller.qc.is_active:
+        if self.controller.qc.is_active:  # QC-specific shortcuts
             if event.key() == QtCore.Qt.Key_AltGr:
                 self.controller.qc.next_specimen()
 

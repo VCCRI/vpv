@@ -41,19 +41,49 @@ class QC(QtGui.QWidget):
         self.ui.textEditSpecimenNotes.textChanged.connect(self.specimen_note_changed)
 
         self.mainwindow = mainwindow
-        self.specimen_index = 0
+        self.specimen_index: int = 0
 
         self.qc_results_file: Path = None
         self.is_active = False
         self.atlas_meta = None
         self.root_dir = None  # The folder that is opened, all paths relative to this
-        self.snapshot_dir = None
+        self.screenshot_dir = None
+        self.last_label_clicked: int = 0
 
         self.qc = []  # Containing SpecimenPaths objects
 
         header = self.ui.tableWidgetFlagged.horizontalHeader()
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+
+    def screenshot(self, label: int, remove=False):
+        """
+        Get the current specimen and save a screen shot of the current views that highlight the QC issue.
+        """
+
+        current_spec: SpecimenDataPaths = self.qc[self.specimen_index]
+        preprocessed_id = current_spec.specimen_root.name.split('_')[1]
+        # Make screenshot dir for line if not already exists
+        ss_dir = self.screenshot_dir / current_spec.line_id
+        ss_dir.mkdir(exist_ok=True)
+
+        # If we have backgroubd pixel, return
+        # If there's an atlas an the label is not in it, return
+        if label < 1 or (self.atlas_meta is not None and label not in self.atlas_meta.index):
+            return
+
+        if self.atlas_meta is not None:
+            label_name = self.atlas_meta.at[label, 'label_name']
+
+        ss_file: Path = ss_dir / f'{preprocessed_id}_{label_name if label_name else self.last_label_clicked}.jpg'
+
+        if remove:
+            ss_file.unlink(missing_ok=True)
+            print(f'Removed QC screenshot: {ss_file}')
+        else:
+            image = self.mainwindow.ui.centralwidget.grab()
+            image.save(str(ss_file), quality=30)
+            print(f'QC screenshot saved: {ss_file}')
 
     def specimen_note_changed(self):
         text = str(self.ui.textEditSpecimenNotes.toPlainText())
@@ -63,7 +93,6 @@ class QC(QtGui.QWidget):
         self.qc[self.specimen_index].flag_whole_image = checked
 
     def load_atlas_metadata(self):
-        lm = self.appdata.last_atlas_metadata_file
         paths = QFileDialog.getOpenFileName(self.mainwindow, 'Load atlas metadata',
                                             self.appdata.last_atlas_metadata_file)
 
@@ -82,10 +111,14 @@ class QC(QtGui.QWidget):
         s: set = self.qc[self.specimen_index].qc_flagged
         if label_num in s:
             s.remove(label_num)
+            self.screenshot(label_num, remove=True)
         else:
             s.add(label_num)
+            self.screenshot(label_num)
 
+        self.last_label_clicked = label_num
         self.update_flagged_list()
+
 
     def update_flagged_list(self):
         self.ui.tableWidgetFlagged.clear()
@@ -123,7 +156,6 @@ class QC(QtGui.QWidget):
         self.specimen_index = idx
         self.update_flagged_list()
         self.ui.checkBoxFlagWholeImage.setChecked(spec_qc.flag_whole_image)
-        # self.ui.textEditSpecimenNotes.clear()
         self.ui.textEditSpecimenNotes.setText(spec_qc.notes)
         self.ui.listWidgetQcSpecimens.setCurrentRow(idx)
 
@@ -153,6 +185,10 @@ class QC(QtGui.QWidget):
                                                            str(suggested_qc_file), "QC files (*.yaml)")
         self.qc_results_file = Path(res[0])
         self.appdata.last_qc_output_dir = str(self.qc_results_file.parent)
+
+        # create dir for storing screenshota
+        self.screenshot_dir = self.qc_results_file.parent / 'screenshots'
+        self.screenshot_dir.mkdir(exist_ok=True)
 
         # Check that we can write to this directory
         if not os.access(self.qc_results_file.parent, os.W_OK):
@@ -229,8 +265,10 @@ class QC(QtGui.QWidget):
         with open(invert_yaml, 'r') as fh:
             invert_order = yaml.load(fh)['inversion_order']
 
+        # 080121 Both methods of label propagation now use the rigidly-aligned images to overlay label onto
+        vol_dir = next(spec_dir.rglob('**/reg*/*rigid*'))
+
         if not rev:
-            vol_dir = next(spec_dir.rglob('**/reg*/*rigid*'))
             try:
                 lab_dir = next(spec_dir.rglob('**/inverted_labels/similarity'))
             except StopIteration:
@@ -238,7 +276,6 @@ class QC(QtGui.QWidget):
         else:
             # Labels progated by reverse registration
             last_dir = invert_order[-1]
-            vol_dir = spec_dir / 'inputs/'  # Change this to rigid for the next run
             lab_dir = next(spec_dir.rglob(f'**/inverted_labels/{last_dir}'))
 
         vol = get_file_paths(vol_dir, ignore_folders=SUBFOLDERS_TO_IGNORE)[0]
