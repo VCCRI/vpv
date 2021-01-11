@@ -14,8 +14,7 @@ from vpv.ui.views.ui_qctab import Ui_QC
 from vpv.utils.appdata import AppData
 from vpv.common import info_dialog, question_dialog, Layers, error_dialog
 from lama.common import get_file_paths
-from lama.paths import get_specimen_dirs
-from lama.paths import SpecimenDataPaths
+from lama.paths import get_specimen_dirs, SpecimenDataPaths
 
 
 SUBFOLDERS_TO_IGNORE = ['resolution_images', 'pyramid_images']
@@ -151,53 +150,35 @@ class QC(QtGui.QWidget):
         spec_qc = self.qc[idx]
         spec_qc.qc_done = True
         spec_dir = spec_qc.outroot.parent
-        self.load_specimen_into_viewer(spec_dir)
+        # self.load_specimen_into_viewer(spec_dir)
+
+        num_top_views = 3
+
+        # Set the top row of views
+        for i in range(num_top_views):
+            vol_id = spec_qc.vol_id
+            label_id = spec_qc.label_id
+            self.vpv.views[i].layers[Layers.vol1].set_volume(vol_id)
+            self.vpv.views[i].layers[Layers.vol2].set_volume(label_id)
+
+        title = spec_dir.name
+        self.vpv.mainwindow.setWindowTitle(title)
+
+        self.vpv.data_manager.show2Rows(False)
+
+        # Set colormap
+        self.vpv.data_manager.on_vol2_lut_changed('anatomy_labels')
+
+        # opacity
+        self.vpv.data_manager.modify_layer(Layers.vol2, 'set_opacity', 0.4)
+
+        self.vpv.data_manager.update()
+
         self.specimen_index = idx
         self.update_flagged_list()
         self.ui.checkBoxFlagWholeImage.setChecked(spec_qc.flag_whole_image)
         self.ui.textEditSpecimenNotes.setText(spec_qc.notes)
         self.ui.listWidgetQcSpecimens.setCurrentRow(idx)
-
-    def load_data(self):
-
-        dir_ = QFileDialog.getExistingDirectory(None, "Select root directory containing lama runs",
-                                                self.appdata.last_qc_dir)
-        self.appdata.last_qc_dir = str(dir_)
-
-        root = Path(dir_)
-
-        self.load_atlas_metadata()
-
-        if self.qc:  # Any qc in memory?
-            doit = question_dialog(self.mainwindow, 'Load QC?', 'This will delete any previously made qc flags')
-            if not doit:
-                return
-
-        last_qc_dir = self.appdata.last_qc_output_dir
-
-        if not last_qc_dir:
-            last_qc_dir = Path()
-
-        suggested_qc_file = Path(last_qc_dir) / f'{root.name}_vpv_qc.yaml'
-
-        res = QFileDialog.getSaveFileName(self.mainwindow, "Select new or existing qc file",
-                                                           str(suggested_qc_file), "QC files (*.yaml)")
-        self.qc_results_file = Path(res[0])
-        self.appdata.last_qc_output_dir = str(self.qc_results_file.parent)
-
-        # create dir for storing screenshota
-        self.screenshot_dir = self.qc_results_file.parent / 'screenshots'
-        self.screenshot_dir.mkdir(exist_ok=True)
-
-        # Check that we can write to this directory
-        if not os.access(self.qc_results_file.parent, os.W_OK):
-            error_dialog(self.mainwindow, 'Data not loaded!', 'Directory needs to be writable for qc output')
-            return
-
-        self.load_qc(root)
-        self.root_dir = root
-        self.update_specimen_list()
-        self.load_specimen(0)
 
     def save_qc(self):
         # Convert the list of SpecimenDataPath objects to a yaml
@@ -243,6 +224,8 @@ class QC(QtGui.QWidget):
 
         self.qc = get_specimen_dirs(root)
 
+        self.vpv.clear_views()
+
         # For each Lama specimen object, assign previously qc-flagged labels
         for s in self.qc:
             s.setup() # Lets get rid of setup method
@@ -258,7 +241,53 @@ class QC(QtGui.QWidget):
                 s.flag_whole_image = False
                 s.notes = None
 
-    def load_specimen_into_viewer(self, spec_dir: Path, rev=True, title=None):
+            # Load the specimens into VPV
+            s.vol_id, s.label_id, = self.load_specimen_into_vpv(s.specimen_root)
+
+    def load_data(self):
+
+        dir_ = QFileDialog.getExistingDirectory(None, "Select root directory containing lama runs",
+                                                self.appdata.last_qc_dir)
+        self.appdata.last_qc_dir = str(dir_)
+
+        root = Path(dir_)
+
+        self.load_atlas_metadata()
+
+        if self.qc:  # Any qc in memory?
+            doit = question_dialog(self.mainwindow, 'Load QC?', 'This will delete any previously made qc flags')
+            if not doit:
+                return
+
+        last_qc_dir = self.appdata.last_qc_output_dir
+
+        if not last_qc_dir:
+            last_qc_dir = Path()
+
+        suggested_qc_file = Path(last_qc_dir) / f'{root.name}_vpv_qc.yaml'
+
+        res = QFileDialog.getSaveFileName(self.mainwindow, "Select new or existing qc file",
+                                                           str(suggested_qc_file), "QC files (*.yaml)")
+        self.qc_results_file = Path(res[0])
+        self.appdata.last_qc_output_dir = str(self.qc_results_file.parent)
+
+        # create dir for storing screenshota
+        self.screenshot_dir = self.qc_results_file.parent / 'screenshots'
+        self.screenshot_dir.mkdir(exist_ok=True)
+
+        # Check that we can write to this directory
+        if not os.access(self.qc_results_file.parent, os.W_OK):
+            error_dialog(self.mainwindow, 'Data not loaded!', 'Directory needs to be writable for qc output')
+            return
+
+        self.load_qc(root)
+        self.root_dir = root
+        # self.load_specimens_into_vpv(root)
+        self.update_specimen_list()
+        self.load_specimen(0)
+
+    def load_specimen_into_vpv(self, spec_dir: Path, rev=True, title=None):
+
 
         invert_yaml = next(spec_dir.glob('**/inverted_transforms/invert.yaml'))
         with open(invert_yaml, 'r') as fh:
@@ -281,31 +310,10 @@ class QC(QtGui.QWidget):
         lab = get_file_paths(lab_dir, ignore_folders=SUBFOLDERS_TO_IGNORE)[0]
 
         # Remove previous data so we don't run out of memory
-        self.vpv.clear_views()
         vpv_ids = self.vpv.load_volumes([vol, lab], 'vol')
 
-        num_top_views = 3
+        return vpv_ids
 
-        # Set the top row of views
-        for i in range(num_top_views):
-            vol_id = vpv_ids[0]
-            label_id = vpv_ids[1]
-            self.vpv.views[i].layers[Layers.vol1].set_volume(vol_id)
-            self.vpv.views[i].layers[Layers.vol2].set_volume(label_id)
-
-        if not title:
-            title = spec_dir.name
-        self.vpv.mainwindow.setWindowTitle(title)
-
-        self.vpv.data_manager.show2Rows(False)
-
-        # Set colormap
-        self.vpv.data_manager.on_vol2_lut_changed('anatomy_labels')
-
-        # opacity
-        self.vpv.data_manager.modify_layer(Layers.vol2, 'set_opacity', 0.4)
-
-        self.vpv.data_manager.update()
 
 
 
