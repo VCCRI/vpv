@@ -119,7 +119,6 @@ class QC(QtGui.QWidget):
         self.last_label_clicked = label_num
         self.update_flagged_list()
 
-
     def update_flagged_list(self):
         self.ui.tableWidgetFlagged.clear()
         spec_qc = self.qc[self.specimen_index]
