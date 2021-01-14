@@ -103,11 +103,7 @@ class QC(QtGui.QWidget):
         self.qc[self.specimen_index].flag_whole_image = checked
 
     def load_atlas_metadata(self):
-        paths = QFileDialog.getOpenFileName(self.mainwindow, 'Load atlas metadata',
-                                            self.appdata.last_atlas_metadata_file)
-
-        self.atlas_meta = pd.read_csv(str(paths[0]), index_col=0)
-        self.appdata.last_atlas_metadata_file = str(paths[0])
+        self.atlas_meta = self.vpv.load_atlas_meta()
 
     def label_clicked_slot(self, label_num):
 
@@ -189,7 +185,8 @@ class QC(QtGui.QWidget):
         self.vpv.data_manager.show2Rows(False)
 
         # Set colormap
-        self.vpv.data_manager.on_vol2_lut_changed('anatomy_labels')
+        # Todo. Fall back to 'anatomy_labels' if atlas metadata does not have color info
+        self.vpv.data_manager.on_vol2_lut_changed('custom_atlas_labels')
 
         # opacity
         self.vpv.data_manager.modify_layer(Layers.vol2, 'set_opacity', 0.4)

@@ -18,6 +18,9 @@
 import numpy as np
 import copy
 import csv
+import json
+
+import pandas as pd
 
 from vpv.common import generic_anatomy_label_map_path
 
@@ -29,6 +32,7 @@ class Lut(object):
     def __init__(self):
         self.base = np.zeros((256, 3), dtype=np.ubyte)
         self.anatomy_lut = self.set_setup_anatomy_label_map()
+        self.custom_atlas_lut = None
 
     def set_setup_anatomy_label_map(self):
         rgb_values = []
@@ -41,13 +45,42 @@ class Lut(object):
         # Set the first value (background to transparent)
         rgb_values[0][3] = 0.0
         lut = np.array(rgb_values)
-        return lut
+        return lut.astype(np.float)
+
+    def set_custom_atlas_colors(self, atlas_metadata: pd.DataFrame):
+        """
+        If an atlas metadata file is loaded with a 'colour' column use that as the color map
+        """
+        rgb_values = []
+
+        if not 'colour' in atlas_metadata:
+            print('Atlas metadata dataframe does not have a "colour" column')
+
+        # Convert string list to an actual list
+        md = atlas_metadata.copy()
+        md.colour = md.colour.apply(json.loads)
+
+        highest_val = max(atlas_metadata.index) + 1
+        for i in range(highest_val):
+            if i == 0:
+                rgb = (0, 0, 0, 0)
+            try:
+                rgb = md.at[i, 'colour']
+                rgb.append(255)  # add opacity
+            except KeyError:
+                rgb = (0, 0, 0, 0) # Missing label values
+
+            rgb_values.append(rgb)
+
+        lut = np.array(rgb_values)
+        self.custom_atlas_lut = lut.astype(np.float)
 
     def get_lut(self, lut_name):
         return getattr(self, '_' + lut_name)()
 
     def lut_list(self):
-        return ['red', 'green', 'blue', 'inverted_grey', 'grey', 'cyan', 'yellow', 'magenta', 'anatomy_labels']
+        return ['red', 'green', 'blue', 'inverted_grey', 'grey', 'cyan', 'yellow', 'magenta', 'anatomy_labels',
+                'custom_atlas_labels']
 
     def heatmap_lut_list(self):
         return ['hot_red_blue', 'hot_all']
@@ -101,6 +134,9 @@ class Lut(object):
         blue = self.interpolate_colors(colours, 256)[::-1]
         blue[-1][3] = 0.0
         return [red, blue]
+
+    def _custom_atlas_labels(self):
+        return self.custom_atlas_lut, 'custom_atlas_labels'
 
     def transparent(self):
         lut = np.zeros((256, 4), dtype=np.ubyte)

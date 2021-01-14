@@ -20,6 +20,10 @@ class VolumeLayer(Layer):
             self.set_blend_mode_plus()
         self.update()
 
+    def set_custom_labels(self, atlas_metadata):
+        # I don't like this. Jsut create a single LUT somewhere
+        self.lt.set_custom_atlas_colors(atlas_metadata)
+
     def set_scale(self, scale):
         self.image_item.setScale(scale)
 

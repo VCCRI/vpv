@@ -217,6 +217,11 @@ class Vpv(QtCore.QObject):
             meta = pd.read_csv(file_[0], index_col=0)
             self.atlas_meta = meta
 
+            # Todo, we need only one instace of LUT, noy one in each SliceWidget
+            # self.mo
+            # self.data_manager.luts.set_custom_atlas_colors(self.atlas_meta)
+            self.data_manager.modify_layer(Layers.vol2, 'set_custom_labels', meta)
+
     def filter_label(self, labels: Iterable[int]):
         """
         Recieves a label to show. Pass to slice views

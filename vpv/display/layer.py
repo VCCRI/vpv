@@ -30,7 +30,7 @@ class Layer(Qt.QObject):
         self.image_item = None  # Set in the subclasses
         self.vol = None  # When setting to "None" in the view manager we get problems. Needs rewriting
         self.layer_type = layer_type # this should be unique
-        self.lt = Lut()
+        self.lt = Lut()  # Used in subcalsses
         self.isvisible = True
         self.opacity = 1.0
         self._show_labels = [0]  # show all labels to start with (if label layer)
