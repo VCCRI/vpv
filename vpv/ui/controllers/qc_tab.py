@@ -38,6 +38,7 @@ class QC(QtGui.QWidget):
         self.ui.listWidgetQcSpecimens.currentRowChanged.connect(self.load_specimen)
         self.ui.checkBoxFlagWholeImage.clicked.connect(self.flag_whole_image)
         self.ui.textEditSpecimenNotes.textChanged.connect(self.specimen_note_changed)
+        self.ui.checkBoxFlagWholeImage.stateChanged.connect(self.whole_embryo_flag_slot)
 
         self.mainwindow = mainwindow
         self.specimen_index: int = 0
@@ -55,9 +56,16 @@ class QC(QtGui.QWidget):
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
 
+    def whole_embryo_flag_slot(self, state: int):
+        if state == 0:
+            self.screenshot(0, remove=True)
+        elif state == 2:
+            self.screenshot(0)
+
     def screenshot(self, label: int, remove=False):
         """
         Get the current specimen and save a screen shot of the current views that highlight the QC issue.
+        if label == 0, save screenshot for whole embryo
         """
 
         current_spec: SpecimenDataPaths = self.qc[self.specimen_index]
@@ -66,17 +74,20 @@ class QC(QtGui.QWidget):
         ss_dir = self.screenshot_dir / current_spec.line_id
         ss_dir.mkdir(exist_ok=True)
 
-        # If we have backgroubd pixel, return
         # If there's an atlas an the label is not in it, return
-        if label < 1 or (self.atlas_meta is not None and label not in self.atlas_meta.index):
+        if label == 0:
+            label_name = 'whole_embryo'
+
+        elif label < 0 or (self.atlas_meta is not None and label not in self.atlas_meta.index):
             return
 
-        if self.atlas_meta is not None:
+        elif self.atlas_meta is not None:
             label_name = self.atlas_meta.at[label, 'label_name']
 
         ss_file: Path = ss_dir / f'{preprocessed_id}_{label_name if label_name else self.last_label_clicked}.jpg'
 
         if remove:
+
             ss_file.unlink(missing_ok=True)
             print(f'Removed QC screenshot: {ss_file}')
         else:
@@ -102,15 +113,22 @@ class QC(QtGui.QWidget):
 
         label_num = int(label_num)
 
-        if label_num == 0:
-            return
         if not self.is_active:
             return
 
+        if label_num == 0:
+            return
+
         s: set = self.qc[self.specimen_index].qc_flagged
-        if label_num in s:
-            s.remove(label_num)
-            self.screenshot(label_num, remove=True)
+
+        if label_num in s: # remove if already in flag list. Ask before delete.
+
+            label_name = self.atlas_meta.at[label_num, 'label_name']
+            remove_comfirmed = question_dialog(None, f'{label_name}', 'Remove QC flag and screenshot?')
+
+            if remove_comfirmed:
+                s.remove(label_num)
+                self.screenshot(label_num, remove=True)
         else:
             s.add(label_num)
             self.screenshot(label_num)
@@ -147,7 +165,11 @@ class QC(QtGui.QWidget):
         self.load_specimen(new_index)
 
     def load_specimen(self, idx):
-        spec_qc = self.qc[idx]
+        try:
+            spec_qc = self.qc[idx]
+        except IndexError:
+            spec_qc = self.qc[0]
+
         spec_qc.qc_done = True
         spec_dir = spec_qc.outroot.parent
         # self.load_specimen_into_viewer(spec_dir)
@@ -176,7 +198,11 @@ class QC(QtGui.QWidget):
 
         self.specimen_index = idx
         self.update_flagged_list()
+
+        self.ui.checkBoxFlagWholeImage.blockSignals(True)
         self.ui.checkBoxFlagWholeImage.setChecked(spec_qc.flag_whole_image)
+        self.ui.checkBoxFlagWholeImage.blockSignals(False)
+
         self.ui.textEditSpecimenNotes.setText(spec_qc.notes)
         self.ui.listWidgetQcSpecimens.setCurrentRow(idx)
 
@@ -309,7 +335,6 @@ class QC(QtGui.QWidget):
         vol = get_file_paths(vol_dir, ignore_folders=SUBFOLDERS_TO_IGNORE)[0]
         lab = get_file_paths(lab_dir, ignore_folders=SUBFOLDERS_TO_IGNORE)[0]
 
-        # Remove previous data so we don't run out of memory
         vpv_ids = self.vpv.load_volumes([vol, lab], 'vol')
 
         return vpv_ids
