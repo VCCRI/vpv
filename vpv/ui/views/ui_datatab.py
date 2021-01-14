@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_datatab.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.1
+# Created by: PyQt5 UI code generator 5.14.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -124,6 +124,9 @@ class Ui_data(object):
         self.verticalLayout_5.addLayout(self.verticalLayout_9)
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.pushButtonLoadAtlasMeta = QtWidgets.QPushButton(data)
+        self.pushButtonLoadAtlasMeta.setObjectName("pushButtonLoadAtlasMeta")
+        self.horizontalLayout_4.addWidget(self.pushButtonLoadAtlasMeta)
         self.labelNewVersion = QtWidgets.QLabel(data)
         self.labelNewVersion.setText("")
         self.labelNewVersion.setObjectName("labelNewVersion")
@@ -475,9 +478,10 @@ class Ui_data(object):
         self.comboBoxOrientation.setItemText(1, _translate("data", "coronal"))
         self.comboBoxOrientation.setItemText(2, _translate("data", "axial"))
         self.comboBoxOrientation.setItemText(3, _translate("data", "Isosurface - Not implemented"))
+        self.pushButtonLoadAtlasMeta.setText(_translate("data", "Load atlas metadata"))
         self.pushButtonScaleBarColor.setText(_translate("data", "scale bar color"))
         self.labelVolume.setText(_translate("data", "Volume 1"))
-        self.label_14.setText(_translate("data", "Volume 2"))
+        self.label_14.setText(_translate("data", "Volume 2 / Atlas"))
         self.label_3.setText(_translate("data", "opacity"))
         self.labelData.setText(_translate("data", "Heatmap Data"))
         self.pushButtonRecalcConnectComponents.setText(_translate("data", "Find blobs"))
@@ -491,4 +495,4 @@ class Ui_data(object):
         self.label_16.setText(_translate("data", "Scale bar length"))
         self.checkBoxScaleBarLabel.setText(_translate("data", "scale label"))
 from vpv.ui.views.combobox_ignore_scroll import QComboBoxIgnoreSCroll
-from . import resources_rc
+import resources_rc

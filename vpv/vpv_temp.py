@@ -59,6 +59,8 @@ if os.name == 'nt':
     else:
         logging.info('cannot find winpython folder: {}'.format(winpython_path))
 
+import pandas as pd
+
 from vpv.ui.controllers.dock_widget_manager import ManagerDockWidget
 from vpv.model.model import DataModel
 from vpv.utils.appdata import AppData
@@ -83,8 +85,6 @@ except Exception:  # I thnk it might not be an ImportError? look into it
     logging.info('cannot import qtconsole, so diabling console widget tab')
     console_imported = False
 
-
-
 from vpv.ui.controllers.gradient_editor import GradientEditor
 import zipfile
 from vpv.lib import addict
@@ -92,7 +92,6 @@ import tempfile
 import csv
 import logging.config
 from vpv.common import log_path
-
 
 
 class Vpv(QtCore.QObject):
@@ -104,6 +103,7 @@ class Vpv(QtCore.QObject):
     crosshair_invisible_signal = QtCore.pyqtSignal()
     volume_pixel_signal = QtCore.pyqtSignal(float)
     volume2_pixel_signal = QtCore.pyqtSignal(float)
+    atlas_label_over_signal = QtCore.pyqtSignal(str)
     heatmap_pixel_signal = QtCore.pyqtSignal(float)
     # volume_position_signal = QtCore.pyqtSignal(int, int, int)
 
@@ -148,6 +148,7 @@ class Vpv(QtCore.QObject):
 
         self.volume_pixel_signal.connect(self.mainwindow.set_volume_pix_intensity)
         self.volume2_pixel_signal.connect(self.mainwindow.set_volume2_pix_intensity)
+        self.atlas_label_over_signal.connect(self.mainwindow.set_current_label)
         self.heatmap_pixel_signal.connect(self.mainwindow.set_data_pix_intensity)
 
         self.options_tab = OptionsTab(self.mainwindow, self.appdata)
@@ -194,6 +195,27 @@ class Vpv(QtCore.QObject):
         self.annotation_radius_changed(self.appdata.annotation_circle_radius)
 
         self.check_vpv_version()
+
+        self.atlas_meta = None
+        self.data_manager.load_metadata_signal.connect(self.load_atlas_meta)
+
+    def load_atlas_meta(self) ->pd.DataFrame:
+        """
+        Atlases loaded into the volume2 slot can be assigned label names and color information using a metadata file
+
+        Returns
+        -------
+        Metadata file with (minimally) following columns
+        label: int
+        label_name: str
+        colour: rgb (eg. 255,0,0) - optional
+        """
+        file_ = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Load atlas metadata',
+                                            self.appdata.last_atlas_metadata_file)
+        if file_:
+            self.appdata.last_atlas_metadata_file = str(file_[0])
+            meta = pd.read_csv(file_[0], index_col=0)
+            self.atlas_meta = meta
 
     def filter_label(self, labels: Iterable[int]):
         """
@@ -280,6 +302,7 @@ class Vpv(QtCore.QObject):
                 if vol2:
                     vol2_hover_voxel_value = vol2.get_data(Orientation.axial, vol_points[2], xy=[x1, vol_points[1]])
                     self.volume2_pixel_signal.emit((round(float(vol2_hover_voxel_value), 4)))
+
                 if hm:
                     hm_hover_voxel_value = hm.get_data(Orientation.axial, vol_points[2], xy=[x1, vol_points[1]])
                     self.heatmap_pixel_signal.emit((round(float(hm_hover_voxel_value), 4)))
@@ -295,6 +318,12 @@ class Vpv(QtCore.QObject):
 
     def set_current_label(self, value):
         self.last_selected_label = value
+
+        if self.atlas_meta is not None and value >=1:
+            label_name = self.atlas_meta.at[int(value), 'label_name']
+        else:
+            label_name = ''
+        self.atlas_label_over_signal.emit(label_name)
 
     def update_qc(self, *args, **kwargs):
         """

@@ -141,24 +141,29 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.mouse_position_label = QtGui.QLabel(self)
         self.mouse_position_label.setStyleSheet("QLabel {color : white; }")
-        self.mouse_position_label.setFixedWidth(300)
+        self.mouse_position_label.setFixedWidth(130)
         self.mouse_position_label.show()
         self.ui.toolBar.addWidget(self.mouse_position_label)
 
         self.volume_pix_val_label = QtGui.QLabel(self)
         self.volume_pix_val_label.setStyleSheet("QLabel {color : white; }")
-        self.volume_pix_val_label.setFixedWidth(100)
+        self.volume_pix_val_label.setFixedWidth(60)
         self.ui.toolBar.addWidget(self.volume_pix_val_label)
 
         self.volume2_pix_val_label = QtGui.QLabel(self)
         self.volume2_pix_val_label.setStyleSheet("QLabel {color : white; }")
-        self.volume2_pix_val_label.setFixedWidth(100)
+        self.volume2_pix_val_label.setFixedWidth(60)
         self.ui.toolBar.addWidget(self.volume2_pix_val_label)
 
         self.data_pix_val_label = QtGui.QLabel(self)
         self.data_pix_val_label.setStyleSheet("QLabel {color : white; }")
-        self.data_pix_val_label.setFixedWidth(100)
+        self.data_pix_val_label.setFixedWidth(60)
         self.ui.toolBar.addWidget(self.data_pix_val_label)
+
+        self.atlas_label_name_label = QtGui.QLabel(self)
+        self.atlas_label_name_label.setStyleSheet("QLabel {color : white; }")
+        self.atlas_label_name_label.setFixedWidth(300)
+        self.ui.toolBar.addWidget(self.atlas_label_name_label)
 
         self.ui.toolBar.setMinimumHeight(30)
 
@@ -194,6 +199,9 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def set_volume2_pix_intensity(self, value):
         self.volume2_pix_val_label.setText('vol2: {}  '.format(value))
+
+    def set_current_label(self, label: str):
+        self.atlas_label_name_label.setText(label)
 
     def set_data_pix_intensity(self, value):
         self.data_pix_val_label.setText('data: {}  '.format(value))

@@ -208,6 +208,13 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
+            <widget class="QPushButton" name="pushButtonLoadAtlasMeta">
+             <property name="text">
+              <string>Load atlas metadata</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QLabel" name="labelNewVersion">
              <property name="text">
               <string/>
@@ -355,7 +362,7 @@ padding: 3px;
 color: rgb(223, 223, 223);</string>
          </property>
          <property name="text">
-          <string>Volume 2</string>
+          <string>Volume 2 / Atlas</string>
          </property>
         </widget>
        </item>

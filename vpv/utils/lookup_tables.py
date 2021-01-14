@@ -22,7 +22,8 @@ import csv
 from vpv.common import generic_anatomy_label_map_path
 
 
-ANATOMY_LABELS_FILE = 'generic_anatomy.csv'
+# ANATOMY_LABELS_FILE = 'generic_anatomy.csv'
+
 
 class Lut(object):
     def __init__(self):

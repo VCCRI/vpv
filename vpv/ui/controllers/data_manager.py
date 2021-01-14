@@ -47,6 +47,7 @@ class ManageData(QtGui.QWidget):
     ui_changed_signal = QtCore.pyqtSignal()
     scale_bar_color_signal = QtCore.pyqtSignal(QtGui.QColor)
     gradient_editor_signal = QtCore.pyqtSignal()
+    load_metadata_signal = QtCore.pyqtSignal()
 
     def __init__(self, controller, model, mainwindow, appdata):
         super(ManageData, self).__init__(mainwindow)
@@ -137,7 +138,12 @@ class ManageData(QtGui.QWidget):
         self.ui.doubleSpinBoxVol2Opacity.setSingleStep(0.1)
         self.ui.doubleSpinBoxVol2Opacity.setValue(1.0)
 
+        self.ui.pushButtonLoadAtlasMeta.clicked.connect(self.load_atlas_meta_slot)
+
         self.connect_signal_slots()
+
+    def load_atlas_meta_slot(self):
+        self.load_metadata_signal.emit()
 
     def connect_signal_slots(self):
         self.ui.pushButtonRecalcConnectComponents.clicked.connect(self.controller.recalc_connected_components)
