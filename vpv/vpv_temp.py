@@ -221,6 +221,7 @@ class Vpv(QtCore.QObject):
             # self.mo
             # self.data_manager.luts.set_custom_atlas_colors(self.atlas_meta)
             self.data_manager.modify_layer(Layers.vol2, 'set_custom_labels', meta)
+            return self.atlas_meta
 
     def filter_label(self, labels: Iterable[int]):
         """

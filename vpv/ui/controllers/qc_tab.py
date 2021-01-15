@@ -39,6 +39,7 @@ class QC(QtGui.QWidget):
         self.ui.checkBoxFlagWholeImage.clicked.connect(self.flag_whole_image)
         self.ui.textEditSpecimenNotes.textChanged.connect(self.specimen_note_changed)
         self.ui.checkBoxFlagWholeImage.stateChanged.connect(self.whole_embryo_flag_slot)
+        self.ui.pushButtonFlagAllLabels.clicked.connect(self.flag_all_labels)
 
         self.mainwindow = mainwindow
         self.specimen_index: int = 0
@@ -50,11 +51,16 @@ class QC(QtGui.QWidget):
         self.screenshot_dir = None
         self.last_label_clicked: int = 0
 
-        self.qc = []  # Containing SpecimenPaths objects
+        self.specimens = []  # Containing SpecimenPaths objects
 
         header = self.ui.tableWidgetFlagged.horizontalHeader()
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+
+    def flag_all_labels(self):
+        for label in self.atlas_meta.index:
+            self.specimens[self.specimen_index].qc_flagged.add(label)
+        self.update_flagged_list()
 
     def whole_embryo_flag_slot(self, state: int):
         if state == 0:
@@ -68,7 +74,7 @@ class QC(QtGui.QWidget):
         if label == 0, save screenshot for whole embryo
         """
 
-        current_spec: SpecimenDataPaths = self.qc[self.specimen_index]
+        current_spec: SpecimenDataPaths = self.specimens[self.specimen_index]
         preprocessed_id = current_spec.specimen_root.name.split('_')[1]
         # Make screenshot dir for line if not already exists
         ss_dir = self.screenshot_dir / current_spec.line_id
@@ -97,10 +103,10 @@ class QC(QtGui.QWidget):
 
     def specimen_note_changed(self):
         text = str(self.ui.textEditSpecimenNotes.toPlainText())
-        self.qc[self.specimen_index].notes = text
+        self.specimens[self.specimen_index].notes = text
 
     def flag_whole_image(self, checked):
-        self.qc[self.specimen_index].flag_whole_image = checked
+        self.specimens[self.specimen_index].flag_whole_image = checked
 
     def load_atlas_metadata(self):
         self.atlas_meta = self.vpv.load_atlas_meta()
@@ -115,7 +121,7 @@ class QC(QtGui.QWidget):
         if label_num == 0:
             return
 
-        s: set = self.qc[self.specimen_index].qc_flagged
+        s: set = self.specimens[self.specimen_index].qc_flagged
 
         if label_num in s: # remove if already in flag list. Ask before delete.
 
@@ -134,7 +140,7 @@ class QC(QtGui.QWidget):
 
     def update_flagged_list(self):
         self.ui.tableWidgetFlagged.clear()
-        spec_qc = self.qc[self.specimen_index]
+        spec_qc = self.specimens[self.specimen_index]
         self.ui.tableWidgetFlagged.setRowCount(0)
 
         for i,  f in enumerate(spec_qc.qc_flagged):
@@ -152,7 +158,7 @@ class QC(QtGui.QWidget):
     def update_specimen_list(self):
         self.ui.listWidgetQcSpecimens.clear()
 
-        for s in self.qc:
+        for s in self.specimens:
             view_path = str(Path(*s.outroot.parts[-4:]))
             self.ui.listWidgetQcSpecimens.addItem(view_path)
 
@@ -162,9 +168,9 @@ class QC(QtGui.QWidget):
 
     def load_specimen(self, idx):
         try:
-            spec_qc = self.qc[idx]
+            spec_qc = self.specimens[idx]
         except IndexError:
-            spec_qc = self.qc[0]
+            spec_qc = self.specimens[0]
 
         spec_qc.qc_done = True
         spec_dir = spec_qc.outroot.parent
@@ -221,7 +227,7 @@ class QC(QtGui.QWidget):
         with open(self.qc_results_file, 'w') as fh:
 
             s: SpecimenDataPaths
-            for s in self.qc:
+            for s in self.specimens:
                 if not s.qc_done:
                     continue
 
@@ -245,12 +251,12 @@ class QC(QtGui.QWidget):
             info_dialog(self.mainwindow, 'QC file NOT found', 'A new qc session will be started')  # Do it on next save
             qc_info = {}
 
-        self.qc = get_specimen_dirs(root)
+        self.specimens = get_specimen_dirs(root)
 
         self.vpv.clear_views()
 
         # For each Lama specimen object, assign previously qc-flagged labels
-        for s in self.qc:
+        for s in self.specimens:
             s.setup() # Lets get rid of setup method
             s.qc_done = False
             preprocesed_id = s.specimen_root.name.split('_')[1]
@@ -277,7 +283,7 @@ class QC(QtGui.QWidget):
 
         self.load_atlas_metadata()
 
-        if self.qc:  # Any qc in memory?
+        if self.specimens:  # Any qc in memory?
             doit = question_dialog(self.mainwindow, 'Load QC?', 'This will delete any previously made qc flags')
             if not doit:
                 return

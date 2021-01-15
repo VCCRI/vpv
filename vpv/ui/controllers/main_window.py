@@ -141,28 +141,28 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.mouse_position_label = QtGui.QLabel(self)
         self.mouse_position_label.setStyleSheet("QLabel {color : white; }")
-        self.mouse_position_label.setFixedWidth(130)
+        self.mouse_position_label.setFixedWidth(120)
         self.mouse_position_label.show()
         self.ui.toolBar.addWidget(self.mouse_position_label)
 
         self.volume_pix_val_label = QtGui.QLabel(self)
         self.volume_pix_val_label.setStyleSheet("QLabel {color : white; }")
-        self.volume_pix_val_label.setFixedWidth(60)
+        self.volume_pix_val_label.setFixedWidth(80)
         self.ui.toolBar.addWidget(self.volume_pix_val_label)
 
         self.volume2_pix_val_label = QtGui.QLabel(self)
         self.volume2_pix_val_label.setStyleSheet("QLabel {color : white; }")
-        self.volume2_pix_val_label.setFixedWidth(60)
+        self.volume2_pix_val_label.setFixedWidth(80)
         self.ui.toolBar.addWidget(self.volume2_pix_val_label)
 
         self.data_pix_val_label = QtGui.QLabel(self)
         self.data_pix_val_label.setStyleSheet("QLabel {color : white; }")
-        self.data_pix_val_label.setFixedWidth(60)
+        self.data_pix_val_label.setFixedWidth(80)
         self.ui.toolBar.addWidget(self.data_pix_val_label)
 
         self.atlas_label_name_label = QtGui.QLabel(self)
         self.atlas_label_name_label.setStyleSheet("QLabel {color : white; }")
-        self.atlas_label_name_label.setFixedWidth(300)
+        self.atlas_label_name_label.setFixedWidth(240)
         self.ui.toolBar.addWidget(self.atlas_label_name_label)
 
         self.ui.toolBar.setMinimumHeight(30)
