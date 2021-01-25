@@ -52,9 +52,9 @@ def load(config_path, root_dir):
 
     for i, view in enumerate(views):
 
-        top_vol_id = vpv_ids[i * i]
+        top_vol_id = vpv_ids[i * 2]
         # label_id = top_labels[i].stem
-        bottom_vol_id = vpv_ids[i * i + 1]
+        bottom_vol_id = vpv_ids[i * 2 + 1]
         # if label_id == vol_id:
         #     label_id = f'{label_id}(1)'
         ex.views[i].layers[Layers.vol1].set_volume(top_vol_id)
