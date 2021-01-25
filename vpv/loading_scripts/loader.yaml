@@ -1,18 +1,17 @@
 
 # example config file for vpv/utils/data_loader.py
 
-# Any variable that will be repeated within the config can be defined as an anchor using '&'
-#target: &/mnt/bit_nfs/neil/impc_e18.5/jax/test_run_210121/target/Harwell_E18.5_avg.nrrd
+# Paths can be absolute paths or patterns that will be used in Path(root_dir).glob(pattern)
 
 view_template:
   ori: 'sagittal'
   top:
     color: red
-    opacity: 1.0
+#   opacity: 1.0 always 1.0
   bottom:
     path: '/mnt/bit_nfs/neil/impc_e18.5/jax/test_run_210121/target/Harwell_E18.5_avg.nrrd'
     color: cyan
-    opacity: 1.0
+    opacity: 0.6 # Pop avg is bright
 
 
 
@@ -29,4 +28,4 @@ views:
   - top:
       path: '**/*reg*/def*16/**/*.nrrd'
   - top:
-      path: '**/*reg*/def*8/**/*.nrrd'
+      path: '**/*reg*/deformable_8/**/*.nrrd' # Disambiguate 128
