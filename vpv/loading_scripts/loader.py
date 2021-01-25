@@ -52,15 +52,18 @@ def load(config_path, root_dir):
 
     for i, view in enumerate(views):
 
-        top_vol_id = vpv_ids[i]
+        top_vol_id = vpv_ids[i * i]
         # label_id = top_labels[i].stem
-        bottom_vol_id = vpv_ids[i+1]
+        bottom_vol_id = vpv_ids[i * i + 1]
         # if label_id == vol_id:
         #     label_id = f'{label_id}(1)'
         ex.views[i].layers[Layers.vol1].set_volume(top_vol_id)
         ex.views[i].layers[Layers.vol2].set_volume(bottom_vol_id)
+
         ex.views[i].set_orientation(Orientation[view['ori']])
+
         ex.views[i].layers[Layers.vol2].set_opacity(view['top']['opacity'])
+
         ex.views[i].layers[Layers.vol1].set_lut(view['top']['color'])
         ex.views[i].layers[Layers.vol2].set_lut(view['bottom']['color'])
 
