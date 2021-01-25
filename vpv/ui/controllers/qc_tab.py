@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QDialog, QMessageBox, QFileDialog
 import pandas as pd
 import yaml
 import addict
+# from orderedset import OrderedSet
 
 from vpv.ui.views.ui_qctab import Ui_QC
 from vpv.utils.appdata import AppData
@@ -262,11 +263,11 @@ class QC(QtGui.QWidget):
             preprocesed_id = s.specimen_root.name.split('_')[1]
             if preprocesed_id in qc_info:
                 s.qc_done = True
-                s.qc_flagged = set(qc_info[preprocesed_id]['qc_flagged'])
+                s.qc_flagged = OrderedSet(qc_info[preprocesed_id]['qc_flagged'])
                 s.flag_whole_image = qc_info[preprocesed_id]['flag_whole_image']
                 s.notes = qc_info[preprocesed_id]['notes']
             else:
-                s.qc_flagged = set()
+                s.qc_flagged = OrderedSet()
                 s.flag_whole_image = False
                 s.notes = None
 

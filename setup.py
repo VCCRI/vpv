@@ -44,7 +44,8 @@ setup(
         'pyqtgraph',
         'toml',
         'python-dateutil',
-        'addict'
+        'addict',
+        'orderedset'
     ],
 
     url='https://github.com/mpi2/vpv',
