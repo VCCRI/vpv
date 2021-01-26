@@ -6,10 +6,9 @@ import os
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtWidgets import QDialog, QMessageBox, QFileDialog
 
-import pandas as pd
 import yaml
 import addict
-# from orderedset import OrderedSet
+from orderedset import OrderedSet
 
 from vpv.ui.views.ui_qctab import Ui_QC
 from vpv.utils.appdata import AppData
@@ -193,7 +192,8 @@ class QC(QtGui.QWidget):
 
         # Set colormap
         # Todo. Fall back to 'anatomy_labels' if atlas metadata does not have color info
-        self.vpv.data_manager.on_vol2_lut_changed('custom_atlas_labels')
+        lut_name = 'custom_atlas_labels' if 'colour' in self.atlas_meta.columns else 'anatomy_labels'
+        self.vpv.data_manager.on_vol2_lut_changed(lut_name)
 
         # opacity
         self.vpv.data_manager.modify_layer(Layers.vol2, 'set_opacity', 0.4)

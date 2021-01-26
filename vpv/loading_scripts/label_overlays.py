@@ -1,10 +1,9 @@
 """
 A work in progress.
+An example script for loading propagated atlas labels from a LAMA run over the rigidly-aligned speciemn image.
 
 Given a root directory, load image, inverted labels and set opacity etc.
-Set window title.
 
-Make it configurable, and docuetn a bit
 """
 
 from pathlib import Path
@@ -38,8 +37,9 @@ def load(line_dir: Path, rev=False, title=None):
     with open(invert_yaml, 'r') as fh:
         invert_order = yaml.load(fh)['inversion_order']
 
+    vol_dir = next(line_dir.rglob('**/reg*/*rigid*'))
+
     if not rev:
-        vol_dir = next(line_dir.rglob('**/reg*/*rigid*'))
         try:
             lab_dir = next(line_dir.rglob('**/inverted_labels/similarity'))
         except StopIteration:
@@ -47,7 +47,6 @@ def load(line_dir: Path, rev=False, title=None):
     else:
         # Labels progated by reverse registration
         last_dir = invert_order[-1]
-        vol_dir = line_dir / 'inputs/'
         lab_dir = next(line_dir.rglob(f'**/inverted_labels/{last_dir}'))
 
 

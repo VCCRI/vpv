@@ -55,6 +55,8 @@ class Lut(object):
 
         if not 'colour' in atlas_metadata:
             print('Atlas metadata dataframe does not have a "colour" column')
+            self.custom_atlas_lut = None
+            return
 
         # Convert string list to an actual list
         md = atlas_metadata.copy()
