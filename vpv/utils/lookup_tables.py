@@ -53,13 +53,26 @@ class Lut(object):
         """
         rgb_values = []
 
-        if not 'colour' in atlas_metadata:
+        if 'colour' not in atlas_metadata:
             print('Atlas metadata dataframe does not have a "colour" column')
             self.custom_atlas_lut = None
             return
 
         # Convert string list to an actual list
         md = atlas_metadata.copy()
+
+        # # If there is a qc_group column in metadata file, group all the colors together
+        if 'qc_group' in atlas_metadata:
+
+            gb_qc = md.groupby('qc_group')
+            for group_name, gdf in gb_qc:
+                # Get the colour of the first label in the group
+                col = gdf.iloc[0, gdf.columns.get_loc('colour')]
+
+                # Apply same color to all in group
+                md.loc[md.index.isin(gdf.index), 'colour'] = [col] * len(gdf)
+
+        # Convert string representation to list of ints
         md.colour = md.colour.apply(json.loads)
 
         highest_val = max(atlas_metadata.index) + 1
@@ -72,6 +85,8 @@ class Lut(object):
             except KeyError:
                 rgb = (0, 0, 0, 0) # Missing label values
 
+            if len(rgb) != 4:
+                raise ValueError
             rgb_values.append(rgb)
 
         lut = np.array(rgb_values)
