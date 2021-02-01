@@ -13,12 +13,16 @@ from vpv.common import Layers, Orientation
 
 
 def resolve_wildcard_paths(paths, root):
+
     res = []
     for p in paths:
+        if not p:
+            res.append(None)
         if '*' in str(p):
             p = next(root.glob(str(p)))
         res.append(p)
     return res
+
 
 
 def load(config_path, root_dir):
@@ -45,37 +49,61 @@ def load(config_path, root_dir):
     ex = Vpv()
 
     vpv_ids = []
+    top_ids = []
+    bottom_ids = []
 
-    already_loaded = {}
+    already_loaded = {}  # path: vpv_id
+
     for view in views:
-        top_vol = Path(view['top']['path'])
-        bottom_vol = Path(view['bottom']['path'])
-        vols = resolve_wildcard_paths([top_vol, bottom_vol], root_dir)
+        try:
+            top_vol = Path(view['top']['path'])
+        except KeyError:
+            top_vol = None
 
-        for v in vols:
-            if v in already_loaded:
-                vpv_ids.append(already_loaded[v])
-            else:
-                vpv_ids.extend(ex.load_volumes([v], 'vol'))
-                already_loaded[v] = vpv_ids[-1]
+        try:
+            bottom_vol = Path(view['bottom']['path'])
+        except KeyError:
+            bottom_vol = None
+
+        top_path = resolve_wildcard_paths([top_vol], root_dir)[0]
+        bottom_path = resolve_wildcard_paths([bottom_vol], root_dir)[0]
+
+        if not top_path:
+            top_ids.append(None)
+        elif top_path in already_loaded:
+            top_ids.append(already_loaded[top_path])
+        else:
+            top_ids.extend(ex.load_volumes([top_path], 'vol'))
+            already_loaded[top_path] = top_ids[-1]
+
+        if not bottom_path:
+            bottom_ids.append(None)
+        elif bottom_path in already_loaded:
+            bottom_ids.append(already_loaded[bottom_path])
+        else:
+            bottom_ids.extend(ex.load_volumes([bottom_path], 'vol'))
+            already_loaded[bottom_path] = bottom_ids[-1]
+
 
     for i, view in enumerate(views):
 
-        top_vol_id = vpv_ids[i * 2]
-        # label_id = top_labels[i].stem
-        bottom_vol_id = vpv_ids[i * 2 + 1]
-        # if label_id == vol_id:
-        #     label_id = f'{label_id}(1)'
-        ex.views[i].layers[Layers.vol1].set_volume(top_vol_id)
-        ex.views[i].layers[Layers.vol2].set_volume(bottom_vol_id)
+        top_vol_id = top_ids[i * 2]
+        if top_vol_id:
+            ex.views[i].layers[Layers.vol1].set_volume(top_vol_id)
+
+        bottom_vol_id = bottom_ids[i * 2]
+        if bottom_vol_id:
+            ex.views[i].layers[Layers.vol2].set_volume(bottom_vol_id)
 
         ex.views[i].set_orientation(Orientation[view['ori']])
 
-        if view['bottom'].get('opacity'):
+        if view.get('bottom') and view['bottom'].get('opacity'):
             ex.views[i].layers[Layers.vol2].set_opacity(view['bottom']['opacity'])
 
-        ex.views[i].layers[Layers.vol1].set_lut(view['top']['color'])
-        ex.views[i].layers[Layers.vol2].set_lut(view['bottom']['color'])
+        if view.get('top') and view['top'].get('color'):
+            ex.views[i].layers[Layers.vol1].set_lut(view['top']['color'])
+        if view.get('bottom') and view['bottom'].get('color'):
+            ex.views[i].layers[Layers.vol2].set_lut(view['bottom']['color'])
 
     # Show two rows
     ex.data_manager.show2Rows(True if len(views) > 3 else False)

@@ -29,7 +29,7 @@ import sys
 from pathlib import Path
 import logging
 from os.path import join, isdir
-from typing import Iterable, List
+from typing import Iterable, List, Tuple
 p = sys.path
 
 from PyQt5 import QtGui, QtCore, QtWidgets
@@ -197,18 +197,21 @@ class Vpv(QtCore.QObject):
         self.check_vpv_version()
 
         self.atlas_meta = None
+
         self.data_manager.load_metadata_signal.connect(self.load_atlas_meta)
 
-    def load_atlas_meta(self) ->pd.DataFrame:
+    def load_atlas_meta(self) ->Tuple[pd.DataFrame, str]:
         """
         Atlases loaded into the volume2 slot can be assigned label names and color information using a metadata file
 
         Returns
         -------
         Metadata file with (minimally) following columns
-        label: int
-        label_name: str
-        colour: rgb (eg. 255,0,0) - optional
+            label: int
+            label_name: str
+            colour: rgb (eg. 255,0,0) - optional
+
+        The name of the metadata file
         """
         file_ = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Load atlas metadata',
                                             self.appdata.last_atlas_metadata_file)
@@ -220,7 +223,8 @@ class Vpv(QtCore.QObject):
             # Todo, we need only one instace of LUT, not one in each SliceWidget
             # self.data_manager.luts.set_custom_atlas_colors(self.atlas_meta)
             self.data_manager.modify_layer(Layers.vol2, 'set_custom_labels', meta)
-            return self.atlas_meta
+
+            return self.atlas_meta, Path(file_[0]).name
 
     def filter_label(self, labels: Iterable[int]):
         """

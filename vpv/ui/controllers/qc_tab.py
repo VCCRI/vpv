@@ -57,6 +57,8 @@ class QC(QtGui.QWidget):
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
 
+        self.atlas_meta_name = None  # Name of atlas metadata file so we know which atlas version we QCd against'
+
     def flag_all_labels(self):
         for label in self.atlas_meta.index:
             self.specimens[self.specimen_index].qc_flagged.add(label)
@@ -109,7 +111,7 @@ class QC(QtGui.QWidget):
         self.specimens[self.specimen_index].flag_whole_image = checked
 
     def load_atlas_metadata(self):
-        self.atlas_meta = self.vpv.load_atlas_meta()
+        self.atlas_meta, self.atlas_meta_name = self.vpv.load_atlas_meta()
 
     def label_clicked_slot(self, label_num):
 
@@ -236,7 +238,8 @@ class QC(QtGui.QWidget):
                 results[preprocessed_id] = {'qc_flagged': list(s.qc_flagged),
                                             'flag_whole_image': s.flag_whole_image,
                                             'notes': s.notes,
-                                            'path': str(s.outroot)}
+                                            'path': str(s.outroot),
+                                            'atlas_version': self.atlas_meta_name}
 
             yaml.dump(results, fh)
             info_dialog(self.mainwindow, 'Saved OK', f'QC dsaved to {self.qc_results_file}')
