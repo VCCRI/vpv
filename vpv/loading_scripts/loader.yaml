@@ -8,10 +8,10 @@ view_template:
   top:
     color: red
 #   opacity: 1.0 always 1.0
-#  bottom:
-#    path: '/mnt/bit_nfs/neil/impc_e18.5/jax/test_run_210121/target/Harwell_E18.5_avg.nrrd'
-#    color: cyan
-#    opacity: 0.6 # Pop avg is bright
+  bottom:
+    path: '/mnt/bit_nfs/neil/impc_e18.5/jax/test_run_210121/target/Harwell_E18.5_avg.nrrd'
+    color: cyan
+    opacity: 0.6 # Pop avg is bright
 
 
 
@@ -19,13 +19,13 @@ view_template:
 views:
   - top:
       path: '**/*reg*/rigid/**/*.nrrd'
-#  - top:
-#      path: '**/*reg*/affine/**/*.nrrd'
-#  - top:
-#      path: '**/*reg*/def*64/**/*.nrrd'
-#  - top:
-#      path: '**/*reg*/def*32/**/*.nrrd'
-#  - top:
-#      path: '**/*reg*/def*16/**/*.nrrd'
-#  - top:
-#      path: '**/*reg*/deformable_8/**/*.nrrd' # Disambiguate 128
+  - top:
+      path: '**/*reg*/affine/**/*.nrrd'
+  - top:
+      path: '**/*reg*/def*64/**/*.nrrd'
+  - top:
+      path: '**/*reg*/def*32/**/*.nrrd'
+  - top:
+      path: '**/*reg*/def*16/**/*.nrrd'
+  - top:
+      path: '**/*reg*/deformable_8/**/*.nrrd' # Disambiguate 128

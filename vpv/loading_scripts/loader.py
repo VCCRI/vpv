@@ -48,7 +48,6 @@ def load(config_path, root_dir):
     app = QtGui.QApplication([])
     ex = Vpv()
 
-    vpv_ids = []
     top_ids = []
     bottom_ids = []
 
@@ -87,11 +86,11 @@ def load(config_path, root_dir):
 
     for i, view in enumerate(views):
 
-        top_vol_id = top_ids[i * 2]
+        top_vol_id = top_ids[i]
         if top_vol_id:
             ex.views[i].layers[Layers.vol1].set_volume(top_vol_id)
 
-        bottom_vol_id = bottom_ids[i * 2]
+        bottom_vol_id = bottom_ids[i]
         if bottom_vol_id:
             ex.views[i].layers[Layers.vol2].set_volume(bottom_vol_id)
 
