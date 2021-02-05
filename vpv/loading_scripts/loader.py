@@ -37,6 +37,9 @@ def load(config_path, root_dir):
 
     for v in config['views']:
         view = copy.deepcopy(template)
+        # Override template with view-specific options
+        if v.get('ori'):
+            view['ori'] = v['ori']
         if v.get('top'):
             for k, p in v['top'].items():
                 view['top'][k] = p

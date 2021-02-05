@@ -17,7 +17,8 @@ view_template:
 
 ### Define up to 6 views. Override any artibutes from the template
 views:
-  - top:
+  - ori: 'sagittal'
+    top:
       path: '**/*reg*/rigid/**/*.nrrd'
   - top:
       path: '**/*reg*/affine/**/*.nrrd'
@@ -27,5 +28,6 @@ views:
       path: '**/*reg*/def*32/**/*.nrrd'
   - top:
       path: '**/*reg*/def*16/**/*.nrrd'
-  - top:
+  - ori: 'axial'
+    top:
       path: '**/*reg*/deformable_8/**/*.nrrd' # Disambiguate 128
