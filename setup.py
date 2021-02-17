@@ -45,7 +45,8 @@ setup(
         'toml',
         'python-dateutil',
         'addict',
-        'orderedset'
+        'orderedset',
+        'pandas'
     ],
 
     url='https://github.com/mpi2/vpv',

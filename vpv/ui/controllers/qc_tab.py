@@ -14,7 +14,7 @@ from vpv.ui.views.ui_qctab import Ui_QC
 from vpv.utils.appdata import AppData
 from vpv.common import info_dialog, question_dialog, Layers, error_dialog
 from lama.common import get_file_paths
-from lama.paths import get_specimen_dirs, SpecimenDataPaths
+from lama.paths import get_specimen_dirs, LamaSpecimenData
 
 
 SUBFOLDERS_TO_IGNORE = ['resolution_images', 'pyramid_images']
@@ -76,7 +76,7 @@ class QC(QtGui.QWidget):
         if label == 0, save screenshot for whole embryo
         """
 
-        current_spec: SpecimenDataPaths = self.specimens[self.specimen_index]
+        current_spec: LamaSpecimenData = self.specimens[self.specimen_index]
         preprocessed_id = current_spec.specimen_root.name.split('_')[1]
         # Make screenshot dir for line if not already exists
         ss_dir = self.screenshot_dir / current_spec.line_id
@@ -229,7 +229,7 @@ class QC(QtGui.QWidget):
         results = {}
         with open(self.qc_results_file, 'w') as fh:
 
-            s: SpecimenDataPaths
+            s: LamaSpecimenData
             for s in self.specimens:
                 if not s.qc_done:
                     continue
