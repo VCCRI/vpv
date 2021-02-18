@@ -72,6 +72,7 @@ from vpv.annotations.annotations_widget import AnnotationsWidget
 from vpv.model.coordinate_mapper import Coordinate_mapper
 from vpv.ui.controllers import main_window
 from vpv.ui.controllers.qc_tab import QC
+from vpv.ui.controllers.label_filter import LabelFilter
 from vpv.utils import github
 
 
@@ -145,6 +146,7 @@ class Vpv(QtCore.QObject):
             partial(self.data_manager.modify_layer, Layers.vol1, 'toggle_visibility'))
         self.mainwindow.toggle_volume2_visibility_signal.connect(
             partial(self.data_manager.modify_layer, Layers.vol2, 'toggle_visibility'))
+        self.mainwindow.key_event_signal.connect(self.key_events)
 
         self.volume_pixel_signal.connect(self.mainwindow.set_volume_pix_intensity)
         self.volume2_pixel_signal.connect(self.mainwindow.set_volume2_pix_intensity)
@@ -154,7 +156,12 @@ class Vpv(QtCore.QObject):
         self.options_tab = OptionsTab(self.mainwindow, self.appdata)
         self.options_tab.flip_signal.connect(self.update_slice_views)
 
-        self.options_tab.filter_label_signal.connect(self.filter_label)
+
+        self.filter_widget = LabelFilter(self.mainwindow)
+        self.filter_widget.filter_label_signal.connect(self.filter_label)
+        self.filter_widget.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.options_tab.toggle_filter_widget_signal.connect(self.filter_widget.toggle_visibility)
+
 
         # Sometimes QT console is a pain to install. If not availale do not make console tab
         if console_imported:
@@ -199,6 +206,11 @@ class Vpv(QtCore.QObject):
         self.atlas_meta = None
 
         self.data_manager.load_metadata_signal.connect(self.load_atlas_meta)
+
+    def key_events(self, event:QtGui.QKeyEvent):
+        if event.key() == QtCore.Qt.Key_F:
+            self.filter_widget.toggle_visibility()
+
 
     def load_atlas_meta(self) ->Tuple[pd.DataFrame, str]:
         """

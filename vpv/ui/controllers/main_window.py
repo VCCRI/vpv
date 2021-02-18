@@ -30,6 +30,7 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
     key_up_down_signal= QtCore.pyqtSignal(bool)
     toggle_volume1_visibility_signal = QtCore.pyqtSignal()  # main image
     toggle_volume2_visibility_signal = QtCore.pyqtSignal()  # Label map or other overlay
+    key_event_signal = QtCore.pyqtSignal(QtGui.QKeyEvent)
 
     def __init__(self, controller, appdata):
         """
@@ -218,7 +219,8 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def keyPressEvent(self, event):
         """
-        Define keyboard shortcuts
+        Define keyboard shortcuts.
+        These should be processed in the VPV main module
         """
 
         if self.controller.qc.is_active:  # QC-specific shortcuts
@@ -242,12 +244,15 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.on_checkbox_index_slider(visible)
         elif event.key() == QtCore.Qt.Key_P:
             self.controller.take_screen_shot()
-        elif event.key() == QtCore.Qt.Key_F:
+        elif event.key() == QtCore.Qt.Key_D:
             self.d_pressed_signal.emit()
         elif event.key() == QtCore.Qt.Key_2:
             self.toggle_volume2_visibility_signal.emit()
         elif event.key() == QtCore.Qt.Key_1:
             self.toggle_volume1_visibility_signal.emit()
+        else:
+            # TODO all events should be propagated this way to man VPV module
+            self.key_event_signal.emit(event)
 
     def on_view_full_screen(self, checked):
         if checked:

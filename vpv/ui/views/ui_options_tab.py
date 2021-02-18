@@ -2,9 +2,10 @@
 
 # Form implementation generated from reading ui file 'ui_options_tab.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.2
+# Created by: PyQt5 UI code generator 5.14.2
 #
 # WARNING! All changes made in this file will be lost!
+
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -13,6 +14,11 @@ class Ui_options(object):
     def setupUi(self, options):
         options.setObjectName("options")
         options.resize(761, 737)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(options.sizePolicy().hasHeightForWidth())
+        options.setSizePolicy(sizePolicy)
         self.label_2 = QtWidgets.QLabel(options)
         self.label_2.setGeometry(QtCore.QRect(10, 10, 118, 29))
         self.label_2.setObjectName("label_2")
@@ -26,7 +32,7 @@ class Ui_options(object):
         self.label.setText("")
         self.label.setObjectName("label")
         self.widgetFlipButtons = QtWidgets.QWidget(options)
-        self.widgetFlipButtons.setGeometry(QtCore.QRect(10, 80, 344, 161))
+        self.widgetFlipButtons.setGeometry(QtCore.QRect(10, 150, 344, 161))
         self.widgetFlipButtons.setObjectName("widgetFlipButtons")
         self.label_3 = QtWidgets.QLabel(self.widgetFlipButtons)
         self.label_3.setGeometry(QtCore.QRect(9, 9, 85, 17))
@@ -61,9 +67,6 @@ class Ui_options(object):
         self.checkBoxAxialFlipx.setText("")
         self.checkBoxAxialFlipx.setObjectName("checkBoxAxialFlipx")
         self.gridLayout.addWidget(self.checkBoxAxialFlipx, 1, 3, 1, 1)
-        self.label_10 = QtWidgets.QLabel(self.layoutWidget)
-        self.label_10.setObjectName("label_10")
-        self.gridLayout.addWidget(self.label_10, 2, 0, 1, 1)
         self.checkBoxSagittalFlipY = QtWidgets.QCheckBox(self.layoutWidget)
         self.checkBoxSagittalFlipY.setText("")
         self.checkBoxSagittalFlipY.setObjectName("checkBoxSagittalFlipY")
@@ -91,19 +94,19 @@ class Ui_options(object):
         self.checkBoxAxialFlipZ.setText("")
         self.checkBoxAxialFlipZ.setObjectName("checkBoxAxialFlipZ")
         self.gridLayout.addWidget(self.checkBoxAxialFlipZ, 3, 3, 1, 1)
+        self.label_10 = QtWidgets.QLabel(self.layoutWidget)
+        self.label_10.setObjectName("label_10")
+        self.gridLayout.addWidget(self.label_10, 2, 0, 1, 1)
         self.checkBoxImpcView = QtWidgets.QCheckBox(options)
-        self.checkBoxImpcView.setGeometry(QtCore.QRect(20, 270, 62, 20))
+        self.checkBoxImpcView.setGeometry(QtCore.QRect(20, 350, 62, 20))
         self.checkBoxImpcView.setText("")
         self.checkBoxImpcView.setObjectName("checkBoxImpcView")
         self.textBrowser = QtWidgets.QTextBrowser(options)
-        self.textBrowser.setGeometry(QtCore.QRect(50, 270, 256, 151))
+        self.textBrowser.setGeometry(QtCore.QRect(50, 350, 256, 151))
         self.textBrowser.setObjectName("textBrowser")
-        self.lineEditShowLabel = QtWidgets.QLineEdit(options)
-        self.lineEditShowLabel.setGeometry(QtCore.QRect(30, 490, 113, 25))
-        self.lineEditShowLabel.setObjectName("lineEditShowLabel")
-        self.label_9 = QtWidgets.QLabel(options)
-        self.label_9.setGeometry(QtCore.QRect(10, 460, 461, 17))
-        self.label_9.setObjectName("label_9")
+        self.pushButtonFilterLabels = QtWidgets.QPushButton(options)
+        self.pushButtonFilterLabels.setGeometry(QtCore.QRect(20, 80, 181, 25))
+        self.pushButtonFilterLabels.setObjectName("pushButtonFilterLabels")
 
         self.retranslateUi(options)
         QtCore.QMetaObject.connectSlotsByName(options)
@@ -117,8 +120,8 @@ class Ui_options(object):
         self.label_5.setText(_translate("options", "coronal"))
         self.label_6.setText(_translate("options", "axial"))
         self.label_7.setText(_translate("options", "Flip horizontal"))
-        self.label_10.setText(_translate("options", "flip vertical"))
         self.label_8.setText(_translate("options", "Reverse slice ordering"))
+        self.label_10.setText(_translate("options", "flip vertical"))
         self.textBrowser.setHtml(_translate("options", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -126,6 +129,4 @@ class Ui_options(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">IMPC view. </span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Checking this button with ensure that data downloaded from the DCC will be in the agreed orientation. For other data you may have to use the individual flip options.</p></body></html>"))
-        self.label_9.setText(_translate("options", "Show only these lables (space-seperated list of label numbers)"))
-
-
+        self.pushButtonFilterLabels.setText(_translate("options", "Label filter (f)"))
