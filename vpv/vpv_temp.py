@@ -156,7 +156,6 @@ class Vpv(QtCore.QObject):
         self.options_tab = OptionsTab(self.mainwindow, self.appdata)
         self.options_tab.flip_signal.connect(self.update_slice_views)
 
-
         self.filter_widget = LabelFilter(self.mainwindow)
         self.filter_widget.filter_label_signal.connect(self.filter_label)
         self.filter_widget.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)

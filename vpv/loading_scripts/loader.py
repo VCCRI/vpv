@@ -19,7 +19,11 @@ def resolve_wildcard_paths(paths, root):
         if not p:
             res.append(None)
         if '*' in str(p):
-            p = next(root.glob(str(p)))
+            try:
+                p = next(root.glob(str(p)))
+            except StopIteration:
+                raise FileNotFoundError(f'The pattern {p} is yielding no images') # Debug
+
         res.append(p)
     return res
 

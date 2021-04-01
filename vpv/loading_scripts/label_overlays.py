@@ -33,24 +33,33 @@ def load(line_dir: Path, rev=False, title=None):
     app = QtGui.QApplication([])
     ex = Vpv()
 
-    invert_yaml = next(line_dir.glob('**/inverted_transforms/invert.yaml'))
-    with open(invert_yaml, 'r') as fh:
-        invert_order = yaml.load(fh)['inversion_order']
+    try:
+        invert_yaml = next(line_dir.glob('**/inverted_transforms/propagate.yaml'))
+    except StopIteration:
 
-    vol_dir = next(line_dir.rglob('**/reg*/*rigid*'))
+        try: # Old version name of config file
+            invert_yaml = next(line_dir.glob('**/inverted_transforms/invert.yaml'))
+        except StopIteration:
+            raise FileNotFoundError("Cannot find 'inverted_transforms/propagate.yaml' in LAMA output directory")
+
+    with open(invert_yaml, 'r') as fh:
+        try:
+            invert_order = yaml.load(fh)['label_propagation_order']
+        except KeyError:
+            try:
+                invert_order = yaml.load(fh)['inversion_order']
+            except KeyError:
+                raise
 
     if not rev:
-        try:
-            lab_dir = next(line_dir.rglob('**/inverted_labels/similarity'))
-        except StopIteration:
-            lab_dir = next(line_dir.rglob('**/inverted_labels/affine'))
+        vol_dir = next(line_dir.rglob('**/inputs'))
     else:
-        # Labels progated by reverse registration
-        last_dir = invert_order[-1]
-        lab_dir = next(line_dir.rglob(f'**/inverted_labels/{last_dir}'))
+        vol_dir = next(line_dir.rglob('**/reg*/*rigid*'))
+    lab_dir = next(line_dir.glob(f'**/inverted_labels'))
 
 
     vol = get_file_paths(vol_dir, ignore_folders=IGNORE)[0]
+
     lab = get_file_paths(lab_dir, ignore_folders=IGNORE)[0]
 
     ex.load_volumes([vol, lab], 'vol')

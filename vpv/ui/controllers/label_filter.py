@@ -27,4 +27,5 @@ class LabelFilter(QtGui.QWidget):
             self.hide()
         else:
             self.show()
+            self.ui.lineEditShowLabel.setFocus()
 
