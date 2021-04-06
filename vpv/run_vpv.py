@@ -7,7 +7,6 @@ if sys.version_info[0] < 3:
 
 from PyQt5 import QtGui
 from vpv.vpv_temp import Vpv
-from vpv.utils import data_loader
 from vpv.common import log_path
 from vpv._version import __version__ as vpv_version
 import logging
@@ -45,9 +44,6 @@ def main():
                         level=logging.DEBUG, filename=log_path)
 
     logging.info('VPV v{} starting'.format(vpv_version))
-
-    if not args.volumes and args.loader_file:
-        data_loader.load(args.loader_file)
 
     app = QtGui.QApplication(sys.argv)
 
