@@ -28,7 +28,6 @@ def resolve_wildcard_paths(paths, root):
     return res
 
 
-
 def load(config_path, root_dir):
 
     with open(config_path, 'r') as fh:
@@ -40,6 +39,9 @@ def load(config_path, root_dir):
     views = []
 
     for v in config['views']:
+        if v is None:
+            views.append(None)
+            continue
         view = copy.deepcopy(template)
         # Override template with view-specific options
         if v.get('ori'):
@@ -61,6 +63,12 @@ def load(config_path, root_dir):
     already_loaded = {}  # path: vpv_id
 
     for view in views:
+
+        if view is None:
+            top_ids.append(None)
+            bottom_ids.append(None)
+            continue  # Skip view
+
         try:
             top_vol = Path(view['top']['path'])
         except KeyError:
@@ -94,8 +102,10 @@ def load(config_path, root_dir):
             bottom_ids.extend(ex.load_volumes([bottom_path], 'vol'))
             already_loaded[bottom_path] = bottom_ids[-1]
 
-
     for i, view in enumerate(views):
+
+        if view is None:
+            continue  # Skip view
 
         top_vol_id = top_ids[i]
         if top_vol_id:
