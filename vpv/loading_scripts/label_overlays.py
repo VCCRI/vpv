@@ -1,6 +1,6 @@
 """
 A work in progress.
-An example script for loading propagated atlas labels from a LAMA run over the rigidly-aligned speciemn image.
+An example script for loading propagated atlas labels from a single spcimen from a LAMA run over the rigidly-aligned speciemn image.
 
 Given a root directory, load image, inverted labels and set opacity etc.
 

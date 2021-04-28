@@ -71,8 +71,12 @@ def load(config_path, root_dir):
         except KeyError:
             bottom_vol = None
 
-        top_path = resolve_wildcard_paths([top_vol], root_dir)[0]
-        bottom_path = resolve_wildcard_paths([bottom_vol], root_dir)[0]
+        if root_dir:
+            top_path = resolve_wildcard_paths([top_vol], root_dir)[0]
+            bottom_path = resolve_wildcard_paths([bottom_vol], root_dir)[0]
+        else:
+            top_path = top_vol
+            bottom_path = bottom_vol
 
         if not top_path:
             top_ids.append(None)
@@ -124,6 +128,9 @@ if __name__ == '__main__':
 
     # load(cfg)
     _config = sys.argv[1]
-    _root_dir = sys.argv[2]
+    if len(sys.argv) == 2:
+        _root_dir = None
+    else:
+        _root_dir = Path(sys.argv[2])
 
-    load(_config, Path(_root_dir))
+    load(_config, _root_dir)
