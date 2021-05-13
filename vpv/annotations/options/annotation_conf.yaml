@@ -19,6 +19,7 @@ centers:
         file_: e9_5/har_terms_eml.yaml
       IMPC_EMO_002:
         file_: e14_5/har_terms.yaml
+      IMPC_EMA_002: e18_5/har_terms.yaml
   J:
     short_name: J
     procedures:
