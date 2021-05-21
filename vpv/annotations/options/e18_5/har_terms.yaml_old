@@ -54,7 +54,7 @@ parameters:
     order: 7
     impc_id: IMPC_EMA_023_001
     options: 1 
-    default_option: 'no' 
+    default_option: imageOnly 
     mandatory: no 
   param8:
     name: Cerebral cortex
