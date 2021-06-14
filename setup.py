@@ -26,7 +26,7 @@ def get_resources():
 
 setup(
     name='vpv_viewer',
-    version='2.3.5',
+    version='2.3.6',
     packages=find_packages(exclude=("dev")),
 	package_data={'': get_resources()},  # Puts it in the wheel dist. MANIFEST.in gets it in source dist
     # package_data={'': ['current_commit',

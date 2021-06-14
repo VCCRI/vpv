@@ -105,7 +105,7 @@ def load(line_dir: Path, rev=False, title=None):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser("Overlay LAMA-propagated labels")
-    parser.add_argument('dir_', help='LAMA specimen directory')
+    parser.add_argument('-d', help='LAMA specimen directory')
     parser.add_argument('-r', '--rev', dest='rev',  help='If set we look for overlays in final def folder',
                         required=False, default=False, action='store_true')
     parser.add_argument('-t', '--title', dest='title',  help='VPV window title',

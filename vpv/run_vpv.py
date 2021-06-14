@@ -32,8 +32,8 @@ def main():
                         default=False)
     parser.add_argument('-an', '-analysis', dest='analysis_zips', help='Analysis zip path',
                         default=False)
-    parser.add_argument('-l', '-loader', dest='loader_file', help='Pass in a loder toml file created by utils.data_loader.py',
-                        default=False)
+    # parser.add_argument('-l', '-loader', dest='loader_file', help='Pass in a loder toml file created by utils.data_loader.py',
+    #                     default=False)
     args = parser.parse_args()
 
     for handler in logging.root.handlers[:]:

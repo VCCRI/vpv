@@ -134,8 +134,6 @@ def load(config_path, root_dir):
 if __name__ == '__main__':
     import sys
 
-    import sys
-
     # load(cfg)
     _config = sys.argv[1]
     if len(sys.argv) == 2:
