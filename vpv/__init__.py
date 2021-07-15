@@ -1,3 +1,4 @@
+from .version import __version__
 # from vpv_viewer import common
 # from vpv_viewer import ui
 # from vpv_viewer import model

@@ -17,7 +17,7 @@
 
 
 from pathlib import Path
-from vpv import _version
+from vpv import __version__
 from vpv import resources
 from PyQt5 import QtGui, QtCore, QtWidgets
 from vpv.ui.views.ui_main_window import Ui_MainWindow

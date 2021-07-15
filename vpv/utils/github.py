@@ -4,7 +4,7 @@
 
 import urllib.request
 import urllib
-from vpv._version import __version__
+from vpv import __version__
 import socket
 
 def get_latest_github_version():

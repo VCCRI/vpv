@@ -6,6 +6,10 @@ from vpv import annotations, resources
 import os
 import vpv
 
+# Get __verison_dunder without importing lama
+version_file = Path(__file__).resolve().parent / 'vpv' / '_version.py'
+exec(open(version_file).read())
+
 
 def get_resources():
     """
@@ -23,10 +27,9 @@ def get_resources():
     files.extend(resource_files)
     return files
 
-
 setup(
     name='vpv_viewer',
-    version='2.3.6',
+    version=__version__,
     packages=find_packages(exclude=("dev")),
 	package_data={'': get_resources()},  # Puts it in the wheel dist. MANIFEST.in gets it in source dist
     # package_data={'': ['current_commit',

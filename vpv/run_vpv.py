@@ -8,7 +8,7 @@ if sys.version_info[0] < 3:
 from PyQt5 import QtGui
 from vpv.vpv_temp import Vpv
 from vpv.common import log_path
-from vpv._version import __version__ as vpv_version
+from vpv import __version__
 import logging
 import traceback
 
@@ -43,7 +43,7 @@ def main():
                         datefmt='%Y-%m-%d %I:%M:%S %p',
                         level=logging.DEBUG, filename=log_path)
 
-    logging.info('VPV v{} starting'.format(vpv_version))
+    logging.info('VPV v{} starting'.format(__version__))
 
     app = QtGui.QApplication(sys.argv)
 
