@@ -50,6 +50,7 @@ setup(
         'addict',
         'orderedset',
         'pandas'
+        'lama_phenotype_detection'
     ],
 
     url='https://github.com/mpi2/vpv',
