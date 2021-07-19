@@ -122,8 +122,7 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.recent_menu.triggered.connect(self.on_recent_menu)
 
-        version_text = _version.__version__
-        self.version_action = QtGui.QAction('Version: {}'.format(version_text), view_menu, checkable=False)
+        self.version_action = QtGui.QAction('Version: {}'.format(__version__), view_menu, checkable=False)
         info_menu.addAction(self.version_action)
 
         self.window_title_action = QtGui.QAction('Edit Window title', info_menu, checkable=False)

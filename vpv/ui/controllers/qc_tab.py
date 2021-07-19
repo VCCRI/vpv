@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QDialog, QMessageBox, QFileDialog
 
 import yaml
 import addict
-from orderedset import OrderedSet
+from ordered_set import OrderedSet
 
 from vpv.ui.views.ui_qctab import Ui_QC
 from vpv.utils.appdata import AppData
