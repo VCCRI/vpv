@@ -7,3 +7,7 @@ mypy_cache/**
 build/**
 dist/**
 vpv_viewer.egg-info/**
+*.ico
+*.iss
+*.exe
+WinPython-64bit-3.6.3.0Zero/**
