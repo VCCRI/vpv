@@ -11,3 +11,4 @@ vpv_viewer.egg-info/**
 *.iss
 *.exe
 WinPython-64bit-3.6.3.0Zero/**
+WinPython-64bit-3.6.3.0Zero_hw/**
