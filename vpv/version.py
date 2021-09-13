@@ -1,4 +1,5 @@
-__version__ = '2.2.9'  # Add lama to dependencies
+__version__ = '2.3.7' # Henrik testing release
+#__version__ = '2.2.9'  # Add lama to dependencies
 #__version__ = '2.2.8'  # version bug and chnaged orderedset (needs visusal c++ in Windows) to ordered-set (pure python)
 # __version__ = '2.2.7'  # Add new annotation procedures EMA for Jax - bugfix
 #__version__ = '2.2.6'  # Add new annotation procedures EMA for Jax
