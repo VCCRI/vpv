@@ -26,7 +26,7 @@ def get_annotator_id_and_date(procedure_id) -> Tuple[str, str]:
         'IMPC_EOL': ('IMPC_EOL_052_001', 'IMPC_EOL_053_001'),
         'IMPC_EML': ('IMPC_EML_057_001', 'IMPC_EML_058_001'),
         'IMPC_EMO': ('IMPC_EMO_178_001', 'IMPC_EMO_179_001'),
-        'IMPC_EMA': ('IMPC_EMA_002_001', 'IMPC_EMA_150_001')
+        'IMPC_EMA': ('IMPC_EMA_149_001', 'IMPC_EMA_150_001')
     }
 
     if procedure_id[:8] not in map_:
