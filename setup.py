@@ -7,7 +7,7 @@ import os
 import vpv
 
 # Get __verison_dunder without importing lama
-version_file = Path(__file__).resolve().parent / 'vpv' / '_version.py'
+version_file = Path(__file__).resolve().parent / 'vpv' / 'version.py'
 exec(open(version_file).read())
 
 
