@@ -1,4 +1,5 @@
-__version__ = '2.3.8' # Fix for EMA manual annotation
+__version__ = '2.3.9' # Added supped for EMA annotation for BCM and UCD
+#__version__ = '2.3.8' # Fix for EMA manual annotation
 #__version__ = '2.3.7' # Henri testing release
 #__version__ = '2.2.9'  # Add lama to dependencies
 #__version__ = '2.2.8'  # version bug and chnaged orderedset (needs visusal c++ in Windows) to ordered-set (pure python)
