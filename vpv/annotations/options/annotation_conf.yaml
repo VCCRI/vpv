@@ -34,12 +34,16 @@ centers:
     procedures:
       IMPC_EMO_002:
         file_: e15_5/bcm_terms.yaml
+      IMPC_EMA_002:
+        file_: e18_5/bcm_terms.yaml
 
   UCD:
     short_name: UCD
     procedures:
       IMPC_EMO_002:
         file_: e15_5/ucd_terms.yaml
+      IMPC_EMA_002:
+        file_: e18_5/ucd_terms.yaml
 
 
 #centers:
