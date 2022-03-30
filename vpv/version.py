@@ -1,4 +1,5 @@
-__version__ = '2.4.1' # Added supped for EMA annotation for BCM and UCD
+__version__ = '2.4.2' # Bug fixes for new annotations BCM and UCD
+#__version__ = '2.4.1' # Added supped for EMA annotation for BCM and UCD
 #__version__ = '2.3.9' # Added supped for EMA annotation for BCM and UCD
 #__version__ = '2.3.8' # Fix for EMA manual annotation
 #__version__ = '2.3.7' # Henri testing release
