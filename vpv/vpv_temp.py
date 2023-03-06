@@ -32,7 +32,10 @@ from os.path import join, isdir
 from typing import Iterable, List, Tuple
 p = sys.path
 
-from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5 import QtCore
+from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import QApplication, QMessageBox, QDesktopWidget
+from PyQt5.QtWidgets import QFileDialog
 from functools import partial
 from vpv import common
 from vpv.ui.controllers import importer
@@ -40,8 +43,8 @@ from vpv.ui.controllers import importer
 from vpv.ui.controllers import log_viewer
 
 try:
-    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
-    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
+    QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+    QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
 except AttributeError:
     logging.info("High DPI scaling not available. QT >=5.6 is needed for this ")
 
@@ -206,7 +209,7 @@ class Vpv(QtCore.QObject):
 
         self.data_manager.load_metadata_signal.connect(self.load_atlas_meta)
 
-    def key_events(self, event:QtGui.QKeyEvent):
+    def key_events(self, event:QKeyEvent):
         if event.key() == QtCore.Qt.Key_F:
             self.filter_widget.toggle_visibility()
 
@@ -224,7 +227,7 @@ class Vpv(QtCore.QObject):
 
         The name of the metadata file
         """
-        file_ = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Load atlas metadata',
+        file_ = QFileDialog.getOpenFileName(self.mainwindow, 'Load atlas metadata',
                                             self.appdata.last_atlas_metadata_file)
         if file_:
             self.appdata.last_atlas_metadata_file = str(file_[0])
@@ -328,7 +331,7 @@ class Vpv(QtCore.QObject):
                     self.heatmap_pixel_signal.emit((round(float(hm_hover_voxel_value), 4)))
 
         # # If shift is pressed emit signal to get other views to get to the same or interscting slice
-        modifiers = QtGui.QApplication.keyboardModifiers()
+        modifiers = QApplication.keyboardModifiers()
 
         if modifiers == QtCore.Qt.ShiftModifier:
 
@@ -447,13 +450,13 @@ class Vpv(QtCore.QObject):
 
         """
         sshot = self.mainwindow.ui.centralwidget.grab()
-        QtGui.QApplication.clipboard().setPixmap(sshot)
+        QApplication.clipboard().setPixmap(sshot)
 
 
 
         if common.question_dialog(self.mainwindow, "Screenshot copied to clipboard", 'Save to file?'):
 
-            path = QtWidgets.QFileDialog.getSaveFileName(self.mainwindow, 'Save screen shot',
+            path = QFileDialog.getSaveFileName(self.mainwindow, 'Save screen shot',
                                                   self.appdata.last_screen_shot_dir)
             print(path)
             if path[0]:
@@ -487,7 +490,7 @@ class Vpv(QtCore.QObject):
         self.annotations_manager.tab_changed(indx)
 
     def updating_started(self):
-        self.updating_dlg = QtGui.QMessageBox()
+        self.updating_dlg = QMessageBox()
 
     def updating_finished(self):
         self.updating_dlg.close()
@@ -723,9 +726,9 @@ class Vpv(QtCore.QObject):
         if last_dir:
             last_dir = last_dir[0]
             if not os.path.isdir(last_dir):
-                files = QtWidgets.QFileDialog.getOpenFileNames(self.mainwindow, "Select files to load")
+                files = QFileDialog.getOpenFileNames(self.mainwindow, "Select files to load")
             else:
-                files = QtWidgets.QFileDialog.getOpenFileNames(self.mainwindow, "Select files to load", last_dir)
+                files = QFileDialog.getOpenFileNames(self.mainwindow, "Select files to load", last_dir)
         self.load_data_slot(files[0])
 
     def clear_views(self):
@@ -743,8 +746,8 @@ class Vpv(QtCore.QObject):
             try:
                 self.model.add_volume(file_paths, 'virtual_stack', memory_map=True)
             except ValueError:
-                QtGui.QMessageBox.warning(self.mainwindow, 'Loading error',
-                    "Virtual stack could not be loaded\nAre all images the same dimension?", QtGui.QMessageBox.Ok)
+                QMessageBox.warning(self.mainwindow, 'Loading error',
+                    "Virtual stack could not be loaded\nAre all images the same dimension?", QMessageBox.Ok)
             else:
                 self.appdata.set_last_dir_browsed(last_dir)
                 if self.dock_widget.isVisible():
@@ -1084,7 +1087,7 @@ class Vpv(QtCore.QObject):
     def on_view_new_screen(self):
 
         # Work out how to maximize on anotehr screen
-        # dtw = QtGui.QDesktopWidget()
+        # dtw = QDesktopWidget()
         # current_screen = dtw.screenNumber(self.mainwindow)
         # print 'scree', dtw.screenGeometry(3)
 

@@ -7,7 +7,8 @@
 # WARNING! All changes made in this file will be lost!
 
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtGui import QIcon, QPixmap
 
 
 class Ui_SliceWidget(object):
@@ -68,8 +69,8 @@ class Ui_SliceWidget(object):
         self.pushButtonScrollLeft = QtWidgets.QPushButton(self.controlsWidget)
         self.pushButtonScrollLeft.setStyleSheet("border:none")
         self.pushButtonScrollLeft.setText("")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/icons/scroll_arrow_left.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/scroll_arrow_left.png"), QIcon.Normal, QIcon.Off)
         self.pushButtonScrollLeft.setIcon(icon)
         self.pushButtonScrollLeft.setIconSize(QtCore.QSize(15, 15))
         self.pushButtonScrollLeft.setObjectName("pushButtonScrollLeft")
@@ -77,9 +78,9 @@ class Ui_SliceWidget(object):
         self.pushButtonScrollRight = QtWidgets.QPushButton(self.controlsWidget)
         self.pushButtonScrollRight.setStyleSheet("border:none")
         self.pushButtonScrollRight.setText("")
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/icons/scroll_arrow_right.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon1.addPixmap(QtGui.QPixmap(":/icons/scroll_arrow_right_active.png"), QtGui.QIcon.Active, QtGui.QIcon.On)
+        icon1 = QIcon()
+        icon1.addPixmap(QPixmap(":/icons/scroll_arrow_right.png"), QIcon.Normal, QIcon.Off)
+        icon1.addPixmap(QPixmap(":/icons/scroll_arrow_right_active.png"), QIcon.Active, QIcon.On)
         self.pushButtonScrollRight.setIcon(icon1)
         self.pushButtonScrollRight.setIconSize(QtCore.QSize(15, 15))
         self.pushButtonScrollRight.setObjectName("pushButtonScrollRight")
@@ -87,8 +88,8 @@ class Ui_SliceWidget(object):
         self.pushButtonManageVolumes = QtWidgets.QPushButton(self.controlsWidget)
         self.pushButtonManageVolumes.setStyleSheet("border:none")
         self.pushButtonManageVolumes.setText("")
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/icons/settings.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2 = QIcon()
+        icon2.addPixmap(QPixmap(":/icons/settings.png"), QIcon.Normal, QIcon.Off)
         self.pushButtonManageVolumes.setIcon(icon2)
         self.pushButtonManageVolumes.setIconSize(QtCore.QSize(15, 15))
         self.pushButtonManageVolumes.setFlat(False)

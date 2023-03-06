@@ -1,4 +1,4 @@
-from PyQt5 import QtGui
+from PyQt5.QtGui import QPainter
 import pyqtgraph as pg
 from .layer import Layer
 
@@ -8,7 +8,7 @@ class VolumeLayer(Layer):
     def __init__(self, *args):
         super(VolumeLayer, self).__init__(*args)
         self.image_item = pg.ImageItem(autoLevels=False)
-        self.image_item.setCompositionMode(QtGui.QPainter.CompositionMode_Plus)
+        self.image_item.setCompositionMode(QPainter.CompositionMode_Plus)
         self.image_items.append(self.image_item)
         self.lut = self.lt.get_lut('grey')
 
@@ -32,11 +32,11 @@ class VolumeLayer(Layer):
         Set to blend for normal volumes
         :return:
         """
-        self.image_item.setCompositionMode(QtGui.QPainter.CompositionMode_Plus)
+        self.image_item.setCompositionMode(QPainter.CompositionMode_Plus)
 
     def set_blend_mode_over(self):
         """
         Set to overlay for labelmaps
         :return:
         """
-        self.image_item.setCompositionMode(QtGui.QPainter.CompositionMode_SourceOver)
+        self.image_item.setCompositionMode(QPainter.CompositionMode_SourceOver)

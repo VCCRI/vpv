@@ -20,8 +20,11 @@ This module is involved in the display of a single orthogonal view.
 
 """
 
-from PyQt5 import QtGui, QtCore
-from PyQt5.QtWidgets import QWidget, QLabel
+from PyQt5 import QtCore
+from PyQt5.QtGui import QColor, QPalette, QPen, QBrush, QFont
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QLabel
+
 import pyqtgraph as pg
 from typing import Iterable
 from vpv.ui.views.ui_slice_widget import Ui_SliceWidget
@@ -58,7 +61,7 @@ class ViewBox(pg.ViewBox):
         super().invertX(invert)
 
 
-class InformationOverlay(QtGui.QWidget):
+class InformationOverlay(QWidget):
     """
     Widget for displaying volume id information
 
@@ -72,11 +75,11 @@ class InformationOverlay(QtGui.QWidget):
     def __init__(self, parent=None):
         super(InformationOverlay, self).__init__(parent)
 
-        palette = QtGui.QPalette(self.palette())
+        palette = QPalette(self.palette())
         palette.setColor(palette.Background, QtCore.Qt.transparent)
 
         self.setPalette(palette)
-        self.vbox = QtGui.QVBoxLayout()
+        self.vbox = QVBoxLayout()
         self.label1 = self._make_label()
         self.label2 = self._make_label()
         self.label3 = self._make_label()
@@ -169,7 +172,7 @@ class RoiOverlay(object):
         if self.roi_item:
             self.parent.viewbox.removeItem(self.roi_item)
             self.roi_item = None
-        self.roi_item = QtGui.QGraphicsRectItem(x, y, w, h)
+        self.roi_item = QGraphicsRectItem(x, y, w, h)
         self.roi_item.setPen(pg.mkPen({'color': [255, 255, 0], 'width': 1}))
         self.parent.viewbox.addItem(self.roi_item)
 
@@ -212,7 +215,8 @@ class AnnotationOverlay(object):
         y1 = y - (self.size / 2)
         if self.annotation_item:
             self.parent.viewbox.removeItem(self.annotation_item)
-        self.annotation_item = QtGui.QGraphicsEllipseItem(x1, y1, self.size, self.size)
+        self.annotation_item = QGraphicsEllipseItem(x1, y1, self.size,
+            self.size)
         self.annotation_item.setPen(pg.mkPen({'color': color, 'width': 1}))
         self.parent.viewbox.addItem(self.annotation_item)
 
@@ -233,7 +237,7 @@ class OrientationIndicator():
         self.bottom = QLabel('I', parent)
         self.left = QLabel('R', parent)
         self.right = QLabel('L', parent)
-        style_sheet = "color: rgba(255, 171, 0); font-size: 12pt; font-weight: 200;"
+        style_sheet = "color: rgba(255, 171, 0, 1); font-size: 12pt; font-weight: 200;"
         self.top.setStyleSheet(style_sheet)
         self.bottom.setStyleSheet(style_sheet)
         self.right.setStyleSheet(style_sheet)
@@ -313,14 +317,14 @@ class ScaleBar(pg.ScaleBar):
     Pyqtgraph scalebar displayed at bottom of the orthogonal view
     """
     def __init__(self):
-        color = QtGui.QColor(255, 255, 255)
+        color = QColor(255, 255, 255)
         self.scale_bar_label_visible = False
-        pen = QtGui.QPen(color)
-        brush = QtGui.QBrush(color)
+        pen = QPen(color)
+        brush = QBrush(color)
         self.scalebar_size = DEFAULT_SCALE_BAR_SIZE
         super(ScaleBar, self).__init__(size=self.scalebar_size, suffix='um', width=7, pen=pen, brush=brush)
         self.voxel_size = DEFAULT_VOXEL_SIZE
-        font = QtGui.QFont('Arial', 16, QtGui.QFont.Bold)
+        font = QFont('Arial', 16, QFont.Bold)
         self.text.setFont(font)
         self.set_scalebar_size(self.scalebar_size)
 
@@ -329,8 +333,8 @@ class ScaleBar(pg.ScaleBar):
         self.updateBar()
 
     def set_color(self, qcolor):
-        self.bar.setBrush(QtGui.QBrush(qcolor))
-        self.bar.setPen(QtGui.QPen(qcolor))
+        self.bar.setBrush(QBrush(qcolor))
+        self.bar.setPen(QPen(qcolor))
         self.updateBar()
 
     def set_scalebar_size(self, size):

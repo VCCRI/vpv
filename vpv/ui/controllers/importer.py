@@ -17,8 +17,9 @@
 import re
 from pathlib import Path
 
-from PyQt5 import QtGui, QtCore
-from PyQt5.QtWidgets import QDialog, QMessageBox, QFileDialog
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QDialog, QMessageBox, QFileDialog, QTableWidgetItem
+from PyQt5.QtWidgets import QComboBox, QCheckBox
 import os
 from vpv.ui.views.ui_importer import Ui_Dialog
 
@@ -84,10 +85,10 @@ class Import(QDialog):
             # If one path is dropped onto the main window and it's a directory, as if we want to load a stack of slices
             if len(dragged_files) == 1 and os.path.isdir(dragged_files[0]):
 
-                # use_folder_of_slices = QtGui.QMessageBox.question(parent, 'Choose data type?',
+                # use_folder_of_slices = QMessageBox.question(parent, 'Choose data type?',
                 #                                                   "Load individual 2D slices from folder (yes)\n"
                 #                                                   "Load multiple image volumes (No)",
-                #                                                   'Hello' | QtGui.QMessageBox.No)
+                #                                                   'Hello' | QMessageBox.No)
                 box = QMessageBox()
                 box.setIcon(QMessageBox.NoIcon)
                 box.setWindowTitle('Choose data type')
@@ -329,21 +330,21 @@ class Import(QDialog):
             if not type_guess:
                 continue
 
-            item = QtGui.QTableWidgetItem(path)
+            item = QTableWidgetItem(path)
             # Show last couple of path parts so we can seee where it's oaded from
             part_path = str(Path(*Path(path).parts[-3:]))
             item.setText(part_path)
             item.setData(QtCore.Qt.UserRole, path)
             self.ui.table.setItem(row, 0, item)
 
-            type_combo = QtGui.QComboBox()
+            type_combo = QComboBox()
             type_combo.addItems(TYPE_CHOICES)
             type_combo.setCurrentIndex(type_combo.findText(type_guess))
             type_combo.activated.connect(self.type_combo_changed)
             self.type_combo_boxes.append(type_combo)
             self.ui.table.setCellWidget(row, 1, type_combo)
 
-            load_checkbox = QtGui.QCheckBox()
+            load_checkbox = QCheckBox()
             load_checkbox.setChecked(True)
             self.ui.table.setCellWidget(row, 2, load_checkbox)
 
@@ -364,12 +365,12 @@ class Import(QDialog):
 
         for row, item in enumerate(filelist):
 
-            data_path = QtGui.QTableWidgetItem(item)
+            data_path = QTableWidgetItem(item)
             data_path.setText(os.path.basename(item))
             data_path.setData(QtCore.Qt.UserRole, item)
             self.ui.table.setItem(row, 0, data_path)
 
-            load_checkbox = QtGui.QCheckBox()
+            load_checkbox = QCheckBox()
             load_checkbox.setChecked(True)
             self.ui.table.setCellWidget(row, 2, load_checkbox)
 

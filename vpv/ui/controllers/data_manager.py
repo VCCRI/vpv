@@ -1,6 +1,8 @@
 import numpy as np
-from PyQt5 import QtGui, QtCore
-from PyQt5.QtWidgets import QDialog
+from PyQt5 import QtCore
+from PyQt5.QtGui import QColor, QFont
+from PyQt5.QtWidgets import QDialog, QWidget, QTableWidget, QColorDialog
+from PyQt5.QtWidgets import QTableWidgetItem, QButtonGroup, QPushButton
 import pyqtgraph as pg
 from vpv.lib.qrangeslider import QRangeSlider
 from vpv.utils.lookup_tables import Lut
@@ -40,12 +42,12 @@ class VolNameDialog(QDialog):
         self.close()
 
 
-class ManageData(QtGui.QWidget):
+class ManageData(QWidget):
     data_processing_signal = QtCore.pyqtSignal()
     data_processing_finished_signal = QtCore.pyqtSignal()
     roi_signal = QtCore.pyqtSignal(list, list, list)
     ui_changed_signal = QtCore.pyqtSignal()
-    scale_bar_color_signal = QtCore.pyqtSignal(QtGui.QColor)
+    scale_bar_color_signal = QtCore.pyqtSignal(QColor)
     gradient_editor_signal = QtCore.pyqtSignal()
     load_metadata_signal = QtCore.pyqtSignal()
 
@@ -108,7 +110,7 @@ class ManageData(QtGui.QWidget):
 
         self.ui.checkBox6Views.setChecked(False)
 
-        self.blob_table = QtGui.QTableWidget(self)
+        self.blob_table = QTableWidget(self)
         self.ui.verticalLayoutConnectedComponents.addWidget(self.blob_table, 0)
 
         self.blob_table.setColumnCount(3)
@@ -233,7 +235,7 @@ class ManageData(QtGui.QWidget):
         self.gradient_editor_signal.emit() # called 5/6 times on one click
 
     def on_scalebar_color(self):
-        color = QtGui.QColorDialog.getColor()
+        color = QColorDialog.getColor()
         self.scale_bar_color_signal.emit(color)
 
     def on_change_vol_name(self):
@@ -316,7 +318,7 @@ class ManageData(QtGui.QWidget):
             self.controller.current_view.layers[Layers.vectors].set_scale(value)
 
     def vector_change_color(self):
-        col = QtGui.QColorDialog.getColor()
+        col = QColorDialog.getColor()
 
         if col.isValid():
             self.modify_layer(Layers.vectors, 'set_arrow_color', col)
@@ -382,9 +384,9 @@ class ManageData(QtGui.QWidget):
             for i, (size_mean, bbox) in enumerate(conn.items()):
                 self.blob_table.insertRow(i)
                 bbox_string = ', '.join(str(x) for x in bbox)
-                self.blob_table.setItem(i, 0, QtGui.QTableWidgetItem(str(size_mean[0])))
-                self.blob_table.setItem(i, 1, QtGui.QTableWidgetItem(str(size_mean[1])))
-                self.blob_table.setItem(i, 2, QtGui.QTableWidgetItem(bbox_string))
+                self.blob_table.setItem(i, 0, QTableWidgetItem(str(size_mean[0])))
+                self.blob_table.setItem(i, 1, QTableWidgetItem(str(size_mean[1])))
+                self.blob_table.setItem(i, 2, QTableWidgetItem(bbox_string))
 
         self.blob_table.resizeColumnsToContents()
 
@@ -481,13 +483,13 @@ class ManageData(QtGui.QWidget):
 
         if heatmap_vol.fdr_thresholds:
             self.ui.labelFdrThresholds.show()
-            group = QtGui.QButtonGroup(self)
+            group = QButtonGroup(self)
             for q, t in heatmap_vol.fdr_thresholds.items():
                 try:
                     float(t)
                 except (ValueError, TypeError):
                     continue
-                button = QtGui.QPushButton(str(q))
+                button = QPushButton(str(q))
                 group.addButton(button)
                 button.clicked.connect(partial(self.on_fdr_button_clicked, t))
                 self.ui.gridLayoutFdrButtons.addWidget(button, row, col)
@@ -821,10 +823,10 @@ class ColorScaleBar(object):
         self.layout = layout
         self.layout.addWidget(self.color_scale_widget)
         self.color_scale_view = self.color_scale_widget.addViewBox(row=0, col=0, enableMouse=False, lockAspect=True)
-        self.font = QtGui.QFont('Arial', 13, QtGui.QFont.Bold)
+        self.font = QFont('Arial', 13, QFont.Bold)
         self.neg_lut = neg_lut
         self.pos_lut = pos_lut
-        self.pushButtonInvertColor = QtGui.QPushButton('Invert color')
+        self.pushButtonInvertColor = QPushButton('Invert color')
         self.pushButtonInvertColor.clicked.connect(self.on_invert)
         self.layout.addWidget(self.pushButtonInvertColor)
         self.pushButtonInvertColor.hide()
@@ -911,21 +913,21 @@ class ColorScaleBar(object):
     def on_invert(self):
         if self.inverted:
             self.inverted = False
-            self.label.textItem.setDefaultTextColor(QtGui.QColor(0, 0, 0))
-            self.max_pos_text.textItem.setDefaultTextColor(QtGui.QColor(0, 0, 0))
-            self.min_pos_text.textItem.setDefaultTextColor(QtGui.QColor(0, 0, 0))
-            self.max_neg_text.textItem.setDefaultTextColor(QtGui.QColor(0, 0, 0))
-            self.min_neg_text.textItem.setDefaultTextColor(QtGui.QColor(0, 0, 0))
-            self.color_scale_widget.setBackground(QtGui.QColor(255, 255, 255))
+            self.label.textItem.setDefaultTextColor(QColor(0, 0, 0))
+            self.max_pos_text.textItem.setDefaultTextColor(QColor(0, 0, 0))
+            self.min_pos_text.textItem.setDefaultTextColor(QColor(0, 0, 0))
+            self.max_neg_text.textItem.setDefaultTextColor(QColor(0, 0, 0))
+            self.min_neg_text.textItem.setDefaultTextColor(QColor(0, 0, 0))
+            self.color_scale_widget.setBackground(QColor(255, 255, 255))
 
         else:
             self.inverted = True
-            self.label.textItem.setDefaultTextColor(QtGui.QColor(255, 255, 255))
-            self.max_pos_text.textItem.setDefaultTextColor(QtGui.QColor(255, 255, 255))
-            self.min_pos_text.textItem.setDefaultTextColor(QtGui.QColor(255, 255, 255))
-            self.max_neg_text.textItem.setDefaultTextColor(QtGui.QColor(255, 255, 255))
-            self.min_neg_text.textItem.setDefaultTextColor(QtGui.QColor(255, 255, 255))
-            self.color_scale_widget.setBackground(QtGui.QColor(0, 0, 0))
+            self.label.textItem.setDefaultTextColor(QColor(255, 255, 255))
+            self.max_pos_text.textItem.setDefaultTextColor(QColor(255, 255, 255))
+            self.min_pos_text.textItem.setDefaultTextColor(QColor(255, 255, 255))
+            self.max_neg_text.textItem.setDefaultTextColor(QColor(255, 255, 255))
+            self.min_neg_text.textItem.setDefaultTextColor(QColor(255, 255, 255))
+            self.color_scale_widget.setBackground(QColor(0, 0, 0))
 
     def hide(self):
         self.pushButtonInvertColor.hide()

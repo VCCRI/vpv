@@ -19,18 +19,23 @@
 from pathlib import Path
 from vpv import __version__
 from vpv import resources
-from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5 import QtCore
+from PyQt5.QtGui import QKeyEvent, QIcon
+from PyQt5.QtWidgets import QGridLayout, QVBoxLayout, QMenuBar
+from PyQt5.QtWidgets import QMenu, QAction, QLabel, QInputDialog
+from PyQt5.QtWidgets import QProgressDialog, QMainWindow
+
 from vpv.ui.views.ui_main_window import Ui_MainWindow
 from vpv.common import style_sheet_path, question_dialog
 
 
-class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
+class Mainwindow(QMainWindow, Ui_MainWindow):
     hide_view_signal = QtCore.pyqtSignal(int)
     d_pressed_signal = QtCore.pyqtSignal()
     key_up_down_signal= QtCore.pyqtSignal(bool)
     toggle_volume1_visibility_signal = QtCore.pyqtSignal()  # main image
     toggle_volume2_visibility_signal = QtCore.pyqtSignal()  # Label map or other overlay
-    key_event_signal = QtCore.pyqtSignal(QtGui.QKeyEvent)
+    key_event_signal = QtCore.pyqtSignal(QKeyEvent)
 
     def __init__(self, controller, appdata):
         """
@@ -46,11 +51,11 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.ui.setupUi(self)
         self.setWindowTitle("VPV")
         icon_path = Path(resources.__file__).parent / 'vpv.png'
-        self.setWindowIcon(QtGui.QIcon(str(icon_path)))
+        self.setWindowIcon(QIcon(str(icon_path)))
         self.setWindowIconText('VPV')
 
-        self.view_layout = QtGui.QGridLayout()
-        self.manager_layout = QtGui.QVBoxLayout()
+        self.view_layout = QGridLayout()
+        self.manager_layout = QVBoxLayout()
         self.ui.horizontalLayoutMain.addLayout(self.manager_layout)
         self.ui.horizontalLayoutMain.addLayout(self.view_layout)
 
@@ -62,57 +67,57 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         #### Menus #####################################################################################################
 
-        menubar = QtGui.QMenuBar()
-        view_menu = QtGui.QMenu("View", self)
-        info_menu = QtGui.QMenu("Info", self)
-        data_menu = QtGui.QMenu("Data", self)
-        self.recent_menu = QtGui.QMenu("Recently used", self)
+        menubar = QMenuBar()
+        view_menu = QMenu("View", self)
+        info_menu = QMenu("Info", self)
+        data_menu = QMenu("Data", self)
+        self.recent_menu = QMenu("Recently used", self)
 
-        self.view_fullscreen_action = QtGui.QAction('Full screen', view_menu, checkable=True)
+        self.view_fullscreen_action = QAction('Full screen', view_menu, checkable=True)
         self.view_fullscreen_action.setChecked(False)
         self.view_fullscreen_action.triggered.connect(self.on_view_full_screen)
         view_menu.addAction(self.view_fullscreen_action)
 
-        self.view_slider_action = QtGui.QAction('Sliders', view_menu, checkable=True)
+        self.view_slider_action = QAction('Sliders', view_menu, checkable=True)
         self.view_slider_action.setChecked(True)
         self.view_slider_action.triggered.connect(self.on_checkbox_index_slider)
         view_menu.addAction(self.view_slider_action)
 
-        self.view_overlay_controls_action = QtGui.QAction('Overlay controls', view_menu, checkable=True)
+        self.view_overlay_controls_action = QAction('Overlay controls', view_menu, checkable=True)
         self.view_overlay_controls_action.triggered.connect(self.on_checkbox_overlay_controls)
         self.view_overlay_controls_action.setChecked(True)
         view_menu.addAction(self.view_overlay_controls_action)
 
-        self.view_vol_id_action = QtGui.QAction('Show data labels', view_menu, checkable=True)
+        self.view_vol_id_action = QAction('Show data labels', view_menu, checkable=True)
         self.view_vol_id_action.triggered.connect(self.on_action_show_data_labels)
         self.view_vol_id_action.setChecked(True)
         view_menu.addAction(self.view_vol_id_action)
 
-        self.scale_bars_action = QtGui.QAction('Show scale bars', view_menu, checkable=True)
+        self.scale_bars_action = QAction('Show scale bars', view_menu, checkable=True)
         self.scale_bars_action.triggered.connect(self.on_action_show_scale_bars)
         self.scale_bars_action.setChecked(True)
         view_menu.addAction(self.scale_bars_action)
 
-        self.color_bars_action = QtGui.QAction('Show colour scale bars', view_menu, checkable=True)
+        self.color_bars_action = QAction('Show colour scale bars', view_menu, checkable=True)
         self.color_bars_action.triggered.connect(self.on_action_show_color_scale_bars)
         self.color_bars_action.setChecked(False)
         view_menu.addAction(self.color_bars_action)
 
-        self.view_perm_crosshair_action = QtGui.QAction('Persistent crosshairs', view_menu, checkable=True)
+        self.view_perm_crosshair_action = QAction('Persistent crosshairs', view_menu, checkable=True)
         self.view_perm_crosshair_action.triggered.connect(self.on_action_perm_crosshair)
         self.view_perm_crosshair_action.setChecked(False)
         view_menu.addAction(self.view_perm_crosshair_action)
 
-        self.ori_indication_visible_action = QtGui.QAction('Orientation labels', view_menu, checkable=True)
+        self.ori_indication_visible_action = QAction('Orientation labels', view_menu, checkable=True)
         self.ori_indication_visible_action.triggered.connect(self.on_action_orientation_labels)
         self.ori_indication_visible_action.setChecked(True)  # Todo this should be saved in appdata
         view_menu.addAction(self.ori_indication_visible_action)
 
-        self.load_data_action = QtGui.QAction('Load data', data_menu, checkable=False)
+        self.load_data_action = QAction('Load data', data_menu, checkable=False)
         self.load_data_action.triggered.connect(self.controller.browse_files)
         data_menu.addAction(self.load_data_action)
 
-        self.clear_data_action = QtGui.QAction('Clear data', data_menu, checkable=False)
+        self.clear_data_action = QAction('Clear data', data_menu, checkable=False)
         self.clear_data_action.triggered.connect(self.controller.clear_views)
         data_menu.addAction(self.clear_data_action)
 
@@ -122,14 +127,14 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.recent_menu.triggered.connect(self.on_recent_menu)
 
-        self.version_action = QtGui.QAction('Version: {}'.format(__version__), view_menu, checkable=False)
+        self.version_action = QAction('Version: {}'.format(__version__), view_menu, checkable=False)
         info_menu.addAction(self.version_action)
 
-        self.window_title_action = QtGui.QAction('Edit Window title', info_menu, checkable=False)
+        self.window_title_action = QAction('Edit Window title', info_menu, checkable=False)
         self.window_title_action.triggered.connect(self.edit_window_title)
         info_menu.addAction(self.window_title_action)
 
-        self.show_log_action = QtGui.QAction('Show log', data_menu, checkable=False)
+        self.show_log_action = QAction('Show log', data_menu, checkable=False)
         self.show_log_action.triggered.connect(self.controller.show_log)
         info_menu.addAction(self.show_log_action)
 
@@ -139,28 +144,28 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
         menubar.addMenu(self.recent_menu)
         self.ui.toolBar.addWidget(menubar)
 
-        self.mouse_position_label = QtGui.QLabel(self)
+        self.mouse_position_label = QLabel(self)
         self.mouse_position_label.setStyleSheet("QLabel {color : white; }")
         self.mouse_position_label.setFixedWidth(120)
         self.mouse_position_label.show()
         self.ui.toolBar.addWidget(self.mouse_position_label)
 
-        self.volume_pix_val_label = QtGui.QLabel(self)
+        self.volume_pix_val_label = QLabel(self)
         self.volume_pix_val_label.setStyleSheet("QLabel {color : white; }")
         self.volume_pix_val_label.setFixedWidth(80)
         self.ui.toolBar.addWidget(self.volume_pix_val_label)
 
-        self.volume2_pix_val_label = QtGui.QLabel(self)
+        self.volume2_pix_val_label = QLabel(self)
         self.volume2_pix_val_label.setStyleSheet("QLabel {color : white; }")
         self.volume2_pix_val_label.setFixedWidth(80)
         self.ui.toolBar.addWidget(self.volume2_pix_val_label)
 
-        self.data_pix_val_label = QtGui.QLabel(self)
+        self.data_pix_val_label = QLabel(self)
         self.data_pix_val_label.setStyleSheet("QLabel {color : white; }")
         self.data_pix_val_label.setFixedWidth(80)
         self.ui.toolBar.addWidget(self.data_pix_val_label)
 
-        self.atlas_label_name_label = QtGui.QLabel(self)
+        self.atlas_label_name_label = QLabel(self)
         self.atlas_label_name_label.setStyleSheet("QLabel {color : white; }")
         self.atlas_label_name_label.setFixedWidth(240)
         self.ui.toolBar.addWidget(self.atlas_label_name_label)
@@ -175,7 +180,7 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.setStyleSheet(fh.read())
 
     def edit_window_title(self):
-        text, ok = QtGui.QInputDialog.getText(self, 'Change VPV window title', 'New title:')
+        text, ok = QInputDialog.getText(self, 'Change VPV window title', 'New title:')
         if ok:
             self.setWindowTitle(text)
 
@@ -338,7 +343,7 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.controller.close()
 
     def data_processing_slot(self):
-        self.progress_dialog = QtGui.QProgressDialog('Rendering...', 'cancel', 0, 0, self)
+        self.progress_dialog = QProgressDialog('Rendering...', 'cancel', 0, 0, self)
         #p.connect_close_slot(self.controller.data_processing_finished_signal)
         self.controller.data_processing_finished_signal.connect(self.progress_dialog.close)
         self.progress_dialog.show()
@@ -347,7 +352,7 @@ class Mainwindow(QtWidgets.QMainWindow, Ui_MainWindow):
 class ProgressIndicator(QtCore.QThread):
     def __init__(self, parent):
         QtCore.QThread.__init__(self, parent)
-        self.progress_dialog = QtGui.QProgressDialog('Rendering...', 'cancel', 0, 0, parent)
+        self.progress_dialog = QProgressDialog('Rendering...', 'cancel', 0, 0, parent)
 
 
     def connect_close_slot(self, signal):

@@ -1,9 +1,11 @@
 
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QWidget
+
 from vpv.ui.views.ui_label_filter import Ui_LabelFilter
 
 
-class LabelFilter(QtGui.QWidget):
+class LabelFilter(QWidget):
     filter_label_signal = QtCore.pyqtSignal(list)
 
     def __init__(self, mainwindow):

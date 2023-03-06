@@ -1,5 +1,5 @@
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import QDialog
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QDialog, QApplication
 from vpv.ui.views.ui_log_viewer import Ui_Dialog
 from vpv.common import error_dialog
 
@@ -28,7 +28,7 @@ class Logview(QDialog):
         self.show()
 
     def copy_text(self):
-        cb = QtGui.QApplication.clipboard()
+        cb = QApplication.clipboard()
         cb.clear(mode=cb.Clipboard)
         cb.setText(self.log_text, mode=cb.Clipboard)
 

@@ -8,8 +8,9 @@ Works something like this:
 import os
 from os.path import dirname, abspath, join, isdir
 import datetime
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QFileDialog, QComboBox, QCheckBox
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QFileDialog, QComboBox
+from PyQt5.QtWidgets import QCheckBox, QHeaderView
 from vpv.ui.views.ui_annotations import Ui_Annotations
 from vpv.common import Layers, AnnotationOption, info_dialog, error_dialog, question_dialog
 from vpv.annotations.annotations_model import centre_stage_options
@@ -221,9 +222,9 @@ class AnnotationsWidget(QWidget):
 
         # Set root column to invisible
         self.ui.treeWidgetAvailableTerms.setColumnWidth(0, 0)
-        header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
 
         # For each annotation set an info row in the annotations table
         for i, ann in enumerate(sorted(vol.annotations, key=lambda an_: an_.order)):
@@ -248,7 +249,7 @@ class AnnotationsWidget(QWidget):
             setup_option_box_signal(options_box, child)
             self.ui.treeWidgetAvailableTerms.setItemWidget(child, 2, options_box)
 
-            done_checkbox = QtWidgets.QCheckBox()
+            done_checkbox = QCheckBox()
             done_checkbox.setChecked(ann.looked_at)
 
             done_checkbox.stateChanged.connect(partial(self.parameter_done_signal, child, done_checkbox))

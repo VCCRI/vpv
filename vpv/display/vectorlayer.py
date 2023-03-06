@@ -1,4 +1,4 @@
-from PyQt5 import QtGui
+from PyQt5.QtWidgets import QGraphicsPathItem
 import pyqtgraph as pg
 from vpv.common import Orientation
 import numpy as np
@@ -163,7 +163,7 @@ class VectorLayer(object):
                     connect.append(0)
 
         path = pg.arrayToQPath(np.array(x_points), np.array(y_points), np.array(connect))
-        self.item = QtGui.QGraphicsPathItem(path)
+        self.item = QGraphicsPathItem(path)
         self.item.setPen(pg.mkPen({'color': self.arrow_color, 'width': 1}))
         self.viewbox.addItem(self.item)
 

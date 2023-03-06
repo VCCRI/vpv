@@ -7,8 +7,8 @@
 # WARNING! All changes made in this file will be lost!
 
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtGui import QIcon, QPixmap
 
 class Ui_data(object):
     def setupUi(self, data):
@@ -140,8 +140,8 @@ class Ui_data(object):
         self.pushButtonScreenShot = QtWidgets.QPushButton(data)
         self.pushButtonScreenShot.setStyleSheet("border: none")
         self.pushButtonScreenShot.setText("")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/icons/Camera_font_awesome.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/Camera_font_awesome.png"), QIcon.Normal, QIcon.Off)
         self.pushButtonScreenShot.setIcon(icon)
         self.pushButtonScreenShot.setIconSize(QtCore.QSize(24, 24))
         self.pushButtonScreenShot.setObjectName("pushButtonScreenShot")
@@ -176,8 +176,8 @@ class Ui_data(object):
         self.pushButtonEditVolName.setSizePolicy(sizePolicy)
         self.pushButtonEditVolName.setStyleSheet("border:none")
         self.pushButtonEditVolName.setText("")
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/icons/edit.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1 = QIcon()
+        icon1.addPixmap(QPixmap(":/icons/edit.png"), QIcon.Normal, QIcon.Off)
         self.pushButtonEditVolName.setIcon(icon1)
         self.pushButtonEditVolName.setIconSize(QtCore.QSize(20, 20))
         self.pushButtonEditVolName.setObjectName("pushButtonEditVolName")

@@ -1,9 +1,9 @@
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
 from nose.tools import assert_equals, nottest
 import sys
 from os.path import join, dirname
 sys.path.insert(0, join(dirname(__file__), '..'))
 from data_manager import ColorScaleBar
-from PyQt5 import QtGui, QtWidgets
 from lookup_tables import Lut
 
 
@@ -18,12 +18,12 @@ def test_color_bar():
     hotred = lut._hot_red_blue()[0]
     hotblue = lut._hot_red_blue()[1]
 
-    app = QtGui.QApplication(sys.argv)
-    w = QtGui.QWidget()
+    app = QApplication(sys.argv)
+    w = QWidget()
     w.resize(250, 150)
     w.move(300, 300)
     w.setWindowTitle('color bar test')
-    layout =  QtWidgets.QVBoxLayout()
+    layout =  QVBoxLayout()
     w.setLayout(layout)
     cb = ColorScaleBar(layout, hotblue, hotred)
     cb.show()

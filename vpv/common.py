@@ -1,4 +1,3 @@
-from PyQt5.QtWidgets import QMessageBox
 from enum import Enum
 from inspect import getframeinfo, stack
 import SimpleITK as sitk
@@ -9,7 +8,8 @@ from os import mkdir
 import yaml
 import logging
 import appdirs
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QMessageBox
 from typing import Tuple
 import numpy as np
 
@@ -93,7 +93,7 @@ def load_yaml(path):
     with open(path, 'r') as fh:
 
         try:
-            yaml_data = yaml.load(fh)
+            yaml_data = yaml.load(fh, Loader=yaml.FullLoader)
 
         except yaml.YAMLError as e:
             fh.seek(0)
@@ -118,9 +118,10 @@ def error_dialog(parent, title, msg):
 
 
 def question_dialog(parent, title, message):
-    reply = QMessageBox.question(parent, title, message, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+    reply = QMessageBox.question(parent, title, message, QMessageBox.Yes,
+        QMessageBox.No)
 
-    if reply == QtGui.QMessageBox.Yes:
+    if reply == QMessageBox.Yes:
         return True
 
     else:
@@ -262,7 +263,7 @@ def timing(f):
         return ret
     return wrap
 
-# class infoDialogTimed(QtGui.QMessageBox):
+# class infoDialogTimed(QMessageBox):
 #     def __init__(self, timeout, message):
 #         super(infoDialogTimed, self).__init__(self, timeout, message)
 #         self.timeout = timeout

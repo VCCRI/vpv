@@ -1,6 +1,7 @@
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QComboBox
 
-class QComboBoxIgnoreSCroll(QtGui.QComboBox):
+class QComboBoxIgnoreSCroll(QComboBox):
 
     def __init__(self, scrollWidget=None, *args, **kwargs):
         super(QComboBoxIgnoreSCroll, self).__init__(*args, **kwargs)

@@ -1,5 +1,7 @@
 
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QWidget
+
 from vpv.ui.views.ui_options_tab import Ui_options
 from vpv.utils.appdata import AppData
 
@@ -10,7 +12,7 @@ tab widget
 """
 
 
-class OptionsTab(QtGui.QWidget):
+class OptionsTab(QWidget):
     flip_signal = QtCore.pyqtSignal()
     toggle_filter_widget_signal = QtCore.pyqtSignal()
 

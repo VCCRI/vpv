@@ -1,6 +1,8 @@
-
 from vpv.ui.views.ui_consoletab import Ui_console
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton
+#from PyQt5.QtGui import *
+
 # from pyqtgraph import console
 from vpv.common import Layers
 import skimage
@@ -14,8 +16,6 @@ os.environ['QT_API'] = 'pyqt'
 import sip
 sip.setapi("QString", 2)
 sip.setapi("QVariant", 2)
-from PyQt5.QtGui  import *
-from PyQt5.QtWidgets import QWidget
 # Import the console machinery from ipython
 
 from qtconsole.rich_jupyter_widget import RichJupyterWidget

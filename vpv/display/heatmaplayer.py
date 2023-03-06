@@ -1,4 +1,4 @@
-from PyQt5 import QtGui
+from PyQt5.QtGui import QPainter
 import pyqtgraph as pg
 import numpy as np
 from .layer import Layer
@@ -8,12 +8,12 @@ class HeatmapLayer(Layer):
     def __init__(self, *args):
         super(HeatmapLayer, self).__init__(*args)
         self.neg_image_item = pg.ImageItem(autoLevels=False)
-        self.neg_image_item.setCompositionMode(QtGui.QPainter.CompositionMode_SourceOver)
+        self.neg_image_item.setCompositionMode(QPainter.CompositionMode_SourceOver)
         self.neg_image_item.setLookupTable(self.lt._hot_red_blue()[1])
         self.image_items.append(self.neg_image_item)
 
         self.pos_image_item = pg.ImageItem(autoLevels=False)
-        self.pos_image_item.setCompositionMode(QtGui.QPainter.CompositionMode_SourceOver)
+        self.pos_image_item.setCompositionMode(QPainter.CompositionMode_SourceOver)
         self.pos_image_item.setLookupTable(self.lt._hot_red_blue()[0])
         self.image_items.append(self.pos_image_item)
 

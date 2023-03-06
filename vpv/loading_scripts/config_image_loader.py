@@ -4,10 +4,11 @@ Given a directory of images, this script will load them based on a config.
 See example 'loader.yaml'
 """
 
+from PyQt5.QtWidgets import QApplication
 import copy
 from pathlib import Path
 import yaml
-from PyQt5 import QtGui
+
 from vpv.vpv_temp import Vpv
 from vpv.common import Layers, Orientation
 
@@ -54,7 +55,7 @@ def load(config_path, root_dir):
                 view['bottom'][k] = p
         views.append(view)
 
-    app = QtGui.QApplication([])
+    app = QApplication([])
     ex = Vpv()
 
     top_ids = []

@@ -9,7 +9,7 @@ Given a root directory, load image, inverted labels and set opacity etc.
 from pathlib import Path
 import sys
 from itertools import chain
-from PyQt5 import QtGui
+from PyQt5.QtWidgets import QApplication
 from vpv.vpv_temp import Vpv
 from vpv.common import Layers, Orientation
 from lama.common import get_file_paths
@@ -30,7 +30,7 @@ OPACITY = 0.4
 
 
 def load(line_dir: Path, rev=False, title=None):
-    app = QtGui.QApplication([])
+    app = QApplication([])
     ex = Vpv()
 
     try:

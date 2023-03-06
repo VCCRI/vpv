@@ -3,8 +3,9 @@ import shutil
 from datetime import datetime
 import os
 
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtWidgets import QDialog, QMessageBox, QFileDialog
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QWidget, QDialog, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QTableWidgetItem, QHeaderView
 
 import yaml
 import addict
@@ -20,7 +21,7 @@ from lama.paths import get_specimen_dirs, LamaSpecimenData
 SUBFOLDERS_TO_IGNORE = ['resolution_images', 'pyramid_images']
 
 
-class QC(QtGui.QWidget):
+class QC(QWidget):
 
     load_specimen_signal = QtCore.pyqtSignal(list, str)
     clear_data_signal = QtCore.pyqtSignal()
@@ -54,8 +55,8 @@ class QC(QtGui.QWidget):
         self.specimens = []  # Containing SpecimenPaths objects
 
         header = self.ui.tableWidgetFlagged.horizontalHeader()
-        header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(1, QHeaderView.Stretch)
 
         self.atlas_meta_name = None  # Name of atlas metadata file so we know which atlas version we QCd against'
 
@@ -154,8 +155,9 @@ class QC(QtGui.QWidget):
             else:
                 label_name = ''
             self.ui.tableWidgetFlagged.insertRow(i)
-            self.ui.tableWidgetFlagged.setItem(i, 0, QtGui.QTableWidgetItem(str(f)))
-            self.ui.tableWidgetFlagged.setItem(i, 1,  QtGui.QTableWidgetItem(label_name))
+            self.ui.tableWidgetFlagged.setItem(i, 0, QTableWidgetItem(str(f)))
+            self.ui.tableWidgetFlagged.setItem(i, 1,
+                QTableWidgetItem(label_name))
 
     def update_specimen_list(self):
         self.ui.listWidgetQcSpecimens.clear()
