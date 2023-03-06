@@ -49,7 +49,7 @@ setup(
         'python-dateutil',
         'addict',
         'orderedset',
-        'pandas'
+        'pandas',
         'lama_phenotype_detection'
     ],
 
