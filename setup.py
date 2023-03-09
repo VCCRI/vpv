@@ -48,7 +48,7 @@ setup(
         'toml',
         'python-dateutil',
         'addict',
-        'orderedset',
+        'ordered_set',
         'pandas',
         'lama_phenotype_detection'
     ],

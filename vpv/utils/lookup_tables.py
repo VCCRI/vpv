@@ -45,7 +45,7 @@ class Lut(object):
         # Set the first value (background to transparent)
         rgb_values[0][3] = 0.0
         lut = np.array(rgb_values)
-        return lut.astype(np.float)
+        return lut.astype(float)
 
     def set_custom_atlas_colors(self, atlas_metadata: pd.DataFrame):
         """
@@ -90,7 +90,7 @@ class Lut(object):
             rgb_values.append(rgb)
 
         lut = np.array(rgb_values)
-        self.custom_atlas_lut = lut.astype(np.float)
+        self.custom_atlas_lut = lut.astype(float)
 
     def get_lut(self, lut_name):
         return getattr(self, '_' + lut_name)()
