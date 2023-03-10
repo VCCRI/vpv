@@ -162,3 +162,4 @@ class Layer(Qt.QObject):
 
     def set_opacity(self, opacity: float):
         self.opacity = opacity
+

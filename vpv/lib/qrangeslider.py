@@ -403,7 +403,7 @@ class QRangeSlider(QWidget, Ui_Form):
     def setStart(self, value):
         """sets the range slider start value"""
         #assert type(value) is int
-        v = round(self._valueToPos(value), 2)
+        v = int(round(self._valueToPos(value), 2))
         self._splitter.splitterMoved.disconnect()
         self._splitter.moveSplitter(v, self._SPLIT_START)
         self._splitter.splitterMoved.connect(self._handleMoveSplitter)
@@ -418,7 +418,7 @@ class QRangeSlider(QWidget, Ui_Form):
     def setEnd(self, value):
         """set the range slider end value"""
         #assert type(value) is int
-        v = self._valueToPos(value)
+        v = int(self._valueToPos(value))
         self._splitter.splitterMoved.disconnect()
         self._splitter.moveSplitter(v, self._SPLIT_END)
         self._splitter.splitterMoved.connect(self._handleMoveSplitter)
@@ -525,3 +525,4 @@ if __name__ == '__main__':
     rs.setBackgroundStyle('background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #222, stop:1 #333);')
     rs.handle.setStyleSheet('background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #282, stop:1 #393);')
     app.exec_()
+

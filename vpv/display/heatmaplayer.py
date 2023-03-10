@@ -37,7 +37,7 @@ class HeatmapLayer(Layer):
         if self.vol:
             self.set_slice(self.parent.current_slice_idx)
            
-    def set_volume(self, volname):
+    def set_volume(self, volname, initial=False):
         """
         :param vol, Volume object from model.py
         """
@@ -93,3 +93,4 @@ class HeatmapLayer(Layer):
         self.image_items[0].setImage(opacity=0.0)
         self.image_items[1].setImage(opacity=0.0)
         # self.item = None
+

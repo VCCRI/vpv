@@ -306,10 +306,10 @@ class OrientationIndicator():
         self.left.setText(l)
 
         geom = self.parent.geometry()
-        self.top.move(geom.width() / 2, 25)
-        self.bottom.move(geom.width() / 2, geom.height() - 50)
-        self.left.move(10, geom.height() / 2)
-        self.right.move(geom.width() - 10, geom.height() / 2)
+        self.top.move(round(geom.width() / 2), 25)
+        self.bottom.move(round(geom.width() / 2), geom.height() - 50)
+        self.left.move(10, round(geom.height() / 2))
+        self.right.move(geom.width() - 10, round(geom.height() / 2))
 
 
 class ScaleBar(pg.ScaleBar):
@@ -997,3 +997,4 @@ class SliceWidget(QWidget, Ui_SliceWidget):
 
         new_vol_name = vol_ids[new_index]
         self.layers[Layers.vol1].set_volume(new_vol_name)
+

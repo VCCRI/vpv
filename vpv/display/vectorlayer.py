@@ -41,7 +41,7 @@ class VectorLayer(object):
         elif self.orientation == Orientation.axial:
             return self.vol.get_axial
 
-    def set_volume(self, volname):
+    def set_volume(self, volname, initial=False):
         if volname == "None":
             self.volume_label_signal.emit("None")
             self.vol = None
@@ -228,3 +228,4 @@ class VectorLayer(object):
 
     def reload(self):
         pass
+
